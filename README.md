@@ -5,6 +5,8 @@ Hi Team!
 LINK TO TASKS: https://docs.google.com/spreadsheets/d/1TCTr5MdYi8wI19u99qNhtnsQCVoXtOLZzT26y7Ycyuk/edit?usp=sharing
 
 HI heres some notes i took down during today's demo 17/8/2018
+
+
 4230 queue on matlab 
 *try to get communication between matlab and robot studio, comment on code, use git
 1. figure design (fiddly job) 
