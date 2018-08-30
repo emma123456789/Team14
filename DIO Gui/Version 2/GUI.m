@@ -22,7 +22,7 @@ function varargout = DIOGUI(varargin)
 
 % Edit the above text to modify the response to help GUI
 
-% Last Modified by GUIDE v2.5 30-Aug-2018 22:56:02
+% Last Modified by GUIDE v2.5 30-Aug-2018 23:15:54
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -346,3 +346,19 @@ function SWP7_Callback(hObject, eventdata, handles)
 
 % Hint: get(hObject,'Value') returns toggle state of SWP7
 end
+
+
+% --- Executes on button press in SecretButton.
+function SecretButton_Callback(hObject, eventdata, handles)
+% hObject    handle to SecretButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+        set(handles.CameraPanel,'Visible','On');
+        set(handles.ControlPanel,'Visible','On');
+        set(handles.DIOPanel,'Visible','On');
+        set(handles.RobotStatusPanel,'Visible','On');
+        set(handles.SafetyPanel,'Visible','Off');
+        
+end
+
