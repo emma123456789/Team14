@@ -22,7 +22,7 @@ function varargout = DIOGUI(varargin)
 
 % Edit the above text to modify the response to help GUI
 
-% Last Modified by GUIDE v2.5 31-Aug-2018 13:20:33
+% Last Modified by GUIDE v2.5 31-Aug-2018 19:24:02
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -237,26 +237,6 @@ function SafetyConfimation_Callback(hObject, eventdata, handles)
         set(handles.DIOPanel,'Visible','On');
         set(handles.RobotStatusPanel,'Visible','On');
         set(handles.SafetyPanel,'Visible','Off');
-
-%         % Start Camera feed
-%         % Presently will start device camera;
-%         % Attempt to automatically detect which system you have/ mac/windows;
-%         adaptor = imaqhwinfo;
-%         adaptor = adaptor.InstalledAdaptors;
-%         adaptor = adaptor{1};
-%         try
-%             axes(handles.axes1);
-%             tablecam = videoinput(adaptor,1);
-%             hImage = image(zeros(500,1200,3),'Parent',handles.axes1);
-%             preview(tablecam,hImage);
-%         end
-% 
-%         try
-%             axes(handles.axes3);
-%             conveyorcam = videoinput(adaptor,2);
-%             hImage2 = image(zeros(500,1200,3),'Parent',handles.axes3);
-%             preview(conveyorcam,hImage2);
-%         end
           
 
     else
