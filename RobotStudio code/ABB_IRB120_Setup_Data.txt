@@ -1,0 +1,116 @@
+  !TARGETS
+  !-------
+  !
+  !
+  !Home Position of the Table
+  CONST robtarget pTableHome:=[[175,0,147],[0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+  !
+  !Positions on Table for References and Max Extents
+  CONST robtarget pTableT1:=[[175,0,147],[0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+  CONST robtarget pTableT2:=[[175,-520,147],[0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+  CONST robtarget pTableT3:=[[175,520,147],[0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+  CONST robtarget pTableT4:=[[548.6,0,147],[0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+  !
+  !
+  !Table Dimensions and Reference Points as Follows (X,Y,Z):
+  !
+  !                                                       Conveyor Frame
+  !                                                  |<-------- 616 -------->|
+  !                                                  |   | Conveyor Belt |   |
+  !                                                  |   |<---- 450 ---->|   |
+  !                                    ||    --------|   |               |   |
+  !                                    \/    |------||   |  0,409,22.1   |   |
+  !                     Robot Centre  ---->  ||  + |||   |      x        |   |
+  !                                          ||    |||   |      C1       |   |
+  !     Robot Centre to edge of Table=129    -|    |_|   |               |   |
+  !   ----------------------------------------|    |-----------------------------------
+  !   |                                /\      ----                                   |
+  !   |                                ||      |  |                                   |
+  !   |      175,-520,147                   175,0,147                   175,520,147   |
+  !   |           x                             x                            x        |
+  !   |           T2                            T1                           T3       |
+  !   |                                                                               |
+  !   |                                                                               |
+  !   |                                    548.6,0,147                                |
+  !   |                                         x                                     |
+  !   |                                         T4                                    |
+  !   |                                                                               |
+  !   ---------------------------------------------------------------------------------
+  !
+  !
+  !
+  !Home Position of the Chocolate on the Table at Positon T1
+  CONST robtarget pChocTableHome:=[[227,0,152],[0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+  !
+  !
+  !Home Position of the Conveyor
+  CONST robtarget pConvHome:=[[0,409,22.1],[0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+  !
+  !
+  !Conveyor Dimensions and References as Follows (X,Y,Z):
+  !
+  !                                                   /\/\_ _ _ _ _ _ _ _/\/\
+  !                                                  |   |               |   |
+  !                                                  |   |               |   |
+  !                                                  |   |               |   |
+  !                                                  |   |               |   |
+  !                                                  |   |               |   |
+  !                                          --------|   |               |   |
+  !                                          |------||   |  0,409,22.1   |   |
+  !                                          ||  + |||   |      x        |   |
+  !                                          ||    |||   |      C1       |   |
+  !                                          -|    |_|   |               |   |
+  !   ----------------------------------------|    |-----------------------------------
+  !   |                                        ----                                   |
+  !   |                                        |  |                                   |
+  !
+  !
+  !
+  !Home Position of Chocolate in Position P1 in the Box on Conveyor
+  CONST robtarget pChocConvHome:=[[0,488.5,28.1],[0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+  !
+  !
+  !                         -------------------------
+  !                         |----- ----- ----- -----|
+  !                         ||   | |   | |   | |   ||
+  !                         ||   | |   | |   | |   ||
+  !                         ||B4 | |B3 |x|B2 | |B1 ||
+  !                         ||   | |   | |   | |   ||
+  !                         ||   | |   | |   | |   ||
+  !                         |----- ----- ----- -----|
+  !                         -------------------------
+  !
+  !                NOTE: x marks centre of box and Conveyor Home Position C1
+  !
+  !Box Dimensions: 214.0 x 119.0 x 46.0mm Internal
+  !                219.5 x 121.0 x 48.0mm External
+  !
+  !
+  !TOOL DATA
+  !---------
+  !
+  !Suction Cup is 65mm in Z direction from Tool0
+  !
+  PERS tooldata tSCup:=[TRUE,[[0,0,65],[1,0,0,0]],[0.5,[0,0,20],[1,0,0,0],0,0,0]];
+  !
+  !
+  !LOAD DATA 
+  !---------
+  !
+  !Chocolate Bar Dimensions: 114.0 x 53.5 x 7.5mm External (including wrapping)
+  !
+  PERS loaddata loChoc:=[0.35,[57,26.75,3.75],[1,0,0,0],0,0,0];
+  !
+  !
+  !COMMENTS
+  !--------
+  !
+  !Digital I/O Names and Functions
+  !DI10-1	ConStat	= Conveyor Status (Active = 1, Inactive = 0)
+  !
+  !DO10-1	VacPwr	= Vacuum Power (Run = 1, Stop =0)
+  !DO10-2	VacSol	= Vacuum Solenoid (Open = 1, Closed =0)
+  !D010-3	ConRun	= Conveyer Start (Run = 1, Stop = 0)
+  !D010-4	ConDir	= Conveyer Direction (Towards Robot = 1, Away from Robot = 0)
+  !
+  !
