@@ -2,10 +2,9 @@ MODULE MTRN4230_Server_Sample
 
     ! The socket connected to the client.
     VAR socketdev client_socket;
-    
+    VAR bool run_server;
     ! The host and port that we will be listening for a connection on.
-    PERS string host := "192.168.125.1";
-    
+    PERS string host := "127.0.0.1";
     CONST num port := 1025;
     
     PROC Main ()
@@ -14,24 +13,39 @@ MODULE MTRN4230_Server_Sample
         ELSE
             host := "127.0.0.1";
         ENDIF
+        
+        
         MainServer;
         
     ENDPROC
 
     PROC MainServer()
-        
         VAR string received_str;
-        
+        run_server:= TRUE;
         ListenForAndAcceptConnection;
+        
+        WHILE run_server DO
             
-        ! Receive a string from the client.
-        SocketReceive client_socket \Str:=received_str;
+            !VAR bool isJogging;
             
-        ! Send the string back to the client, adding a line feed character.
-        SocketSend client_socket \Str:=(received_str + "\0A");
-
+                
+            ! Receive a string from the client.
+            SocketReceive client_socket \Str:=received_str;
+            !IF received_str = "jogX 60" THEN
+            !    SocketSend client_socket \Str:=("jogX started" + "\0A");
+            !    isJogging := TRUE;
+            !ELSEIF received_str = "jogY 60" THEN 
+            !    SocketSend client_socket \Str:=("jogY started" + "\0A"); 
+            !    isJogging := TRUE;
+            !ELSE
+            !    SocketSend client_socket \Str:=("unknown comand" + "\0A"); 
+            !    isJogging := FALSE;
+            !ENDIF
+            ! Send the string back to the client, adding a line feed character.
+            SocketSend client_socket \Str:=(received_str + "\0A");
+        ENDWHILE
         CloseConnection;
-		
+        
     ENDPROC
 
     PROC ListenForAndAcceptConnection()

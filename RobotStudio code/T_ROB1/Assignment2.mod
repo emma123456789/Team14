@@ -201,37 +201,37 @@ MODULE Assignment2
               MoveL Offs(target, x, y, z), v100, fine, tSCup;
     ENDPROC
     
-    PROC vacPwrOn()
-        SetDO DO10_1, 1;
-    ENDPROC
+!    PROC vacPwrOn()
+!        SetDO DO10_1, 1;
+!    ENDPROC
     
-    PROC vacPwerOff()
-        SetDO DO10_1, 0;
-    ENDPROC
+!    PROC vacPwerOff()
+!        SetDO DO10_1, 0;
+!    ENDPROC
     
-    PROC vacSolOn()
-        SetDO DO10_2, 1;
-    ENDPROC
+!    PROC vacSolOn()
+!        SetDO DO10_2, 1;
+!    ENDPROC
     
-    PROC vacSolOff()
-        SetDO DO10_2, 0;
-    ENDPROC
+!    PROC vacSolOff()
+!        SetDO DO10_2, 0;
+!    ENDPROC
     
-    PROC conRunOn()
-        SetDO DO10_3, 1;
-    ENDPROC
+!    PROC conRunOn()
+!        SetDO DO10_3, 1;
+!    ENDPROC
     
-    PROC conRunOff()
-        SetDO DO10_3, 0;
-    ENDPROC
+!    PROC conRunOff()
+!        SetDO DO10_3, 0;
+!    ENDPROC
     
-    PROC conDirRob()
-        SetDO DO10_4, 1;
-    ENDPROC
+!    PROC conDirRob()
+!        SetDO DO10_4, 1;
+!    ENDPROC
     
-    PROC conDirHome()
-        SetDO DO10_4, 0;
-    ENDPROC
+!    PROC conDirHome()
+!        SetDO DO10_4, 0;
+!    ENDPROC
     
     
     
