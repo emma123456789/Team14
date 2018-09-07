@@ -1,25 +1,40 @@
 MODULE Assignment2
     
     VAR num effectorHeight:= 147;
-    
     VAR robtarget testTarget := [[175, -100, 147],[0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
    
-
+    VAR num jog_inc:=30;
+    VAR num jog_inc_deg:= 5;
+    VAR speeddata jog_speed:=v100;
+    VAR speeddata pose_speed:= v100;
    
     ! The Main procedure. When you select 'PP to Main' on the FlexPendant, it will go to this procedure.
     PROC MainAss2()
       
         
         MoveToCalibPos;
-!        vacPwrOn;
         
+        !only use this if the position can deviate to avoid singularities
         SingArea \Wrist;
+        
+        !absolute position
+        confj  \On;
+        
         VelSet 70, 800;
         
-        jogZ 30, v50;
-        WaitTime 3;
-        jogZ -30, v50;
-        
+        JogY(jog_inc);
+        WaitTime 2;
+        JogY(jog_inc);
+        WaitTime 2;
+        JogY(jog_inc);
+        JogZ(jog_inc);
+        WaitTime 2;
+        JogZ(jog_inc);
+        WaitTime 2;
+        Jog1(-jog_inc_deg);
+        Jog1(-jog_inc_deg);
+        Jog1(-jog_inc_deg);
+        Jog1(+jog_inc_deg);
         
         
        
@@ -37,56 +52,134 @@ MODULE Assignment2
         
 !        MoveL Offs(testTarget, 0, 100, 50), v100, fine, tSCup;
         
-!        MoveL Offs(testTarget, 0, 100, 5), v100, fine, tSCup;
         
 !        vacSolOff;
 !        vacPwerOff;
 !        AccSet 100, 100;
-!        MoveToCalibPos;
         
         
 !        ! Call another procedure, but provide some input arguments.
 !        VariableSample pTableHome, 100, 100, 0, v100, fine;
         
-!        WaitUntil IndInpos(ROB_1,2) = TRUE;
-!        WaitTime 20;
-!        IndDMove ROB_1, 2, 400, 20;
-  
     ENDPROC
     
-    PROC jogX(num inc, speeddata vel)
-        VAR robtarget posC;
-        VAR robtarget posN;
-        
+    PROC JogX(num jog_inc)
+        VAR robtarget pos_current;
+        VAR robtarget pos_new;
+        VAR jointtarget jog_target;
+        VAR errnum err_val;
         !get current pos
-        posC:=CRobT();
+        pos_current:=CRobT();
         
         !calculate new pos
-        posN:=posC;
-        posN.trans.x:=posC.trans.x+inc;
+        pos_new:=pos_current;
+        pos_new.trans.x:=pos_current.trans.x+jog_inc;
         
-        !move to calculated pos
-        MoveJ posN,vel,fine,tSCup;
-        
-        ! should have \WObj:=wTable option to relate to a workzone;        
-    ENDPROC
-    
-    PROC jogZ(num inc, speeddata vel)
-        VAR robtarget posC;
-        VAR robtarget posN;
-        
-        !get current pos
-        posC:=CRobT();
-        
-        !calculate new pos
-        posN:=posC;
-        posN.trans.z:=posC.trans.z+inc;
-        
-        !move to calculated pos
-        MoveJ posN,vel,fine,tSCup;
-        
-        ! sho
+        jog_target:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
+        IF err_val=1135 OR err_val=1074 THEN
+            !send message to matlab
+            WaitTime 1;
+        ELSE
+            !move to calculated pos
+            MoveL pos_new,jog_speed,fine,tSCup;
+        ENDIF
     ENDPROC   
+    
+    PROC JogY(num jog_inc)
+        VAR robtarget pos_current;
+        VAR robtarget pos_new;
+        VAR jointtarget jog_target;
+        VAR errnum err_val;
+        !get current pos
+        pos_current:=CRobT();
+        !calculate new pos
+        pos_new:=pos_current;
+        pos_new.trans.y:=pos_current.trans.y+jog_inc;
+        !check if reachable
+        jog_target:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
+        IF err_val=1135 OR err_val=1074 THEN
+            !send message to matlab
+            WaitTime 1;
+        ELSE
+            !move to calculated pos
+            MoveL pos_new,jog_speed,fine,tSCup;
+        ENDIF
+    ENDPROC   
+    
+    PROC JogZ(num jog_inc)
+        VAR robtarget pos_current;
+        VAR robtarget pos_new;
+        VAR jointtarget jog_target;
+        VAR errnum err_val;
+        !get current pos
+        pos_current:=CRobT();
+        
+        !calculate new pos
+        pos_new:=pos_current;
+        pos_new.trans.z:=pos_current.trans.z+jog_inc;
+        
+        jog_target:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
+        IF err_val=1135 OR err_val=1074 THEN
+            !send message to matlab
+            WaitTime 1;
+        ELSE
+            !move to calculated pos
+            MoveL pos_new,jog_speed,fine,tSCup;
+        ENDIF
+    ENDPROC   
+    
+    !Jog Joint 1
+    PROC Jog1(num jog_inc_deg)
+        VAR jointtarget thetas_current;
+        VAR jointtarget thetas_new;
+        VAR robtarget pos_new;
+        VAR errnum err_val;
+        
+        !get current
+        thetas_current:=CJointT();
+        thetas_new:=thetas_current;
+        !increment new
+        thetas_new.robax.rax_1:=thetas_new.robax.rax_1+jog_inc_deg;
+    
+        pos_new:=CalcRobT(thetas_new,tSCup);
+        thetas_current:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
+        IF err_val=1135 OR err_val=1074 OR err_val = ERR_ROBLIMIT THEN
+            !send message to matlab, out of range
+        ELSE
+            MoveAbsJ thetas_new,jog_speed,fine,tSCup;
+            !send mesage to matlab
+        ENDIF
+    ENDPROC
+    
+    
+    
+     PROC MoveToPose(robjoint thetas_new)
+        VAR jointtarget thetas_new_formatted;
+        thetas_new_formatted:= [thetas_new, [9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];!the formatted joint angles for moving the robot
+               
+        
+        MoveAbsJ thetas_new_formatted, jog_speed, fine, tSCup;
+        
+    ENDPROC
+    
+    
+    PROC MoveAngle(robjoint robot_ang,speeddata robot_speed)
+        VAR jointtarget lin_joint;
+        VAR jointtarget jointpos;
+        VAR robtarget ang_rob;
+        VAR errnum myerrnum;
+        jointpos:=[robot_ang,[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+        ang_rob:=CalcRobT(jointpos,tSCup);
+        lin_joint:=CalcJointT(ang_rob,tSCup\ErrorNumber:=myerrnum);
+!        IF myerrnum=1074 OR myerrnum=1135 THEN
+!            MessageToSend:="Outside Reach\0A";
+!        ELSE
+!            MoveAbsJ jointpos,robot_speed,fine,tSCup;
+!            MessageToSend:="Moving Robot\0A";
+!        ENDIF
+    ERROR
+    ENDPROC
+   
 
     PROC MoveTarget(robtarget target)
         
