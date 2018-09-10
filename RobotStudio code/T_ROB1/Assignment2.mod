@@ -7,6 +7,7 @@ MODULE Assignment2
     VAR num jog_inc_deg:= 5;
     VAR speeddata jog_speed:=v100;
     VAR speeddata pose_speed:= v100;
+    PERS string current_state;
    
     ! The Main procedure. When you select 'PP to Main' on the FlexPendant, it will go to this procedure.
     PROC MainAss2()
@@ -22,44 +23,45 @@ MODULE Assignment2
         
         VelSet 70, 800;
         
-        JogY(jog_inc);
-        WaitTime 2;
-        JogY(jog_inc);
-        WaitTime 2;
-        JogY(jog_inc);
-        JogZ(jog_inc);
-        WaitTime 2;
-        JogZ(jog_inc);
-        WaitTime 2;
-        Jog1(-jog_inc_deg);
-        Jog1(-jog_inc_deg);
-        Jog1(-jog_inc_deg);
-        Jog1(+jog_inc_deg);
+        IF current_state = "jogX" THEN
+            JogX(jog_inc);
+            WaitTime 2;
+        ELSEIF current_state = "jogY" THEN
+            JogY(jog_inc);
+            WaitTime 2;
+        ELSEIF current_state = "jogZ" THEN
+            JogZ(jog_inc);
+            WaitTime 2;
+        ELSEIF current_state = "jog1" THEN
+            Jog1(jog_inc_deg);
+            WaitTime 2;
+        !ELSEIF current_state = "moveToPose" THEN
+            !moveToPose(thetas_new);
+            !WaitTime 2;
+        !ELSEIF current_state = "moveAngle" THEN
+            !moveAngle(robot_ang,robot_speed);
+            !WaitTIme 2;
+        ELSEIF current_state = "unknown" THEN
+            TPWrite "Unknown command";
+            WaitTime 2;
+        ELSE 
+            TPWrite "Illega input";
+            WaitTime 2;
+        ENDIF
         
-        
-       
-!        add effectorHeight, abs(tileHeight);
-!        ! Call my func
-!        testTarget := [[175, 0, effectorHeight], [0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
-!        MoveTarget(testTarget);
-!        vacSolOn;
-        
-!        AccSet 50, 50;
-        
-        
-!        ! Call another procedure that we have defined.
-!       ! MoveLSample;
-        
-!        MoveL Offs(testTarget, 0, 100, 50), v100, fine, tSCup;
-        
-        
-!        vacSolOff;
-!        vacPwerOff;
-!        AccSet 100, 100;
-        
-        
-!        ! Call another procedure, but provide some input arguments.
-!        VariableSample pTableHome, 100, 100, 0, v100, fine;
+        !JogY(jog_inc);
+        !WaitTime 2;
+        !JogY(jog_inc);
+        !WaitTime 2;
+        !JogY(jog_inc);
+        !JogZ(jog_inc);
+        !WaitTime 2;
+        !JogZ(jog_inc);
+        !WaitTime 2;
+        !Jog1(-jog_inc_deg);
+        !Jog1(-jog_inc_deg);
+        !Jog1(-jog_inc_deg);
+        !Jog1(+jog_inc_deg);
         
     ENDPROC
     
@@ -171,12 +173,6 @@ MODULE Assignment2
         jointpos:=[robot_ang,[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
         ang_rob:=CalcRobT(jointpos,tSCup);
         lin_joint:=CalcJointT(ang_rob,tSCup\ErrorNumber:=myerrnum);
-!        IF myerrnum=1074 OR myerrnum=1135 THEN
-!            MessageToSend:="Outside Reach\0A";
-!        ELSE
-!            MoveAbsJ jointpos,robot_speed,fine,tSCup;
-!            MessageToSend:="Moving Robot\0A";
-!        ENDIF
     ERROR
     ENDPROC
    
