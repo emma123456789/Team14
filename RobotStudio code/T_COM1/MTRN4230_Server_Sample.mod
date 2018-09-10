@@ -2,9 +2,10 @@ MODULE MTRN4230_Server_Sample
 
     ! The socket connected to the client.
     VAR socketdev client_socket;
-    VAR bool run_server;
+    
     ! The host and port that we will be listening for a connection on.
     PERS string host := "127.0.0.1";
+    PERS string current_state;
     CONST num port := 1025;
     
     PROC Main ()
@@ -13,39 +14,47 @@ MODULE MTRN4230_Server_Sample
         ELSE
             host := "127.0.0.1";
         ENDIF
-        
-        
         MainServer;
         
     ENDPROC
 
     PROC MainServer()
+        
         VAR string received_str;
-        run_server:= TRUE;
+        !VAR bool isJogging;
+        
         ListenForAndAcceptConnection;
-        
-        WHILE run_server DO
             
-            !VAR bool isJogging;
-            
-                
-            ! Receive a string from the client.
-            SocketReceive client_socket \Str:=received_str;
-            !IF received_str = "jogX 60" THEN
-            !    SocketSend client_socket \Str:=("jogX started" + "\0A");
-            !    isJogging := TRUE;
-            !ELSEIF received_str = "jogY 60" THEN 
-            !    SocketSend client_socket \Str:=("jogY started" + "\0A"); 
-            !    isJogging := TRUE;
-            !ELSE
-            !    SocketSend client_socket \Str:=("unknown comand" + "\0A"); 
-            !    isJogging := FALSE;
-            !ENDIF
-            ! Send the string back to the client, adding a line feed character.
-            SocketSend client_socket \Str:=(received_str + "\0A");
-        ENDWHILE
+        ! Receive a string from the client.
+        SocketReceive client_socket \Str:=received_str;
+        !PERS matlab_str := received_str;
+        IF received_str = "jogX" THEN
+            SocketSend client_socket \Str:=("jogX started" + "\0A");
+            current_state := "jogX";
+        ELSEIF received_str = "jogY" THEN 
+            SocketSend client_socket \Str:=("jogY started" + "\0A"); 
+            current_state := "jogY";
+        ELSEIF received_str = "jogZ" THEN
+            SocketSend client_socket \Str:=("jogZ started" + "\0A");
+            current_state := "jogZ";
+        ELSEIF received_str = "jog1" THEN
+            SocketSend client_socket \Str:=("jog1 started" + "\0A");
+            current_state := "jog1";
+        ELSEIF received_str = "moveToPose" THEN
+            SocketSend client_socket \Str:=("moveToPose started" + "\0A");
+            current_state := "moveToPose";
+        ELSEIF received_str = "moveAngle" THEN
+            SocketSend client_socket \Str:=("moveAngle started" + "\0A");
+            current_state := "moveAngle";
+        ELSE
+            SocketSend client_socket \Str:=("unknown comand" + "\0A"); 
+            current_state := "unknown";
+        ENDIF
+        ! Send the string back to the client, adding a line feed character.
+        !SocketSend client_socket \Str:=(received_str + "\0A");
+
         CloseConnection;
-        
+		
     ENDPROC
 
     PROC ListenForAndAcceptConnection()
