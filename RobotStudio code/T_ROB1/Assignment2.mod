@@ -11,9 +11,10 @@ MODULE Assignment2
    
     ! The Main procedure. When you select 'PP to Main' on the FlexPendant, it will go to this procedure.
     PROC MainAss2()
-      
         
-        MoveToCalibPos;
+        SetDO DO10_3, 1;
+        
+        !MoveToCalibPos;
         
         !only use this if the position can deviate to avoid singularities
         SingArea \Wrist;
@@ -23,17 +24,73 @@ MODULE Assignment2
         
         VelSet 70, 800;
         
-        IF current_state = "jogX" THEN
+        IF current_state = "xPlus" THEN
             JogX(jog_inc);
+            current_state := "None";
             WaitTime 2;
-        ELSEIF current_state = "jogY" THEN
+        ELSEIF current_state = "yPlus" THEN
             JogY(jog_inc);
+            current_state := "None";
             WaitTime 2;
-        ELSEIF current_state = "jogZ" THEN
+        ELSEIF current_state = "zPlus" THEN
             JogZ(jog_inc);
+            current_state := "None";
+            WaitTime 2;
+        ELSEIF current_state = "xMinus" THEN
+            JogX(-jog_inc);
+            current_state := "None";
+            WaitTime 2;
+        ELSEIF current_state = "yMinus" THEN
+            JogY(-jog_inc);
+            current_state := "None";
+            WaitTime 2;
+        ELSEIF current_state = "zMinus" THEN
+            JogZ(-jog_inc);
+            current_state := "None";
             WaitTime 2;
         ELSEIF current_state = "jog1" THEN
             Jog1(jog_inc_deg);
+            current_state := "None";
+            WaitTime 2;
+        ELSEIF current_state = "conOn" THEN
+            conRunOn;
+            current_state := "None";
+            WaitTime 2;
+        ELSEIF current_state = "conOff" THEN
+            conRunOff;
+            current_state := "None";
+            WaitTime 2;
+        !ELSEIF current_state = "conEnabled" THEN
+            !conDirHome;
+            !current_state := "None";
+            !WaitTime 2;
+        !ELSEIF current_state = "conDisabled" THEN
+            !conDirRob;
+            !current_state := "None";
+            !WaitTime 2;
+        ELSEIF current_state = "conReverseOn" THEN
+            conDirHome;
+            current_state := "None";
+            WaitTime 2;
+        ELSEIF current_state = "conReverseOff" THEN
+            conDirRob;
+            current_state := "None";
+            WaitTime 2;
+        ELSEIF current_state = "vacSolOn" THEN
+            vacSolOn;
+            current_state := "None";
+            WaitTime 2;
+        ELSEIF current_state = "vacSolOff" THEN
+            vacSolOff;
+            current_state := "None";
+            WaitTime 2;
+        ELSEIF current_state = "vacPumpOn" THEN
+            vacPwrOn;
+            current_state := "None";
+            WaitTime 2;
+        ELSEIF current_state = "vacPumpOff" THEN
+            vacPwrOff;
+            current_state := "None";
             WaitTime 2;
         !ELSEIF current_state = "moveToPose" THEN
             !moveToPose(thetas_new);
@@ -44,9 +101,9 @@ MODULE Assignment2
         ELSEIF current_state = "unknown" THEN
             TPWrite "Unknown command";
             WaitTime 2;
-        ELSE 
-            TPWrite "Illega input";
-            WaitTime 2;
+        !ELSE 
+            !TPWrite "Illegal input";
+            !WaitTime 2;
         ENDIF
         
         !JogY(jog_inc);
@@ -197,37 +254,37 @@ MODULE Assignment2
               MoveL Offs(target, x, y, z), v100, fine, tSCup;
     ENDPROC
     
-!    PROC vacPwrOn()
-!        SetDO DO10_1, 1;
-!    ENDPROC
+    PROC vacPwrOn()
+        SetDO DO10_1, 1;
+    ENDPROC
     
-!    PROC vacPwerOff()
-!        SetDO DO10_1, 0;
-!    ENDPROC
+    PROC vacPwrOff()
+        SetDO DO10_1, 0;
+    ENDPROC
     
-!    PROC vacSolOn()
-!        SetDO DO10_2, 1;
-!    ENDPROC
+    PROC vacSolOn()
+        SetDO DO10_2, 1;
+    ENDPROC
     
-!    PROC vacSolOff()
-!        SetDO DO10_2, 0;
-!    ENDPROC
+    PROC vacSolOff()
+        SetDO DO10_2, 0;
+    ENDPROC
     
-!    PROC conRunOn()
-!        SetDO DO10_3, 1;
-!    ENDPROC
+    PROC conRunOn()
+        SetDO DO10_3, 1;
+    ENDPROC
     
-!    PROC conRunOff()
-!        SetDO DO10_3, 0;
-!    ENDPROC
+    PROC conRunOff()
+        SetDO DO10_3, 0;
+    ENDPROC
     
-!    PROC conDirRob()
-!        SetDO DO10_4, 1;
-!    ENDPROC
+    PROC conDirRob()
+        SetDO DO10_4, 1;
+    ENDPROC
     
-!    PROC conDirHome()
-!        SetDO DO10_4, 0;
-!    ENDPROC
+    PROC conDirHome()
+        SetDO DO10_4, 0;
+    ENDPROC
     
     
     
