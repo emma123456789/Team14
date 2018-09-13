@@ -1,5 +1,9 @@
 MODULE Assignment2
     
+    VAR socketdev client_socket;
+    ! The host and port that we will be listening for a connection on.
+    !PERS string host := "127.0.0.1";
+    
     VAR num effectorHeight:= 147;
     VAR robtarget testTarget := [[175, -100, 147],[0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
    
@@ -8,14 +12,13 @@ MODULE Assignment2
     VAR speeddata jog_speed:=v100;
     VAR speeddata pose_speed:= v100;
     PERS string current_state;
+    PERS bool isCancelled := FALSE;
+    PERS bool checkCom := FALSE;
+
    
     ! The Main procedure. When you select 'PP to Main' on the FlexPendant, it will go to this procedure.
     PROC MainAss2()
-        
-        SetDO DO10_3, 1;
-        
-        !MoveToCalibPos;
-        
+          
         !only use this if the position can deviate to avoid singularities
         SingArea \Wrist;
         
@@ -28,38 +31,47 @@ MODULE Assignment2
             JogX(jog_inc);
             current_state := "None";
             WaitTime 2;
-        ELSEIF current_state = "yPlus" THEN
+        ENDIF
+        IF current_state = "yPlus" THEN
             JogY(jog_inc);
             current_state := "None";
             WaitTime 2;
-        ELSEIF current_state = "zPlus" THEN
+        ENDIF
+        IF current_state = "zPlus" THEN
             JogZ(jog_inc);
             current_state := "None";
             WaitTime 2;
-        ELSEIF current_state = "xMinus" THEN
+        ENDIF
+        IF current_state = "xMinus" THEN
             JogX(-jog_inc);
             current_state := "None";
             WaitTime 2;
-        ELSEIF current_state = "yMinus" THEN
+        ENDIF
+        IF current_state = "yMinus" THEN
             JogY(-jog_inc);
             current_state := "None";
             WaitTime 2;
-        ELSEIF current_state = "zMinus" THEN
+        ENDIF
+        IF current_state = "zMinus" THEN
             JogZ(-jog_inc);
             current_state := "None";
             WaitTime 2;
-        ELSEIF current_state = "jog1" THEN
+        ENDIF
+        IF current_state = "jog1" THEN
             Jog1(jog_inc_deg);
             current_state := "None";
             WaitTime 2;
-        ELSEIF current_state = "conOn" THEN
+        ENDIF
+        IF current_state = "conOn" THEN
             conRunOn;
             current_state := "None";
             WaitTime 2;
-        ELSEIF current_state = "conOff" THEN
+        ENDIF
+        IF current_state = "conOff" THEN
             conRunOff;
             current_state := "None";
             WaitTime 2;
+        ENDIF
         !ELSEIF current_state = "conEnabled" THEN
             !conDirHome;
             !current_state := "None";
@@ -68,43 +80,65 @@ MODULE Assignment2
             !conDirRob;
             !current_state := "None";
             !WaitTime 2;
-        ELSEIF current_state = "conReverseOn" THEN
+        IF current_state = "conReverseOn" THEN
             conDirHome;
             current_state := "None";
             WaitTime 2;
-        ELSEIF current_state = "conReverseOff" THEN
+        ENDIF 
+        IF current_state = "conReverseOff" THEN
             conDirRob;
             current_state := "None";
             WaitTime 2;
-        ELSEIF current_state = "vacSolOn" THEN
+        ENDIF 
+        IF current_state = "vacSolOn" THEN
             vacSolOn;
             current_state := "None";
             WaitTime 2;
-        ELSEIF current_state = "vacSolOff" THEN
+        ENDIF
+        IF current_state = "vacSolOff" THEN
             vacSolOff;
             current_state := "None";
             WaitTime 2;
-        ELSEIF current_state = "vacPumpOn" THEN
+        ENDIF 
+        IF current_state = "vacPumpOn" THEN
             vacPwrOn;
             current_state := "None";
             WaitTime 2;
-        ELSEIF current_state = "vacPumpOff" THEN
+        ENDIF 
+        IF current_state = "vacPumpOff" THEN
             vacPwrOff;
             current_state := "None";
             WaitTime 2;
+        ENDIF
+        IF current_state = "paused" THEN
+            StopMove;
+            current_state := "None";
+            WaitTime 2;
+        ENDIF
+        IF current_state = "resume" THEN
+            StartMove;
+            current_state := "None";
+            WaitTime 2;
+        ENDIF
+        IF current_state = "cancel" THEN
+            isCancelled := TRUE;
+            current_state := "None";
+            WaitTime 2;
+        ENDIF
         !ELSEIF current_state = "moveToPose" THEN
             !moveToPose(thetas_new);
             !WaitTime 2;
         !ELSEIF current_state = "moveAngle" THEN
             !moveAngle(robot_ang,robot_speed);
             !WaitTIme 2;
-        ELSEIF current_state = "unknown" THEN
+        IF current_state = "unknown" THEN
             TPWrite "Unknown command";
             WaitTime 2;
-        !ELSE 
+        ENDIF
+        !ELSE   
             !TPWrite "Illegal input";
             !WaitTime 2;
-        ENDIF
+        !ENDIF
         
         !JogY(jog_inc);
         !WaitTime 2;
@@ -286,12 +320,5 @@ MODULE Assignment2
         SetDO DO10_4, 0;
     ENDPROC
     
-    
-    
-    
-        
-    
-    
-      
-    
+
 ENDMODULE

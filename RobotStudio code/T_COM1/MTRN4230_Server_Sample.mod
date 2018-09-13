@@ -3,9 +3,11 @@ MODULE MTRN4230_Server_Sample
     ! The socket connected to the client.
     VAR socketdev client_socket;
     ! The host and port that we will be listening for a connection on.
-    PERS string host := "192.168.125.1";
+    PERS string host := "127.0.0.1";
     PERS string current_state;
     CONST num port := 1025;
+    PERS bool isCancelled := FALSE;
+    PERS bool checkCom := FALSE;
     
     
     PROC Main ()
@@ -25,71 +27,185 @@ MODULE MTRN4230_Server_Sample
         !VAR bool isJogging;
         
         VAR string received_str;
-        WHILE TRUE DO
+        WHILE isCancelled=FALSE DO
             ! Receive a string from the client.
             SocketReceive client_socket \Str:=received_str;
             !PERS matlab_str := received_str;
             IF received_str = "xPlus" THEN
                 SocketSend client_socket \Str:=("jogX started" + "\0A");
                 current_state := "xPlus";
-            ELSEIF received_str = "yPlus" THEN 
+            ENDIF
+            
+            IF received_str = "yPlus" THEN 
                 SocketSend client_socket \Str:=("jogY started" + "\0A"); 
                 current_state := "yPlus";
-            ELSEIF received_str = "zPlus" THEN
+            ENDIF
+            
+            IF received_str = "zPlus" THEN
                 SocketSend client_socket \Str:=("jogZ started" + "\0A");
                 current_state := "zPlus";
-            ELSEIF received_str = "xMinus" THEN
+            ENDIF
+            
+            IF received_str = "xMinus" THEN
                 SocketSend client_socket \Str:=("-jogX started" + "\0A");
                 current_state := "xMinus";
-            ELSEIF received_str = "yMinus" THEN
+            ENDIF 
+                
+            IF received_str = "yMinus" THEN
                 SocketSend client_socket \Str:=("-jogY started" + "\0A");
                 current_state := "yMinus";
-            ELSEIF received_str = "zMinus" THEN
+            ENDIF 
+            
+            IF received_str = "zMinus" THEN
                 SocketSend client_socket \Str:=("-jogZ started" + "\0A");
                 current_state := "zMinus";
-            ELSEIF received_str = "jog1" THEN
+            ENDIF 
+            
+            IF received_str = "jog1" THEN
                 SocketSend client_socket \Str:=("jog1 started" + "\0A");
                 current_state := "jog1";
-            ELSEIF received_str = "moveToPose" THEN
+            ENDIF 
+            
+            IF received_str = "moveToPose" THEN
                 SocketSend client_socket \Str:=("moveToPose started" + "\0A");
                 current_state := "moveToPose";
-            ELSEIF received_str = "moveAngle" THEN
+            ENDIF
+            
+            IF received_str = "moveAngle" THEN
                 SocketSend client_socket \Str:=("moveAngle started" + "\0A");
                 current_state := "moveAngle";
-            ELSEIF received_str = "conveyorRunOn" THEN
+            ENDIF 
+            
+            IF received_str = "conveyorRunOn" THEN
                 SocketSend client_socket \Str:=("conveyor turned on" + "\0A");
                 current_state := "conOn";
-            ELSEIF received_str = "conveyorRunOff" THEN
+            ENDIF 
+            
+            IF received_str = "conveyorRunOff" THEN
                 SocketSend client_socket \Str:=("conveyor turned off" + "\0A");
                 current_state := "conOff";
-            ELSEIF received_str = "conveyorReverseOn" THEN
+            ENDIF 
+            
+            IF received_str = "conveyorReverseOn" THEN
                 SocketSend client_socket \Str:=("conveyor reverse on" + "\0A");
                 current_state := "conReverseOn";
-            ELSEIF received_str = "conveyorReverseOff" THEN
+            ENDIF 
+            
+            IF received_str = "conveyorReverseOff" THEN
                 SocketSend client_socket \Str:=("conveyor reverse off" + "\0A");
                 current_state := "conReverseOff";
-            ELSEIF received_str = "enableConveyorOn" THEN
+            ENDIF 
+            
+            IF received_str = "enableConveyorOn" THEN
                 SocketSend client_socket \Str:=("conveyor enabled" + "\0A");
                 current_state := "conEnabled";
-            ELSEIF received_str = "enableConveyorOff" THEN
+            ENDIF
+            
+            IF received_str = "enableConveyorOff" THEN
                 SocketSend client_socket \Str:=("conveyor disabled" + "\0A");
                 current_state := "conDisabled";
-            ELSEIF received_str = "vacuumSolenoidOn" THEN
+            ENDIF
+            
+            IF received_str = "vacuumSolenoidOn" THEN
                 SocketSend client_socket \Str:=("vaccum solenoid on" + "\0A");
                 current_state := "vacSolOn";
-            ELSEIF received_str = "vacuumSolenoidOff" THEN
+            ENDIF 
+            
+            IF received_str = "vacuumSolenoidOff" THEN
                 SocketSend client_socket \Str:=("vacuum solenoid off" + "\0A");
                 current_state := "vacSolOff";
-            ELSEIF received_str = "vacuumPumpOn" THEN
+            ENDIF 
+            
+            IF received_str = "vacuumPumpOn" THEN
                 SocketSend client_socket \Str:=("vacuum pump on" + "\0A");
                 current_state := "vacPumpOn";
-            ELSEIF received_str = "vacuumPumpOff" THEN
+            ENDIF 
+            
+            IF received_str = "vacuumPumpOff" THEN
                 SocketSend client_socket \Str:=("vacuum pump off" + "\0A");
                 current_state := "vacPumpOff";
-            ELSE
+            ENDIF 
+            
+            IF received_str<> "xPlus" AND received_str<> "yPlus" AND
+            received_str<>"zPlus" AND received_str<>"xMinus" AND
+            received_str<>"yMinus" AND received_str<>"zMinus" AND received_str<>"jog1" AND
+            received_str<>"vacuumPumpOn" AND received_str<>"vacuumPumpOff" AND
+            received_str<>"vacuumSolenoidOn" AND received_str<>"vacuumSolenoidOff" AND
+            received_str<>"conveyorRunOn" AND received_str<>"conveyorRunOff" AND 
+            received_str<>"enableConveyorOn" AND received_str<>"enableConveyorOff" AND 
+            received_str<>"conveyorReverseOn" AND received_str<>"conveyorReverseOff" AND
+            received_str<>"moveToPose" AND received_str<>"moveAngle" THEN
                 SocketSend client_socket \Str:=("unknown comand" + "\0A"); 
                 current_state := "unknown";
             ENDIF
+            
+            IF current_state = "None" THEN
+                SocketSend client_socket \Str:=("Done" + "\0A"); 
+            ENDIF    
+            
+            IF received_str = "pause" THEN
+                SocketSend client_socket \Str:=("paused" + "\0A");
+                current_state := "paused";
+            ENDIF
+        
+            IF received_str = "resume" THEN
+                SocketSend client_socket \Str:=("resume" + "\0A");
+                current_state := "resume";
+            ENDIF
+            
+            IF received_str = "cancel" THEN
+                SocketSend client_socket \Str:=("cancel" + "\0A");
+                current_state := "cancel";
+            ENDIF
+            
+            
+            !IF received_str = 
+            !IF current_state = "xPlusDone" THEN
+            !    SocketSend client_socket \Str:=("jogX finished" + "\0A"); 
+            !    current_state := "None";
+            !ELSEIF current_state = "yPlusDone" THEN
+            !    SocketSend client_socket \Str:=("jogY finished" + "\0A"); 
+            !    current_state := "None";
+            !ELSEIF current_state = "zPlusDone" THEN
+            !    SocketSend client_socket \Str:=("jogZ finished" + "\0A"); 
+            !    current_state := "None";
+            !ELSEIF current_state = "xMinusDone" THEN
+            !    SocketSend client_socket \Str:=("-jogX finished" + "\0A"); 
+            !    current_state := "None";
+            !ELSEIF current_state = "yMinusDone" THEN
+            !    SocketSend client_socket \Str:=("-jogY finished" + "\0A"); 
+            !    current_state := "None";
+            !ELSEIF current_state = "zMinusDone" THEN
+            !    SocketSend client_socket \Str:=("-jogZ finished" + "\0A"); 
+            !    current_state := "None";
+            !ELSEIF current_state = "jog1Done" THEN
+            !    SocketSend client_socket \Str:=("jog1 finished" + "\0A"); 
+            !    current_state := "None";
+            !ELSEIF current_state = "conOnDone" THEN
+            !    SocketSend client_socket \Str:=("conveyor turned on finished" + "\0A"); 
+            !    current_state := "None";
+            !ELSEIF current_state = "conOffDone" THEN
+            !    SocketSend client_socket \Str:=("conveyor turned off finished" + "\0A"); 
+            !    current_state := "None";
+            !ELSEIF current_state = "conReverseOnDone" THEN
+            !    SocketSend client_socket \Str:=("conveyor reverse on finished" + "\0A"); 
+            !    current_state := "None";
+            !ELSEIF current_state = "conReverseOffDone" THEN
+            !    SocketSend client_socket \Str:=("conveyor reverse off finished" + "\0A"); 
+            !    current_state := "None";
+            !ELSEIF current_state = "vacSolOnDone" THEN
+            !    SocketSend client_socket \Str:=("vaccum solenoid on finished" + "\0A"); 
+            !    current_state := "None";
+            !ELSEIF current_state = "vacSolOffDone" THEN
+            !    SocketSend client_socket \Str:=("vacuum solenoid off finished" + "\0A"); 
+            !    current_state := "None";
+            !ELSEIF current_state = "vacPumpOnDone" THEN
+            !    SocketSend client_socket \Str:=("vacuum pump on finished" + "\0A"); 
+            !    current_state := "None";
+            !ELSEIF current_state = "vacPumpOffDone" THEN
+            !    SocketSend client_socket \Str:=("vacuum pump off finished" + "\0A"); 
+            !    current_state := "None";
+            !ENDIF
             ! Send the string back to the client, adding a line feed character.
             !SocketSend client_socket \Str:=(received_str + "\0A");
         ENDWHILE
