@@ -14,11 +14,18 @@ MODULE Assignment2
     PERS string current_state;
     PERS bool isCancelled := FALSE;
     PERS bool checkCom := FALSE;
+    VAR num numEnd;
+    VAR num numStart;
+    VAR string numTotal;
 
    
     ! The Main procedure. When you select 'PP to Main' on the FlexPendant, it will go to this procedure.
-    PROC MainAss2()
+    PROC Main()
           
+        numEnd := strLen("jogX 60");
+        numStart :=strFind("jogX 60",1,STR_DIGIT);
+        numTotal := strPart("jogX 60",numStart,numEnd-numStart+1);
+        
         WaitUntil checkCom = TRUE;
         !only use this if the position can deviate to avoid singularities
         SingArea \Wrist;
