@@ -19,6 +19,7 @@ MODULE Assignment2
     ! The Main procedure. When you select 'PP to Main' on the FlexPendant, it will go to this procedure.
     PROC MainAss2()
           
+        WaitUntil checkCom = TRUE;
         !only use this if the position can deviate to avoid singularities
         SingArea \Wrist;
         
@@ -153,6 +154,7 @@ MODULE Assignment2
         !Jog1(-jog_inc_deg);
         !Jog1(-jog_inc_deg);
         !Jog1(+jog_inc_deg);
+        checkCom := FALSE;
         
     ENDPROC
     

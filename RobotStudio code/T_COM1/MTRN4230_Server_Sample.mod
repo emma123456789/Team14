@@ -32,96 +32,115 @@ MODULE MTRN4230_Server_Sample
             SocketReceive client_socket \Str:=received_str;
             !PERS matlab_str := received_str;
             IF received_str = "xPlus" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("jogX started" + "\0A");
                 current_state := "xPlus";
             ENDIF
             
             IF received_str = "yPlus" THEN 
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("jogY started" + "\0A"); 
                 current_state := "yPlus";
             ENDIF
             
             IF received_str = "zPlus" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("jogZ started" + "\0A");
                 current_state := "zPlus";
             ENDIF
             
             IF received_str = "xMinus" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("-jogX started" + "\0A");
                 current_state := "xMinus";
             ENDIF 
                 
             IF received_str = "yMinus" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("-jogY started" + "\0A");
                 current_state := "yMinus";
             ENDIF 
             
             IF received_str = "zMinus" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("-jogZ started" + "\0A");
                 current_state := "zMinus";
             ENDIF 
             
             IF received_str = "jog1" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("jog1 started" + "\0A");
                 current_state := "jog1";
             ENDIF 
             
             IF received_str = "moveToPose" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("moveToPose started" + "\0A");
                 current_state := "moveToPose";
             ENDIF
             
             IF received_str = "moveAngle" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("moveAngle started" + "\0A");
                 current_state := "moveAngle";
             ENDIF 
             
             IF received_str = "conveyorRunOn" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("conveyor turned on" + "\0A");
                 current_state := "conOn";
             ENDIF 
             
             IF received_str = "conveyorRunOff" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("conveyor turned off" + "\0A");
                 current_state := "conOff";
             ENDIF 
             
             IF received_str = "conveyorReverseOn" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("conveyor reverse on" + "\0A");
                 current_state := "conReverseOn";
             ENDIF 
             
             IF received_str = "conveyorReverseOff" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("conveyor reverse off" + "\0A");
                 current_state := "conReverseOff";
             ENDIF 
             
             IF received_str = "enableConveyorOn" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("conveyor enabled" + "\0A");
                 current_state := "conEnabled";
             ENDIF
             
             IF received_str = "enableConveyorOff" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("conveyor disabled" + "\0A");
                 current_state := "conDisabled";
             ENDIF
             
             IF received_str = "vacuumSolenoidOn" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("vaccum solenoid on" + "\0A");
                 current_state := "vacSolOn";
             ENDIF 
             
             IF received_str = "vacuumSolenoidOff" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("vacuum solenoid off" + "\0A");
                 current_state := "vacSolOff";
             ENDIF 
             
             IF received_str = "vacuumPumpOn" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("vacuum pump on" + "\0A");
                 current_state := "vacPumpOn";
             ENDIF 
             
             IF received_str = "vacuumPumpOff" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("vacuum pump off" + "\0A");
                 current_state := "vacPumpOff";
             ENDIF 
@@ -135,25 +154,30 @@ MODULE MTRN4230_Server_Sample
             received_str<>"enableConveyorOn" AND received_str<>"enableConveyorOff" AND 
             received_str<>"conveyorReverseOn" AND received_str<>"conveyorReverseOff" AND
             received_str<>"moveToPose" AND received_str<>"moveAngle" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("unknown comand" + "\0A"); 
                 current_state := "unknown";
             ENDIF
             
             IF current_state = "None" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("Done" + "\0A"); 
             ENDIF    
             
             IF received_str = "pause" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("paused" + "\0A");
                 current_state := "paused";
             ENDIF
         
             IF received_str = "resume" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("resume" + "\0A");
                 current_state := "resume";
             ENDIF
             
             IF received_str = "cancel" THEN
+                checkCom := TRUE;
                 SocketSend client_socket \Str:=("cancel" + "\0A");
                 current_state := "cancel";
             ENDIF
