@@ -11,22 +11,24 @@ MODULE Assignment2
     VAR num jog_inc_deg:= 5;
     VAR speeddata jog_speed:=v100;
     VAR speeddata pose_speed:= v100;
-    PERS string current_state;
-    PERS bool isCancelled := FALSE;
+    PERS string current_state := "None";
+    PERS bool quit := FALSE;
+    PERS bool done := FALSE;
     PERS bool checkCom := FALSE;
-    VAR num numEnd;
-    VAR num numStart;
-    VAR string numTotal;
-    PERS bool done:=TRUE;
+    !VAR num numEnd;
+    !VAR num numStart;
+    !VAR string numTotal;
 
    
     ! The Main procedure. When you select 'PP to Main' on the FlexPendant, it will go to this procedure.
     PROC Main()
           
+        !this is just for testing
         !numEnd := strLen("jogX 60");
         !numStart :=strFind("jogX 60",1,STR_DIGIT);
         !numTotal := strPart("jogX 60",numStart,numEnd-numStart+1);
-        
+        MoveToCalibPos;
+    WHILE quit = FALSE DO
         WaitUntil checkCom = TRUE;
         !only use this if the position can deviate to avoid singularities
         SingArea \Wrist;
@@ -35,156 +37,132 @@ MODULE Assignment2
         confj  \On;
         
         VelSet 70, 800;
-        
-        IF current_state = "xPlus" THEN
-            JogX(jog_inc);
-            done := TRUE;
-            current_state := "None";
-            !SocketSend client_socket \Str:=("Done" + "\0A");
-            WaitTime 2;
-        !ELSEIF
-        ELSEIF current_state = "yPlus" THEN
-            JogY(jog_inc);
-            done := TRUE;
-            current_state := "None";
-            !SocketSend client_socket \Str:=("Done" + "\0A");
-            WaitTime 2;
-        !ENDIF
-        ELSEIF current_state = "zPlus" THEN
-            JogZ(jog_inc);
-            done := TRUE;
-            current_state := "None";
-            !SocketSend client_socket \Str:=("Done" + "\0A");
-            WaitTime 2;
+        IF current_state <> "cancel" THEN
+            IF current_state = "xPlus" THEN
+                JogX(jog_inc);
+                done:= TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF
+            IF current_state = "yPlus" THEN
+                JogY(jog_inc);
+                done:=TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF
+            IF current_state = "zPlus" THEN
+                JogZ(jog_inc);
+                done:=TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF
+            IF current_state = "xMinus" THEN
+                JogX(-jog_inc);
+                done:=TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF
+            IF current_state = "yMinus" THEN
+                JogY(-jog_inc);
+                done:=TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF
+            IF current_state = "zMinus" THEN
+                JogZ(-jog_inc);
+                done:=TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF
+            IF current_state = "jog1" THEN
+                Jog1(jog_inc_deg);
+                done:=TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF
+            IF current_state = "conOn" THEN
+                conRunOn;
+                done:=TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF
+            IF current_state = "conOff" THEN
+                conRunOff;
+                done:=TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF
+            IF current_state = "conReverseOn" THEN
+                conDirHome;
+                done:=TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF 
+            IF current_state = "conReverseOff" THEN
+                conDirRob;
+                done:=TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF 
+            IF current_state = "vacSolOn" THEN
+                vacSolOn;
+                done:=TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF
+            IF current_state = "vacSolOff" THEN
+                vacSolOff;
+                done:=TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF 
+            IF current_state = "vacPumpOn" THEN
+                vacPwrOn;
+                done:=TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF 
+            IF current_state = "vacPumpOff" THEN
+                vacPwrOff;
+                done:=TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF
+            IF current_state = "paused" THEN
+                StopMove;
+                done:=TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF
+            IF current_state = "resume" THEN
+                StartMove;
+                done:=TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF
+            IF current_state = "quit" THEN
+                quit:=TRUE;
+                done:=TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF
+            !ELSEIF current_state = "moveToPose" THEN
+                !moveToPose(thetas_new);
+                !WaitTime 2;
+            !ELSEIF current_state = "moveAngle" THEN
+                !moveAngle(robot_ang,robot_speed);
+                !WaitTIme 2;
+            IF current_state = "unknown" THEN
+                TPWrite "Unknown command";
+                WaitTime 2;
+            ENDIF
+        ELSE
+        done:= TRUE;
+        current_state := "None";
+        WaitTime 2;
         ENDIF
-        
-        IF current_state = "xMinus" THEN
-            JogX(-jog_inc);
-            current_state := "None";
-            SocketSend client_socket \Str:=("Done" + "\0A");
-            WaitTime 2;
-        ENDIF
-        IF current_state = "yMinus" THEN
-            JogY(-jog_inc);
-            current_state := "None";
-            SocketSend client_socket \Str:=("Done" + "\0A");
-            WaitTime 2;
-        ENDIF
-        IF current_state = "zMinus" THEN
-            JogZ(-jog_inc);
-            current_state := "None";
-            SocketSend client_socket \Str:=("Done" + "\0A");
-            WaitTime 2;
-        ENDIF
-        IF current_state = "jog1" THEN
-            Jog1(jog_inc_deg);
-            current_state := "None";
-            SocketSend client_socket \Str:=("Done" + "\0A");
-            WaitTime 2;
-        ENDIF
-        IF current_state = "conOn" THEN
-            conRunOn;
-            current_state := "None";
-            SocketSend client_socket \Str:=("Done" + "\0A");
-            WaitTime 2;
-        ENDIF
-        IF current_state = "conOff" THEN
-            conRunOff;
-            current_state := "None";
-            SocketSend client_socket \Str:=("Done" + "\0A");
-            WaitTime 2;
-        ENDIF
-        !ELSEIF current_state = "conEnabled" THEN
-            !conDirHome;
-            !current_state := "None";
-            !WaitTime 2;
-        !ELSEIF current_state = "conDisabled" THEN
-            !conDirRob;
-            !current_state := "None";
-            !WaitTime 2;
-        IF current_state = "conReverseOn" THEN
-            conDirHome;
-            !current_state := "None";
-            SocketSend client_socket \Str:=("Done" + "\0A");
-            WaitTime 2;
-        ENDIF 
-        IF current_state = "conReverseOff" THEN
-            conDirRob;
-            !current_state := "None";
-            SocketSend client_socket \Str:=("Done" + "\0A");
-            WaitTime 2;
-        ENDIF 
-        IF current_state = "vacSolOn" THEN
-            vacSolOn;
-            !current_state := "None";
-            SocketSend client_socket \Str:=("Done" + "\0A");
-            WaitTime 2;
-        ENDIF
-        IF current_state = "vacSolOff" THEN
-            vacSolOff;
-            !current_state := "None";
-            SocketSend client_socket \Str:=("Done" + "\0A");
-            WaitTime 2;
-        ENDIF 
-        IF current_state = "vacPumpOn" THEN
-            vacPwrOn;
-            !current_state := "None";
-            SocketSend client_socket \Str:=("Done" + "\0A");
-            WaitTime 2;
-        ENDIF 
-        IF current_state = "vacPumpOff" THEN
-            vacPwrOff;
-            !current_state := "None";
-            SocketSend client_socket \Str:=("Done" + "\0A");
-            WaitTime 2;
-        ENDIF
-        IF current_state = "paused" THEN
-            StopMove;
-            !current_state := "None";
-            SocketSend client_socket \Str:=("Done" + "\0A");
-            WaitTime 2;
-        ENDIF
-        IF current_state = "resume" THEN
-            StartMove;
-            !current_state := "None";
-            SocketSend client_socket \Str:=("Done" + "\0A");
-            WaitTime 2;
-        ENDIF
-        IF current_state = "cancel" THEN
-            isCancelled := TRUE;
-            !current_state := "None";
-            SocketSend client_socket \Str:=("Done" + "\0A");
-            WaitTime 2;
-        ENDIF
-        !ELSEIF current_state = "moveToPose" THEN
-            !moveToPose(thetas_new);
-            !WaitTime 2;
-        !ELSEIF current_state = "moveAngle" THEN
-            !moveAngle(robot_ang,robot_speed);
-            !WaitTIme 2;
-        IF current_state = "unknown" THEN
-            TPWrite "Unknown command";
-            WaitTime 2;
-        ENDIF
-        !ELSE   
-            !TPWrite "Illegal input";
-            !WaitTime 2;
-        !ENDIF
-        
-        !JogY(jog_inc);
-        !WaitTime 2;
-        !JogY(jog_inc);
-        !WaitTime 2;
-        !JogY(jog_inc);
-        !JogZ(jog_inc);
-        !WaitTime 2;
-        !JogZ(jog_inc);
-        !WaitTime 2;
-        !Jog1(-jog_inc_deg);
-        !Jog1(-jog_inc_deg);
-        !Jog1(-jog_inc_deg);
-        !Jog1(+jog_inc_deg);
         checkCom := FALSE;
+    ENDWHILE 
         
     ENDPROC
     
@@ -201,10 +179,9 @@ MODULE Assignment2
         pos_new.trans.x:=pos_current.trans.x+jog_inc;
         
         jog_target:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
-        IF err_val <>0  THEN
+        IF err_val=1135 OR err_val=1074 THEN
             !send message to matlab
             WaitTime 1;
-            RETURN;
         ELSE
             !move to calculated pos
             MoveL pos_new,jog_speed,fine,tSCup;
@@ -223,10 +200,9 @@ MODULE Assignment2
         pos_new.trans.y:=pos_current.trans.y+jog_inc;
         !check if reachable
         jog_target:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
-        IF err_val <>0  THEN
+        IF err_val=1135 OR err_val=1074 THEN
             !send message to matlab
             WaitTime 1;
-            RETURN;
         ELSE
             !move to calculated pos
             MoveL pos_new,jog_speed,fine,tSCup;
@@ -246,10 +222,9 @@ MODULE Assignment2
         pos_new.trans.z:=pos_current.trans.z+jog_inc;
         
         jog_target:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
-        IF err_val <>0  THEN
+        IF err_val=1135 OR err_val=1074 THEN
             !send message to matlab
             WaitTime 1;
-            RETURN;
         ELSE
             !move to calculated pos
             MoveL pos_new,jog_speed,fine,tSCup;
