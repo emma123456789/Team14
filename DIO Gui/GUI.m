@@ -22,7 +22,7 @@ function varargout = GUI(varargin)
 
 % Edit the above text to modify the response to help GUI
 
-% Last Modified by GUIDE v2.5 14-Sep-2018 05:50:41
+% Last Modified by GUIDE v2.5 17-Sep-2018 15:16:15
 
 % Begin initialization code - DO NOT EDIT
 gui_Singleton = 1;
@@ -55,16 +55,16 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for GUI
 handles.output = hObject;
 
-% axes(handles.TableCamera);
-% axes(handles.ConveyorCamera);
-% vid = videoinput('winvideo',1); 
-% vid2 = videoinput('winvideo',2); 
-% 
-% % sguideet image handle
-% hImage=image(zeros(800,1280,3),'Parent',handles.TableCamera);
-% hImage2=image(zeros(800,1280,3),'Parent',handles.ConveyorCamera);
-% preview(vid,hImage);
-% preview(vid2,hImage2);
+axes(handles.TableCamera);
+axes(handles.ConveyorCamera);
+vid = videoinput('macvideo',1); 
+%vid2 = videoinput('macvideo',2); 
+
+% sguideet image handle
+hImage=image(zeros(800,1280,3),'Parent',handles.TableCamera);
+hImage2=image(zeros(800,1280,3),'Parent',handles.ConveyorCamera);
+preview(vid,hImage);
+preview(vid,hImage);
 
 
 % Update handles structure
@@ -817,19 +817,17 @@ function endEffectorQ1_CreateFcn(hObject, eventdata, handles)
 end
 
 
-
-function edit25_Callback(hObject, eventdata, handles)
-% hObject    handle to edit25 (see GCBO)
+function jointAngleQ6_Callback(hObject, eventdata, handles)
+% hObject    handle to jointAngleQ3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of edit25 as text
-%        str2double(get(hObject,'String')) returns contents of edit25 as a double
+% Hints: get(hObject,'String') returns contents of jointAngleQ3 as text
+%        str2double(get(hObject,'String')) returns contents of jointAngleQ3 as a double
 end
 
-% --- Executes during object creation, after setting all properties.
-function edit25_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to edit25 (see GCBO)
+function jointAngleQ6_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to jointAngleQ6 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -839,7 +837,6 @@ function edit25_CreateFcn(hObject, eventdata, handles)
         set(hObject,'BackgroundColor','white');
     end
 end
-
 
 
 function jointAngleQ5_Callback(hObject, eventdata, handles)
@@ -863,7 +860,6 @@ function jointAngleQ5_CreateFcn(hObject, eventdata, handles)
         set(hObject,'BackgroundColor','white');
     end
 end
-
 
 
 function jointAngleQ4_Callback(hObject, eventdata, handles)
@@ -1027,9 +1023,9 @@ function poseSpeed_CreateFcn(hObject, eventdata, handles)
     end
 end
 
-% --- Executes on button press in jogXpos.
-function jogXpos_Callback(hObject, eventdata, handles)
-% hObject    handle to jogXpos (see GCBO)
+% --- Executes on button press in endEffectorXpos.
+function endEffectorXpos_Callback(hObject, eventdata, handles)
+% hObject    handle to endEffectorXpos (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -1047,9 +1043,9 @@ queue.add(commandStr);
 
 end
 
-% --- Executes on button press in jogXneg.
-function jogXneg_Callback(hObject, eventdata, handles)
-% hObject    handle to jogXneg (see GCBO)
+% --- Executes on button press in endEffectorXneg.
+function endEffectorXneg_Callback(hObject, eventdata, handles)
+% hObject    handle to endEffectorXneg (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -1060,9 +1056,9 @@ queue.add(commandStr);
 
 end
 
-% --- Executes on button press in jogYpos.
-function jogYpos_Callback(hObject, eventdata, handles)
-% hObject    handle to jogYpos (see GCBO)
+% --- Executes on button press in endEffectorYpos.
+function endEffectorYpos_Callback(hObject, eventdata, handles)
+% hObject    handle to endEffectorYpos (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -1073,9 +1069,9 @@ queue.add(commandStr);
 
 end
 
-% --- Executes on button press in jogZpos.
-function jogZpos_Callback(hObject, eventdata, handles)
-% hObject    handle to jogZpos (see GCBO)
+% --- Executes on button press in endEffectorZpos.
+function endEffectorZpos_Callback(hObject, eventdata, handles)
+% hObject    handle to endEffectorZpos (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -1086,9 +1082,9 @@ queue.add(commandStr);
 
 end
 
-% --- Executes on button press in jogZneg.
-function jogZneg_Callback(hObject, eventdata, handles)
-% hObject    handle to jogZneg (see GCBO)
+% --- Executes on button press in endEffectorZneg.
+function endEffectorZneg_Callback(hObject, eventdata, handles)
+% hObject    handle to endEffectorZneg (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -1099,9 +1095,9 @@ queue.add(commandStr);
 
 end
 
-% --- Executes on button press in jogYneg.
-function jogYneg_Callback(hObject, eventdata, handles)
-% hObject    handle to jogYneg (see GCBO)
+% --- Executes on button press in endEffectorYneg.
+function endEffectorYneg_Callback(hObject, eventdata, handles)
+% hObject    handle to endEffectorYneg (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
@@ -1162,22 +1158,26 @@ function joggingMode_Callback(hObject, eventdata, handles)
     contents = cellstr(get(hObject,'String'));
     joggingModeValue = contents{get(hObject,'Value')};
 
-    if (strcmp(joggingModeValue,'End Effector rel Conveyor'))
+    if (strcmp(joggingModeValue,'End Effector rel Base Frame'))
         set(handles.reorientEndEffectorMode,'Visible','Off');
         set(handles.jointMode,'Visible','Off');
-        set(handles.linearMode,'Visible','On');
-    elseif(strcmp(joggingModeValue,'End Effector rel Base'))
+        set(handles.endEffectorFrameMode,'Visible','Off');
+        set(handles.baseFrameMode,'Visible','On');
+    elseif(strcmp(joggingModeValue,'End Effector rel End Effector Frame'))
         set(handles.reorientEndEffectorMode,'Visible','Off');
         set(handles.jointMode,'Visible','Off');
-        set(handles.linearMode,'Visible','On');    
+        set(handles.endEffectorFrameMode,'Visible','On');
+        set(handles.baseFrameMode,'Visible','Off');
     elseif (strcmp(joggingModeValue,'Joint Angles'))
         set(handles.reorientEndEffectorMode,'Visible','Off');
         set(handles.jointMode,'Visible','On');
-        set(handles.linearMode,'Visible','Off');
+        set(handles.endEffectorFrameMode,'Visible','Off');
+        set(handles.baseFrameMode,'Visible','Off');
     elseif (strcmp(joggingModeValue,'Reorient End Effector'))
         set(handles.reorientEndEffectorMode,'Visible','On');
         set(handles.jointMode,'Visible','Off');
-        set(handles.linearMode,'Visible','Off');
+        set(handles.endEffectorFrameMode,'Visible','Off');
+        set(handles.baseFrameMode,'Visible','Off');
     end 
 
 end
@@ -1369,14 +1369,76 @@ function connectToPort_Callback(hObject, eventdata, handles)
 
 end
 
-function jointAngleQ6_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to jointAngleQ6 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    empty - handles not created until after all CreateFcns called
 
-% Hint: edit controls usually have a white background on Windows.
-%       See ISPC and COMPUTER.
-    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-        set(hObject,'BackgroundColor','white');
-    end
+
+% --- Executes on button press in Shutdown.
+function Shutdown_Callback(hObject, eventdata, handles)
+% hObject    handle to Shutdown (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+
+% --- Executes on button press in baseFrameXpos.
+function baseFrameXpos_Callback(hObject, eventdata, handles)
+% hObject    handle to baseFrameXpos (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+
+% --- Executes on button press in baseFrameYpos.
+function baseFrameYpos_Callback(hObject, eventdata, handles)
+% hObject    handle to baseFrameYpos (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+
+% --- Executes on button press in baseFrameZpos.
+function baseFrameZpos_Callback(hObject, eventdata, handles)
+% hObject    handle to baseFrameZpos (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+
+% --- Executes on button press in baseFrameXneg.
+function baseFrameXneg_Callback(hObject, eventdata, handles)
+% hObject    handle to baseFrameXneg (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+% --- Executes on button press in baseFrameYneg.
+function baseFrameYneg_Callback(hObject, eventdata, handles)
+% hObject    handle to baseFrameYneg (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+% --- Executes on button press in baseFrameZneg.
+function baseFrameZneg_Callback(hObject, eventdata, handles)
+% hObject    handle to baseFrameZneg (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+
+% --- Executes on button press in TableCamSS.
+function TableCamSS_Callback(hObject, eventdata, handles)
+% hObject    handle to TableCamSS (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of TableCamSS
+end
+
+% --- Executes on button press in ConveyorCamSS.
+function ConveyorCamSS_Callback(hObject, eventdata, handles)
+% hObject    handle to ConveyorCamSS (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hint: get(hObject,'Value') returns toggle state of ConveyorCamSS
 end
