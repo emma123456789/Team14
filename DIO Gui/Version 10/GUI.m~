@@ -1579,7 +1579,7 @@ if (get(hObject,'Value') == 1)
     %conveyorParams = load('conveyor.mat');
     %imj is new undistorted im
     %newOrigin = [x,y] origin of imj in the input im
-    [imj, newOrigin]=undistortImage(im, tableparams);
+    [imj, newOrigin]=undistortImage(im, tableParams);
    
     %undistort    
     %pointsToWorld, extrinsics
