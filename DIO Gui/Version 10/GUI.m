@@ -55,16 +55,16 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 % Choose default command line output for GUI
 handles.output = hObject;
 
-axes(handles.TableCamera);
-axes(handles.ConveyorCamera);
-vid = videoinput('macvideo',1); 
-%vid2 = videoinput('macvideo',2); 
-
-% sguideet image handle
-hImage=image(zeros(800,1280,3),'Parent',handles.TableCamera);
-hImage2=image(zeros(800,1280,3),'Parent',handles.ConveyorCamera);
-preview(vid,hImage);
-preview(vid,hImage);
+% axes(handles.TableCamera);
+% axes(handles.ConveyorCamera);
+% vid = videoinput('macvideo',1); 
+% %vid2 = videoinput('macvideo',2); 
+% 
+% % sguideet image handle
+% hImage=image(zeros(800,1280,3),'Parent',handles.TableCamera);
+% hImage2=image(zeros(800,1280,3),'Parent',handles.ConveyorCamera);
+% preview(vid,hImage);
+% preview(vid,hImage);
 
 
 % Update handles structure
@@ -81,6 +81,9 @@ global s_timer;
 global r_timer;
 global command_flag;
 global g_handles;
+global real_robot_IP_address;
+global sim_robot_IP_address;
+global robot_port;
 
 queue = LinkedList();
 status_queue = LinkedList();
@@ -89,19 +92,19 @@ s_timer = timer;
 s_timer.TimerFcn = @sendTimer;
 s_timer.period = 0.5;
 s_timer.ExecutionMode = 'fixedSpacing';
-start(s_timer);
+
 r_timer = timer;
 r_timer.TimerFcn = @receiveTimer;
 r_timer.period = 0.5;
 r_timer.ExecutionMode = 'fixedSpacing';
-start(r_timer);
+
 
 command_flag = 1;
 g_handles = handles;
 
 % The robot's IP address.
-robot_IP_address = '192.168.125.1'; % Real robot ip address
-robot_IP_address = '127.0.0.1'; % Simulation ip address
+real_robot_IP_address = '192.168.125.1'; % Real robot ip address
+sim_robot_IP_address = '127.0.0.1'; % Simulation ip address
 
 % The port that the robot will be listening on. This must be the same as in
 % your RAPID program.
@@ -146,10 +149,14 @@ function error_handling()
 	% Clear the command queue if there is an error
 	queue.clear();
 
-	% Stop the timers	
-	stop(s_timer);
-	stop(r_timer);
-	delete(timerfindall);
+	try
+		% Stop the timers	
+		stop(s_timer);
+		stop(r_timer);
+		delete(timerfindall);
+	catch
+		delete(timerfindall);
+	end
 
 end
 
@@ -404,10 +411,18 @@ global status_queue;
 commandStr = 'cancel';
 status_queue.add(commandStr);
 
+error_handling();
+
 end
 
 % --- Executes on button press in SafetyConfimation.
 function SafetyConfimation_Callback(hObject, eventdata, handles)
+global socket;
+global real_robot_IP_address;
+global sim_robot_IP_address;
+global robot_port;
+global s_timer;
+global r_timer;
 % hObject    handle to SafetyConfimation (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -415,38 +430,83 @@ function SafetyConfimation_Callback(hObject, eventdata, handles)
 
     SWP = SWPGET(handles);
     zero = find(SWP ~= 1);
-    if (isempty(zero))
-        % Effectly changing 'screens'
-        set(handles.CameraPanel,'Visible','On');
-        set(handles.statusPanel,'Visible','On');
-        set(handles.DIOPanel,'Visible','On');
-        set(handles.RobotStatusPanel,'Visible','On');
-        set(handles.SafetyPanel,'Visible','Off');
+    if (isempty(zero))		
+		% Connect to the robot 	
+		try
+			
+			% Open a TCP connection to the robot.
+			socket = tcpip(real_robot_IP_address, robot_port,'ConnectTimeout',5);
+			set(socket, 'ReadAsyncMode', 'continuous');
+			fopen(socket);
+
+			start(s_timer);
+			start(r_timer);
+			
+			% Start Cameras
+			axes(handles.TableCamera);
+			axes(handles.ConveyorCamera);
+			vid = videoinput('macvideo',1); 
+			%vid2 = videoinput('macvideo',2); 
+
+			% sguideet image handle
+			hImage=image(zeros(800,1280,3),'Parent',handles.TableCamera);
+			hImage2=image(zeros(800,1280,3),'Parent',handles.ConveyorCamera);
+			preview(vid,hImage);
+			preview(vid,hImage);
+			
+			% Check if the connection is valid.+6
+
+			if(~isequal(get(socket, 'Status'), 'open'))
+				warning(['Could not open TCP connection to ', real_robot_IP_address, ' on port ', robot_port]);
+				return;
+			end
+			
+			% Effectly changing 'screens'
+			set(handles.CameraPanel,'Visible','On');
+			set(handles.statusPanel,'Visible','On');
+			set(handles.DIOPanel,'Visible','On');
+			set(handles.RobotStatusPanel,'Visible','On');
+			set(handles.SafetyPanel,'Visible','Off');
 		
-	% Connect to the robot 	
-	global socket;
+		catch
+			try 
+				socket = tcpip(sim_robot_IP_address, robot_port,'ConnectTimeout',5);
+				set(socket, 'ReadAsyncMode', 'continuous');
+				fopen(socket);
+				
+				start(s_timer);
+				start(r_timer);
 
-	% The robot's IP address.
-% 	robot_IP_address = '192.168.125.1'; % Real robot ip address
-	robot_IP_address = '127.0.0.1'; % Simulation ip address
+				% Start Cameras
+				axes(handles.TableCamera);
+				axes(handles.ConveyorCamera);
+				vid = videoinput('macvideo',1); 
+				%vid2 = videoinput('macvideo',2); 
 
-	% The port that the robot will be listening on. This must be the same as in
-	% your RAPID program.
-	robot_port = 1025;
-% 	Server_port = 10000;
+				% sguideet image handle
+				hImage=image(zeros(800,1280,3),'Parent',handles.TableCamera);
+				hImage2=image(zeros(800,1280,3),'Parent',handles.ConveyorCamera);
+				preview(vid,hImage);
+				preview(vid,hImage);
 
-	% Open a TCP connection to the robot.
-	socket = tcpip(robot_IP_address, robot_port);
-    
-	set(socket, 'ReadAsyncMode', 'continuous');
-% 	fopen(socket);
-
-	% Check if the connection is valid.+6
-
-	if(~isequal(get(socket, 'Status'), 'open'))
-		warning(['Could not open TCP connection to ', robot_IP_address, ' on port ', robot_port]);
-		return;
-	end
+				if(~isequal(get(socket, 'Status'), 'open'))
+				warning(['Could not open TCP connection to ', sim_robot_IP_address, ' on port ', robot_port]);
+				return;		
+				end
+				
+				% Effectly changing 'screens'
+				set(handles.CameraPanel,'Visible','On');
+				set(handles.statusPanel,'Visible','On');
+				set(handles.DIOPanel,'Visible','On');
+				set(handles.RobotStatusPanel,'Visible','On');
+				set(handles.SafetyPanel,'Visible','Off');
+				
+			catch
+				error_handling();
+				msgbox('I CANNOT CONNECT TO EITHER REAL ROBOT OR SIMULATION');			
+				return;
+			end
+		end
 	
     else
         msgbox('PLEASE READ AND CHECK ALL BOXES');
@@ -602,39 +662,79 @@ end
 
 % --- Executes on button press in SecretButton.
 function SecretButton_Callback(hObject, eventdata, handles)
+global socket;
+global real_robot_IP_address;
+global sim_robot_IP_address;
+global robot_port;
+global s_timer;
+global r_timer;
 % hObject    handle to SecretButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% handles    structure with handles and user data (see GUIDATA)	
 
-        set(handles.CameraPanel,'Visible','On');
-        set(handles.statusPanel,'Visible','On');
-        set(handles.DIOPanel,'Visible','On');
-        set(handles.RobotStatusPanel,'Visible','On');
-        set(handles.SafetyPanel,'Visible','Off');
+	
+	% Connect to the robot 	
+% 		try		
+			% Open a TCP connection to the robot.
+% 			socket = tcpip(real_robot_IP_address, robot_port,'ConnectTimeout',5);
+			socket = tcpip(real_robot_IP_address, robot_port);
+			set(socket, 'ReadAsyncMode', 'continuous');
+% 			fopen(socket);
+
+			start(s_timer);
+			start(r_timer);
+			
+			% Start Cameras
+			axes(handles.TableCamera);
+			axes(handles.ConveyorCamera);
+			vid = videoinput('macvideo',1); 
+			%vid2 = videoinput('macvideo',2); 
+
+			% sguideet image handle
+			hImage=image(zeros(800,1280,3),'Parent',handles.TableCamera);
+			hImage2=image(zeros(800,1280,3),'Parent',handles.ConveyorCamera);
+			preview(vid,hImage);
+			preview(vid,hImage);
+			
+			% Check if the connection is valid.+6
+
+% 			if(~isequal(get(socket, 'Status'), 'open'))
+% 				warning(['Could not open TCP connection to ', real_robot_IP_address, ' on port ', robot_port]);
+% 				return;
+% 			end
+			
+			% Effectly changing 'screens'
+			set(handles.CameraPanel,'Visible','On');
+			set(handles.statusPanel,'Visible','On');
+			set(handles.DIOPanel,'Visible','On');
+			set(handles.RobotStatusPanel,'Visible','On');
+			set(handles.SafetyPanel,'Visible','Off');
 		
-	global socket;
+% 		catch
+% 			try 
+% 				socket = tcpip(sim_robot_IP_address, robot_port,'ConnectTimeout',5);
+% 				set(socket, 'ReadAsyncMode', 'continuous');
+% 				fopen(socket);
+% 
+% 				if(~isequal(get(socket, 'Status'), 'open'))
+% 				warning(['Could not open TCP connection to ', sim_robot_IP_address, ' on port ', robot_port]);
+% 				return;		
+% 				end
+% 				
+% 				% Effectly changing 'screens'
+% 				set(handles.CameraPanel,'Visible','On');
+% 				set(handles.statusPanel,'Visible','On');
+% 				set(handles.DIOPanel,'Visible','On');
+% 				set(handles.RobotStatusPanel,'Visible','On');
+% 				set(handles.SafetyPanel,'Visible','Off');
+% 				
+% 			catch
+% 				error_handling();
+% 				msgbox('I CANNOT CONNECT TO EITHER REAL ROBOT OR SIMULATION');			
+% 				return;
+% 			end
+% 		end
 
-	% The robot's IP address.
-	%robot_IP_address = '192.168.125.1'; % Real robot ip address
-	robot_IP_address = '127.0.0.1'; % Simulation ip address
-
-	% The port that the robot will be listening on. This must be the same as in
-	% your RAPID program.
-	robot_port = 1025;
-% 	Server_port = 10000;
-
-	% Open a TCP connection to the robot.
-	socket = tcpip(robot_IP_address, robot_port);
-    
-	set(socket, 'ReadAsyncMode', 'continuous');
-% 	fopen(socket);
-
-	% Check if the connection is valid.+6
-
-	if(~isequal(get(socket, 'Status'), 'open'))
-		warning(['Could not open TCP connection to ', robot_IP_address, ' on port ', robot_port]);
-		return;
-	end
         
 end
 
@@ -1348,33 +1448,59 @@ end
 
 % --- Executes on button press in connectToPort.
 function connectToPort_Callback(hObject, eventdata, handles)
+global socket;
+global real_robot_IP_address;
+global sim_robot_IP_address;
+global robot_port;
+global s_timer;
+global r_timer;
 % hObject    handle to connectToPort (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-	global socket;
+	% Connect to the robot 	
+		try		
+			% Open a TCP connection to the robot.
+			socket = tcpip(real_robot_IP_address, robot_port,'ConnectTimeout',5);
+			set(socket, 'ReadAsyncMode', 'continuous');
+			fopen(socket);
 
-	% The robot's IP address.
-	robot_IP_address = '192.168.125.1'; % Real robot ip address
-% 	robot_IP_address = '127.0.0.1'; % Simulation ip address
+			start(s_timer);
+			start(r_timer);
+			
+			% Check if the connection is valid.+6
 
-	% The port that the robot will be listening on. This must be the same as in
-	% your RAPID program.
-	robot_port = 1025;
-% 	Server_port = 10000;
+			if(~isequal(get(socket, 'Status'), 'open'))
+				warning(['Could not open TCP connection to ', real_robot_IP_address, ' on port ', robot_port]);
+				return;
+			end
+		
+		catch
+			try 
+				socket = tcpip(sim_robot_IP_address, robot_port,'ConnectTimeout',5);
+				set(socket, 'ReadAsyncMode', 'continuous');
+				fopen(socket);
 
-	% Open a TCP connection to the robot.
-	socket = tcpip(robot_IP_address, robot_port);
-    
-	set(socket, 'ReadAsyncMode', 'continuous');
-% 	fopen(socket);
+				if(~isequal(get(socket, 'Status'), 'open'))
+				warning(['Could not open TCP connection to ', sim_robot_IP_address, ' on port ', robot_port]);
+				return;		
+				end
+				
+			catch
+				% Effectly changing 'screens'
+				set(handles.CameraPanel,'Visible','Off');
+				set(handles.statusPanel,'Visible','Off');
+				set(handles.DIOPanel,'Visible','Off');
+				set(handles.RobotStatusPanel,'Visible','Off');
+				set(handles.SafetyPanel,'Visible','On');
+				
+				error_handling();
+				msgbox('I CANNOT CONNECT TO EITHER REAL ROBOT OR SIMULATION');			
+				return;
+			end
+		end
 
-	% Check if the connection is valid.+6
-
-	if(~isequal(get(socket, 'Status'), 'open'))
-		warning(['Could not open TCP connection to ', robot_IP_address, ' on port ', robot_port]);
-		return;
-	end
+	
 
 end
 
