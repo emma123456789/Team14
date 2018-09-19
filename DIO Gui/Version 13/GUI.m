@@ -1323,17 +1323,15 @@ global jaQ1 jaQ2 jaQ3 jaQ4 jaQ5 jaQ6;
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-	speed = poseSpeed;
+% 	speed = 'v50';
+	
 	switch poseSpeed
 		case 'Slow'
-			poseSpeed1 = v;
-			poseSpeed2 = 500;
+			speed = 'v50';
 		case 'Regular'
-			poseSpeed1 = v;
-			poseSpeed2 = 500;
+			speed = 'v100';
 		case 'Fast'
-			poseSpeed1 = v;
-			poseSpeed2 = 500;
+			speed = 'v500';
 	end
 	
 	

@@ -397,6 +397,7 @@ end
 % --- Executes on button press in Resume.
 function Resume_Callback(hObject, eventdata, handles)
 global status_queue;
+global command_flag;
 % hObject    handle to Resume (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
@@ -404,17 +405,24 @@ global status_queue;
 commandStr = 'resume';
 status_queue.add(commandStr);
 
+% Resume sending commands to the robot
+command_flag = 1;
+
 end
 
 % --- Executes on button press in Pause.
 function Pause_Callback(hObject, eventdata, handles)
 global status_queue;
+global command_flag;
 % hObject    handle to Pause (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
 commandStr = 'pause';
 status_queue.add(commandStr);
+
+% Stop sending commands to the robot
+command_flag = 0;
 
 end
 
@@ -1315,7 +1323,17 @@ global jaQ1 jaQ2 jaQ3 jaQ4 jaQ5 jaQ6;
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-	speed = poseSpeed; 
+	speed = poseSpeed;
+	switch poseSpeed
+		case 'Slow'
+			speed = 'v50';
+		case 'Regular'
+			speed = 'v100';
+		case 'Fast'
+			speed = 'v500';
+	end
+	
+	
 	switch poseMode
 		case 1
 			eex = eeX;
@@ -1325,7 +1343,7 @@ global jaQ1 jaQ2 jaQ3 jaQ4 jaQ5 jaQ6;
 			eeq2 = eeQ2;
 			eeq3 = eeQ3;
 			eeq4 = eeQ4;
-	        commandStr = sprintf('moveErC,%d,%d,%d,%d,%d,%d,%d,%s', eex,eey,eez,eeq1,eeq2,eeq3,eeq4,speed);
+	        commandStr = sprintf('moveerc %d %d %d %d %d %d %d %s', eex,eey,eez,eeq1,eeq2,eeq3,eeq4,speed);
 	        queue.add(commandStr);
 		case 2
 			eex = eeX;
@@ -1335,7 +1353,7 @@ global jaQ1 jaQ2 jaQ3 jaQ4 jaQ5 jaQ6;
 			eeq2 = eeQ2;
 			eeq3 = eeQ3;
 			eeq4 = eeQ4;
-            commandStr = sprintf('moveErT,%d,%d,%d,%d,%d,%d,%d,%s', eex,eey,eez,eeq1,eeq2,eeq3,eeq4,speed);
+            commandStr = sprintf('moveert %d %d %d %d %d %d %d %s', eex,eey,eez,eeq1,eeq2,eeq3,eeq4,speed);
             queue.add(commandStr);
 		case 3
 			q1 = jaQ1;
@@ -1344,7 +1362,7 @@ global jaQ1 jaQ2 jaQ3 jaQ4 jaQ5 jaQ6;
 			q4 = jaQ4;
 			q5 = jaQ5;
 			q6 = jaQ6;
-            commandStr = sprintf('movejas %d,%d,%d,%d,%d,%d,%s', q1,q2,q3,q4,q5,q6,speed);
+            commandStr = sprintf('movejas %d %d %d %d %d %d %s', q1,q2,q3,q4,q5,q6,speed);
             queue.add(commandStr);
 		case 4
 			eeq1 = eeQ1;
@@ -1766,10 +1784,16 @@ end
 
 % --- Executes on button press in Shutdown.
 function Shutdown_Callback(hObject, eventdata, handles)
+global status_queue;
 % hObject    handle to Shutdown (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+commandStr = 'shutdown';
+status_queue.add(commandStr);
+
 error_handling();
+
+
 end
 
 
