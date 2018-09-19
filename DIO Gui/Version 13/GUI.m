@@ -170,7 +170,7 @@ function send_string()
 	if queue.size()>0
 		% Obtain the fist command in the linkedlist
 		commandStr = queue.pop();
-% 		fwrite(socket,commandStr);
+		fwrite(socket,commandStr);
 %         command_flag = 0;
  		%fprintf(char(commandStr));
 		
@@ -188,7 +188,7 @@ function send_priorityString()
 	global g_handles;
     
 	criticalCommandStr = status_queue.pop();
-% 	fwrite(socket,criticalCommandStr);
+	fwrite(socket,criticalCommandStr);
 	
 	% Update Sent Priority Message Log
 	sentList = [{criticalCommandStr}; g_handles.SentMessages.String];
@@ -239,7 +239,7 @@ function connectToRobot(buttonNo)
 		% Start Cameras
 		axes(g_handles.TableCamera);
 		axes(g_handles.ConveyorCamera);
-		vid = videoinput('macvideo',1); 
+		vid = videoinput('winvideo',1); 
 		%vid2 = videoinput('macvideo',2); 
 
 		% sguideet image handle
