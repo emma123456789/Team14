@@ -1,6 +1,6 @@
 MODULE Assignment2
     
-    VAR socketdev client_socket;
+    !PERS socketdev client_socket;
     ! The host and port that we will be listening for a connection on.
     !PERS string host := "127.0.0.1";
     
@@ -11,7 +11,7 @@ MODULE Assignment2
     VAR num jog_inc_deg:= 5;
     VAR speeddata jog_speed:=v100;
     VAR speeddata pose_speed:= v100;
-    PERS string current_state := "None";
+    PERS string current_state := "";
     PERS bool quit := FALSE;
     PERS bool done := FALSE;
     PERS bool checkCom := FALSE;
@@ -45,129 +45,117 @@ MODULE Assignment2
         !obtain current status
         
         !only use this if the position can deviate to avoid singularities
-        SingArea \Wrist;
+        !SingArea \Wrist;
         
         !absolute position
         confj  \On;
         
-        VelSet 70, 800;
+        !VelSet 70, 800;
         
         !IF current_state <> "cancel" THEN
             IF current_state = "moveerc" THEN
                 MoveTargetConveyer numTotal;
                 done:= TRUE;
                 current_state := "None";
-                WaitTime 2;
+            ENDIF
+            IF current_state = "moveert"THEN
+                MoveTargetTable numTotal;
+                done:=TRUE;
+                current_state:="None";
             ENDIF
             IF current_state = "movejas"THEN
                 MoveToPose;
-                WaitTime 2;
+                done:=TRUE;
+                current_state:="None";
             ENDIF
             IF current_state = "xPlus" THEN
                 JogX(jog_inc);
                 done:= TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF
             IF current_state = "yPlus" THEN
                 JogY(jog_inc);
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF
             IF current_state = "zPlus" THEN
                 JogZ(jog_inc);
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF
             IF current_state = "xMinus" THEN
                 JogX(-jog_inc);
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF
             IF current_state = "yMinus" THEN
                 JogY(-jog_inc);
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF
             IF current_state = "zMinus" THEN
                 JogZ(-jog_inc);
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF
             IF current_state = "jog1" THEN
                 Jog1(jog_inc_deg);
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF
             IF current_state = "conOn" THEN
                 conRunOn;
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF
             IF current_state = "conOff" THEN
                 conRunOff;
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF
             IF current_state = "conReverseOn" THEN
                 conDirHome;
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF 
             IF current_state = "conReverseOff" THEN
                 conDirRob;
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF 
             IF current_state = "vacSolOn" THEN
                 vacSolOn;
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF
             IF current_state = "vacSolOff" THEN
                 vacSolOff;
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF 
             IF current_state = "vacPumpOn" THEN
                 vacPwrOn;
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF 
             IF current_state = "vacPumpOff" THEN
                 vacPwrOff;
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF
             IF current_state = "paused" THEN
                 paused:=TRUE;
-                !StopMove;
-                !StorePath;
+                StopMove;
+                StorePath;
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF
             IF current_state = "resume" THEN
                 paused:=FALSE;
-                !RestoPath;
-                !StartMove;
+                RestoPath;
+                StartMove;
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF
             IF current_state = "cancel" THEN
                 cancelled:=TRUE;
@@ -175,30 +163,20 @@ MODULE Assignment2
                 !StartMove;
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF
             IF current_state = "quit" THEN
                 quit:=TRUE;
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             ENDIF
-            !ELSEIF current_state = "moveToPose" THEN
-                !moveToPose(thetas_new);
-                !WaitTime 2;
-            !ELSEIF current_state = "moveAngle" THEN
-                !moveAngle(robot_ang,robot_speed);
-                !WaitTIme 2;
             IF current_state = "unknown" THEN
                 TPWrite "Unknown command";
                 done:=TRUE;
                 current_state := "None";
-                WaitTime 2;
             !ENDIF
         ELSE
-        done:= TRUE;
-        current_state := "None";
-        WaitTime 2;
+        !done:= TRUE;
+        !current_state := "None";
         ENDIF
 
         checkCom := FALSE;
@@ -307,42 +285,91 @@ MODULE Assignment2
     ENDPROC
     
      PROC MoveToPose()
-        VAR robjoint pose;
+        VAR robjoint pose;!
+        VAR speeddata move_speed;
         VAR jointtarget thetas_new_formatted;
+        !errror checking
+        VAR robtarget check_target;
+        VAR jointtarget check_joints;
+        VAR errnum err_val;
         pose:=getPose(numTotal);
+        move_speed := getSpeed(modeSpeed);
         thetas_new_formatted:= [pose, [9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];!the formatted joint angles for moving the robot
-        MoveAbsJ thetas_new_formatted, jog_speed, fine, tSCup;
+        !check if in range
+        check_target:=CalcRobT(thetas_new_formatted,tSCup);
+        check_joints:=CalcJointT(check_target,tSCup\ErrorNumber:=err_val);
+         IF err_val<>0 THEN
+            errorNumber := err_val;
+            errorHandling := TRUE;
+        ELSE
+            MoveAbsJ thetas_new_formatted, move_speed, fine, tSCup;
+         ENDIF
         ERROR
     ENDPROC
-    
-    
-    PROC MoveAngle(robjoint robot_ang,speeddata robot_speed)
-        VAR jointtarget lin_joint;
-        VAR jointtarget jointpos;
-        VAR robtarget ang_rob;
-        VAR errnum myerrnum;
-        jointpos:=[robot_ang,[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
-        ang_rob:=CalcRobT(jointpos,tSCup);
-        lin_joint:=CalcJointT(ang_rob,tSCup\ErrorNumber:=myerrnum);
-    ERROR
-    ENDPROC
-   
 
-    PROC MoveTargetGlobal(robtarget target)
+
+    PROC MoveTargetGlobal(string numTotal{*})
+        VAR robtarget target;
+        VAR speeddata move_speed;
+        VAR jointtarget check_joints;
+        VAR errnum err_val;
         
-           MoveJ target, v100, fine, tSCup;
+        !get data from strings
+        move_speed:=getSpeed(modeSpeed);
+        target:= getTarget(numTotal);
+        
+        !error checking before move
+        check_joints:=CalcJointT(target,tSCup\ErrorNumber:=err_val);
+         IF err_val<>0 THEN
+            errorNumber := err_val;
+            errorHandling := TRUE;
+        ELSE
+            MoveJ target, move_speed, fine, tSCup;
+         ENDIF
+         ERROR
     ENDPROC
     
-    PROC MoveTargetTable(robtarget target)            
-           MoveJ target, v100, fine, tSCup, \WObj:=wTable;           
+    PROC MoveTargetTable(string numTotal{*})
+        VAR robtarget target;
+        VAR speeddata move_speed;
+        VAR jointtarget check_joints;
+        VAR errnum err_val;
+        
+        !get data from strings
+        move_speed:=getSpeed(modeSpeed);
+        target:= getTarget(numTotal);
+        
+        !error checking before move
+        check_joints:=CalcJointT(target,tSCup\ErrorNumber:=err_val);
+         IF err_val<>0 THEN
+            errorNumber := err_val;
+            errorHandling := TRUE;
+        ELSE
+            MoveJ target, move_speed, fine, tSCup, \WObj:=wTable;
+         ENDIF
+         ERROR
     ENDPROC
     
     PROC MoveTargetConveyer(string numTotal{*})
         VAR robtarget target;
         VAR speeddata move_speed;
+        
+        VAR jointtarget check_joints;
+        VAR errnum err_val;
+        
+        !get data from strings
         move_speed:=getSpeed(modeSpeed);
         target:= getTarget(numTotal);
-        MoveJ target, move_speed, fine, tSCup, \WObj:=wConv;
+        
+        !error checking before move
+        check_joints:=CalcJointT(target,tSCup\ErrorNumber:=err_val);
+         IF err_val<>0 THEN
+            errorNumber := err_val;
+            errorHandling := TRUE;
+        ELSE
+            MoveJ target, move_speed, fine, tSCup, \WObj:=wConv;
+         ENDIF
+         ERROR
     ENDPROC
     
     PROC MoveTargetOffset(robtarget target, num x, num y, num z)
@@ -392,6 +419,7 @@ MODULE Assignment2
       ELSEIF modeSpeed = "v500" THEN
           move_speed := v500;
       ENDIF
+      RETURN move_speed;
     ENDFUNC
     
     PROC vacPwrOn()

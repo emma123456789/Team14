@@ -4,7 +4,7 @@ MODULE MTRN4230_Server_Sample
     VAR socketdev client_socket;
     ! The host and port that we will be listening for a connection on.
     PERS string host := "127.0.0.1";
-    PERS string current_state := "None";
+    PERS string current_state := "";
     CONST num port := 1025;
     PERS bool quit := FALSE;
     PERS bool checkCom := FALSE;
@@ -63,6 +63,7 @@ MODULE MTRN4230_Server_Sample
             stringLength := strLen(received_str);
             index := 1;
             numIndex:=1;
+            received_strSeg:="";
             IF stringFound = FALSE THEN
                 stringStart :=  strFind(received_str,index,STR_WHITE);
                 received_strSeg :=  strPart(received_str,index,stringStart-index);
@@ -231,6 +232,7 @@ MODULE MTRN4230_Server_Sample
             received_str<>"enableConveyorOn" AND received_str<>"enableConveyorOff" AND 
             received_str<>"conveyorReverseOn" AND received_str<>"conveyorReverseOff" AND
             received_str<>"moveToPose" AND received_str<>"moveAngle" AND 
+            received_strSeg<>"movejas" AND received_strSeg <> "moveert" AND received_strSeg <> "moveerc" AND 
             received_str<>"" AND received_str<>"pause" AND received_str<>"resume" AND 
             received_str<>"cancel" AND received_str<>"quit" THEN
                 SocketSend client_socket \Str:=("unknown comand" + "\0A"); 
@@ -263,7 +265,7 @@ MODULE MTRN4230_Server_Sample
             ENDIF
             
             !IF received_str <> "cancel" THEN
-            checkCom:=TRUE;
+            !checkCom:=TRUE;
             WaitUntil current_state = "None" and done = TRUE;
             IF errorHandling = TRUE THEN
                 SocketSend client_socket \Str:=("Error Number:" + ValtoStr(errorNumber) + "\0A");
