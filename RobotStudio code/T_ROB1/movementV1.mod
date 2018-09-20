@@ -11,7 +11,7 @@ MODULE Assignment2
     VAR num jog_inc_deg:= 5;
     VAR speeddata jog_speed:=v100;
     VAR speeddata pose_speed:= v100;
-    PERS string current_state := "";
+    PERS string current_state := "None";
     PERS bool quit := FALSE;
     PERS bool done := FALSE;
     PERS bool checkCom := FALSE;
@@ -23,7 +23,7 @@ MODULE Assignment2
     PERS bool cancelled := TRUE;
     PERS string numTotal{7};
     PERS string modeSpeed;
-    
+    PERS wobjdata wobjCurrent;
 
     
    
@@ -33,7 +33,7 @@ MODULE Assignment2
         ! Program Starts
         MoveToCalibPos;
         current_state:="";
-        
+        wobjCurrent:=wTable;
     CONNECT pauseTrigger WITH pauseRoutine;
     IPers paused, pauseTrigger;
     CONNECT cancelTrigger WITH cancelRoutine;
@@ -54,11 +54,13 @@ MODULE Assignment2
         
         !IF current_state <> "cancel" THEN
             IF current_state = "moveerc" THEN
+                wobjCurrent := wConv;
                 MoveTargetConveyer numTotal;
                 done:= TRUE;
                 current_state := "None";
             ENDIF
             IF current_state = "moveert"THEN
+                wobjCurrent:=wTable;
                 MoveTargetTable numTotal;
                 done:=TRUE;
                 current_state:="None";
@@ -194,20 +196,20 @@ MODULE Assignment2
         VAR jointtarget jog_target;
         VAR errnum err_val;
         !get current pos
-        pos_current:=CRobT();
+        pos_current:=CRobT(\WObj:=wobjCurrent);
         
         !calculate new pos
         pos_new:=pos_current;
         pos_new.trans.x:=pos_current.trans.x+jog_inc;
         
-        jog_target:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
+        jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wobjCurrent\ErrorNumber:=err_val);
         IF err_val<>0THEN
             errorNumber := err_val;
             errorHandling := TRUE;
             WaitTime 1;
         ELSE
             !move to calculated pos
-            MoveL pos_new,jog_speed,fine,tSCup;
+            MoveL pos_new,jog_speed,fine,tSCup \WObj:=wobjCurrent;
         ENDIF
         ERROR
             done:=TRUE;
@@ -220,19 +222,19 @@ MODULE Assignment2
         VAR jointtarget jog_target;
         VAR errnum err_val;
         !get current pos
-        pos_current:=CRobT();
+        pos_current:=CRobT(\WObj:=wobjCurrent);
         !calculate new pos
         pos_new:=pos_current;
         pos_new.trans.y:=pos_current.trans.y+jog_inc;
         !check if reachable
-        jog_target:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
+        jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wobjCurrent\ErrorNumber:=err_val);
         IF err_val <> 0 THEN
             errorNumber := err_val;
             errorHandling := TRUE;
             WaitTime 1;
         ELSE
             !move to calculated pos
-            MoveL pos_new,jog_speed,fine,tSCup;
+            MoveL pos_new,jog_speed,fine,tSCup\WObj:=wobjCurrent;
         ENDIF
     ENDPROC   
     
@@ -242,20 +244,20 @@ MODULE Assignment2
         VAR jointtarget jog_target;
         VAR errnum err_val;
         !get current pos
-        pos_current:=CRobT();
+        pos_current:=CRobT(\WObj:=wobjCurrent);
         
         !calculate new pos
         pos_new:=pos_current;
         pos_new.trans.z:=pos_current.trans.z+jog_inc;
         
-        jog_target:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
+        jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wobjCurrent\ErrorNumber:=err_val);
         IF err_val<>0 THEN
             errorNumber := err_val;
             errorHandling := TRUE;
             WaitTime 1;
         ELSE
             !move to calculated pos
-            MoveL pos_new,jog_speed,fine,tSCup;
+            MoveL pos_new,jog_speed,fine,tSCup\WObj:=wobjCurrent;
         ENDIF
         ERROR
     ENDPROC   
@@ -319,12 +321,12 @@ MODULE Assignment2
         target:= getTarget(numTotal);
         
         !error checking before move
-        check_joints:=CalcJointT(target,tSCup\ErrorNumber:=err_val);
+        check_joints:=CalcJointT(target,tSCup \WObj:=wobjCurrent\ErrorNumber:=err_val);
          IF err_val<>0 THEN
             errorNumber := err_val;
             errorHandling := TRUE;
         ELSE
-            MoveJ target, move_speed, fine, tSCup;
+            MoveJ target, move_speed, fine, tSCup\WObj:=wobjCurrent;
          ENDIF
          ERROR
     ENDPROC
@@ -340,14 +342,14 @@ MODULE Assignment2
         target:= getTarget(numTotal);
         
         !error checking before move
-        check_joints:=CalcJointT(target,tSCup\ErrorNumber:=err_val);
-         IF err_val<>0 THEN
+        check_joints:=CalcJointT(target,tSCup\WObj:=wobjCurrent \ErrorNumber:=err_val);
+        IF err_val<>0 THEN
             errorNumber := err_val;
             errorHandling := TRUE;
         ELSE
-            MoveJ target, move_speed, fine, tSCup, \WObj:=wTable;
-         ENDIF
-         ERROR
+            MoveJ target, move_speed, fine, tSCup, \WObj:=wobjCurrent;
+        ENDIF
+        ERROR
     ENDPROC
     
     PROC MoveTargetConveyer(string numTotal{*})
@@ -362,12 +364,12 @@ MODULE Assignment2
         target:= getTarget(numTotal);
         
         !error checking before move
-        check_joints:=CalcJointT(target,tSCup\ErrorNumber:=err_val);
+        check_joints:=CalcJointT(target,tSCup\WObj:=wobjCurrent\ErrorNumber:=err_val);
          IF err_val<>0 THEN
             errorNumber := err_val;
             errorHandling := TRUE;
         ELSE
-            MoveJ target, move_speed, fine, tSCup, \WObj:=wConv;
+            MoveJ target, move_speed, fine, tSCup, \WObj:=wobjCurrent;
          ENDIF
          ERROR
     ENDPROC
@@ -382,14 +384,21 @@ MODULE Assignment2
         VAR robtarget newTarget;
         VAR bool conversion_outcome;
         VAR num converted_num;
+        VAR num roll;
+        VAR num pitch;
+        VAR num yaw;
         
         conversion_outcome := StrtoVal(numTotal{1}, newTarget.trans.x);
         conversion_outcome := StrtoVal(numTotal{2}, newTarget.trans.y);
         conversion_outcome := StrtoVal(numTotal{3}, newTarget.trans.z);
-        conversion_outcome := StrtoVal(numTotal{4}, newTarget.rot.q1);
-        conversion_outcome := StrtoVal(numTotal{5}, newTarget.rot.q2);
-        conversion_outcome := StrtoVal(numTotal{6}, newTarget.rot.q3);
-        conversion_outcome := StrtoVal(numTotal{7}, newTarget.rot.q4);
+!        conversion_outcome := StrtoVal(numTotal{4}, newTarget.rot.q1);
+!        conversion_outcome := StrtoVal(numTotal{5}, newTarget.rot.q2);
+!        conversion_outcome := StrtoVal(numTotal{6}, newTarget.rot.q3);
+!        conversion_outcome := StrtoVal(numTotal{7}, newTarget.rot.q4);
+        conversion_outcome := StrtoVal(numTotal{4}, roll);
+        conversion_outcome := StrtoVal(numTotal{5}, pitch);
+        conversion_outcome := StrtoVal(numTotal{6}, yaw);
+        newTarget.rot := OrientZYX(roll, pitch, yaw); 
         
         RETURN newTarget;
     ENDFUNC

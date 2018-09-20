@@ -4,7 +4,7 @@ MODULE MTRN4230_Server_Sample
     VAR socketdev client_socket;
     ! The host and port that we will be listening for a connection on.
     PERS string host := "127.0.0.1";
-    PERS string current_state := "";
+    PERS string current_state := "None";
     CONST num port := 1025;
     PERS bool quit := FALSE;
     PERS bool checkCom := FALSE;
