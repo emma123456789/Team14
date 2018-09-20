@@ -148,7 +148,7 @@ MODULE Assignment2_sim
         pos_new:=pos_current;
         pos_new.trans.x:=pos_current.trans.x+jog_inc;
         jog_target:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
-        IF err_val>0 OR err_val >0THEN
+        IF err_val<>0 THEN
             !send message to matlab
             errorNo:=1;
             WaitTime 1;
@@ -226,7 +226,7 @@ MODULE Assignment2_sim
     
         pos_new:=CalcRobT(thetas_new,tSCup);
         thetas_current:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
-        IF err_val=1135 OR err_val=1074 OR err_val = ERR_ROBLIMIT THEN
+        IF err_val = ERR_ROBLIMIT THEN
             !send message to matlab, out of range
             RETURN;
         ELSE

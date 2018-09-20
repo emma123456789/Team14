@@ -1,7 +1,7 @@
 function varargout = GUI(varargin)
 % GUI MATLAB code for GUI.fig
 %      GUI, by itself, creates a new GUI or raises the existing
-%      singleton*.
+%      singleton*.  
 %
 %      H = GUI returns the handle to a new GUI or the handle to
 %      the existing singleton*.
@@ -235,18 +235,18 @@ function connectToRobot(buttonNo)
 			start(s_timer);
 			start(r_timer);
 		end
-
-		% Start Cameras
-		axes(g_handles.TableCamera);
-		axes(g_handles.ConveyorCamera);
-		vid = videoinput('winvideo',1); 
-		%vid2 = videoinput('macvideo',2); 
-
-		% sguideet image handle
-		hImage=image(zeros(800,1280,3),'Parent',g_handles.TableCamera);
-		hImage2=image(zeros(800,1280,3),'Parent',g_handles.ConveyorCamera);
-		preview(vid,hImage);
-		preview(vid,hImage);
+% 
+% 		% Start Cameras
+% 		axes(g_handles.TableCamera);
+% 		axes(g_handles.ConveyorCamera);
+% 		vid = videoinput('winvideo',1); 
+% 		%vid2 = videoinput('macvideo',2); 
+% 
+% 		% sguideet image handle
+% 		hImage=image(zeros(800,1280,3),'Parent',g_handles.TableCamera);
+% 		hImage2=image(zeros(800,1280,3),'Parent',g_handles.ConveyorCamera);
+% 		preview(vid,hImage);
+% 		preview(vid,hImage);
 
 		% Check if the connection is valid.+6
 

@@ -5,13 +5,13 @@ MODULE Assignment2
     !PERS string host := "127.0.0.1";
     
     VAR num effectorHeight:= 147;
-    VAR robtarget testTarget := [[175, -100, 147],[0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    PERS robtarget testTarget := [[175, -100, 147],[0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
    
     VAR num jog_inc:=30;
     VAR num jog_inc_deg:= 5;
     VAR speeddata jog_speed:=v100;
     VAR speeddata pose_speed:= v100;
-    PERS string current_state := "";
+    PERS string current_state := "None";
     PERS bool quit := FALSE;
     PERS bool done := FALSE;
     PERS bool checkCom := FALSE;
@@ -20,7 +20,9 @@ MODULE Assignment2
     VAR intnum pauseTrigger;
     VAR intnum cancelTrigger;
     PERS bool paused:=FALSE;
-    PERS bool cancelled := FALSE;
+    PERS bool cancelled := TRUE;
+    PERS string numTotal{7};
+    PERS string modeSpeed;
     
 
     
@@ -30,6 +32,7 @@ MODULE Assignment2
                 
         ! Program Starts
         MoveToCalibPos;
+        current_state:="";
         
     CONNECT pauseTrigger WITH pauseRoutine;
     IPers paused, pauseTrigger;
@@ -50,6 +53,16 @@ MODULE Assignment2
         VelSet 70, 800;
         
         !IF current_state <> "cancel" THEN
+            IF current_state = "moveerc" THEN
+                MoveTargetConveyer numTotal;
+                done:= TRUE;
+                current_state := "None";
+                WaitTime 2;
+            ENDIF
+            IF current_state = "movejas"THEN
+                MoveToPose;
+                WaitTime 2;
+            ENDIF
             IF current_state = "xPlus" THEN
                 JogX(jog_inc);
                 done:= TRUE;
@@ -210,7 +223,7 @@ MODULE Assignment2
         pos_new.trans.x:=pos_current.trans.x+jog_inc;
         
         jog_target:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
-        IF err_val=1135 OR err_val=1074 THEN
+        IF err_val<>0THEN
             errorNumber := err_val;
             errorHandling := TRUE;
             WaitTime 1;
@@ -218,6 +231,9 @@ MODULE Assignment2
             !move to calculated pos
             MoveL pos_new,jog_speed,fine,tSCup;
         ENDIF
+        ERROR
+            done:=TRUE;
+            current_state:="None";
     ENDPROC   
     
     PROC JogY(num jog_inc)
@@ -232,7 +248,7 @@ MODULE Assignment2
         pos_new.trans.y:=pos_current.trans.y+jog_inc;
         !check if reachable
         jog_target:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
-        IF err_val=1135 OR err_val=1074 THEN
+        IF err_val <> 0 THEN
             errorNumber := err_val;
             errorHandling := TRUE;
             WaitTime 1;
@@ -255,7 +271,7 @@ MODULE Assignment2
         pos_new.trans.z:=pos_current.trans.z+jog_inc;
         
         jog_target:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
-        IF err_val=1135 OR err_val=1074 THEN
+        IF err_val<>0 THEN
             errorNumber := err_val;
             errorHandling := TRUE;
             WaitTime 1;
@@ -263,6 +279,7 @@ MODULE Assignment2
             !move to calculated pos
             MoveL pos_new,jog_speed,fine,tSCup;
         ENDIF
+        ERROR
     ENDPROC   
     
     !Jog Joint 1
@@ -280,21 +297,22 @@ MODULE Assignment2
     
         pos_new:=CalcRobT(thetas_new,tSCup);
         thetas_current:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
-        IF err_val=1135 OR err_val=1074 OR err_val = ERR_ROBLIMIT THEN
+        IF err_val<>0 THEN
             errorNumber := err_val;
             errorHandling := TRUE;
         ELSE
             MoveAbsJ thetas_new,jog_speed,fine,tSCup;
         ENDIF
+        ERROR
     ENDPROC
     
-     PROC MoveToPose(robjoint thetas_new)
+     PROC MoveToPose()
+        VAR robjoint pose;
         VAR jointtarget thetas_new_formatted;
-        thetas_new_formatted:= [thetas_new, [9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];!the formatted joint angles for moving the robot
-               
-        
+        pose:=getPose(numTotal);
+        thetas_new_formatted:= [pose, [9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];!the formatted joint angles for moving the robot
         MoveAbsJ thetas_new_formatted, jog_speed, fine, tSCup;
-        
+        ERROR
     ENDPROC
     
     
@@ -310,25 +328,71 @@ MODULE Assignment2
     ENDPROC
    
 
-    PROC MoveTarget(robtarget target)
+    PROC MoveTargetGlobal(robtarget target)
         
-            ! 'MoveJ' executes a joint motion towards a robtarget. This is used to move the robot quickly from one point to another when that 
-            !   movement does not need to be in a straight line.
-            ! 'pTableHome' is a robtarget defined in system module. The exact location of this on the table has been provided to you.
-            ! 'v100' is a speeddata variable, and defines how fast the robot should move. The numbers is the speed in mm/sec, in this case 100mm/sec.
-            ! 'fine' is a zonedata variable, and defines how close the robot should move to a point before executing its next command. 
-            !   'fine' means very close, other values such as 'z10' or 'z50', will move within 10mm and 50mm respectively before executing the next command.
-            ! 'tSCup' is a tooldata variable. This has been defined in a system module, and represents the tip of the suction cup, telling the robot that we
-            !   want to move this point to the specified robtarget. Please be careful about what tool you use, as using the incorrect tool will result in
-            !   the robot not moving where you would expect it to. Generally you should be using
-            MoveJ target, v100, fine, tSCup;
-            
+           MoveJ target, v100, fine, tSCup;
+    ENDPROC
+    
+    PROC MoveTargetTable(robtarget target)            
+           MoveJ target, v100, fine, tSCup, \WObj:=wTable;           
+    ENDPROC
+    
+    PROC MoveTargetConveyer(string numTotal{*})
+        VAR robtarget target;
+        VAR speeddata move_speed;
+        move_speed:=getSpeed(modeSpeed);
+        target:= getTarget(numTotal);
+        MoveJ target, move_speed, fine, tSCup, \WObj:=wConv;
     ENDPROC
     
     PROC MoveTargetOffset(robtarget target, num x, num y, num z)
         
               MoveL Offs(target, x, y, z), v100, fine, tSCup;
     ENDPROC
+    
+    !converts the string fragments from the comms server to a robtarget
+    FUNC robtarget getTarget(string numTotal{*})
+        VAR robtarget newTarget;
+        VAR bool conversion_outcome;
+        VAR num converted_num;
+        
+        conversion_outcome := StrtoVal(numTotal{1}, newTarget.trans.x);
+        conversion_outcome := StrtoVal(numTotal{2}, newTarget.trans.y);
+        conversion_outcome := StrtoVal(numTotal{3}, newTarget.trans.z);
+        conversion_outcome := StrtoVal(numTotal{4}, newTarget.rot.q1);
+        conversion_outcome := StrtoVal(numTotal{5}, newTarget.rot.q2);
+        conversion_outcome := StrtoVal(numTotal{6}, newTarget.rot.q3);
+        conversion_outcome := StrtoVal(numTotal{7}, newTarget.rot.q4);
+        
+        RETURN newTarget;
+    ENDFUNC
+    
+    !converts the string fragments from the comms server to a robtarget
+    FUNC robjoint getPose(string numTotal{*})
+        VAR robjoint pose;
+        VAR bool conversion_outcome;
+        VAR num converted_num;
+        
+        conversion_outcome := StrtoVal(numTotal{1}, pose.rax_1);
+        conversion_outcome := StrtoVal(numTotal{2}, pose.rax_2);
+        conversion_outcome := StrtoVal(numTotal{3}, pose.rax_3);
+        conversion_outcome := StrtoVal(numTotal{4}, pose.rax_4);
+        conversion_outcome := StrtoVal(numTotal{5}, pose.rax_5);
+        conversion_outcome := StrtoVal(numTotal{6}, pose.rax_6);
+        RETURN pose;
+    ENDFUNC
+    
+    !switch statement for the speed string from matlab
+    FUNC speeddata getSpeed(string modeSpeed)
+      VAR speeddata move_speed;
+      IF modeSpeed = "v50" THEN
+          move_speed := v50;
+      ELSEIF modeSpeed = "v100" THEN
+          move_speed := v100;
+      ELSEIF modeSpeed = "v500" THEN
+          move_speed := v500;
+      ENDIF
+    ENDFUNC
     
     PROC vacPwrOn()
         SetDO DO10_1, 1;

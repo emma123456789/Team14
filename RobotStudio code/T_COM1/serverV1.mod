@@ -4,7 +4,7 @@ MODULE MTRN4230_Server_Sample
     VAR socketdev client_socket;
     ! The host and port that we will be listening for a connection on.
     PERS string host := "127.0.0.1";
-    PERS string current_state := "";
+    PERS string current_state := "None";
     CONST num port := 1025;
     PERS bool quit := FALSE;
     PERS bool checkCom := FALSE;
@@ -45,6 +45,7 @@ MODULE MTRN4230_Server_Sample
         
         VAR string received_str := "";
         VAR string received_strSeg := "";
+        current_state:="";
         
         WHILE quit=FALSE DO
             
@@ -56,11 +57,12 @@ MODULE MTRN4230_Server_Sample
             WaitTime 1;
             
             ! Receive a string from the client.            
-            SocketReceive client_socket \Str:=received_str; !\Time:=WAIT_MAX;
+            SocketReceive client_socket \Str:=received_str \Time:=WAIT_MAX;
             
             !for testing, needed later for string separation
             stringLength := strLen(received_str);
             index := 1;
+            numIndex:=1;
             IF stringFound = FALSE THEN
                 stringStart :=  strFind(received_str,index,STR_WHITE);
                 received_strSeg :=  strPart(received_str,index,stringStart-index);
@@ -80,6 +82,7 @@ MODULE MTRN4230_Server_Sample
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "moveert";
                 checkCom := TRUE;
+                
             ENDIF 
             
             IF received_strSeg = "movejas" THEN
@@ -260,6 +263,7 @@ MODULE MTRN4230_Server_Sample
             ENDIF
             
             !IF received_str <> "cancel" THEN
+            checkCom:=TRUE;
             WaitUntil current_state = "None" and done = TRUE;
             IF errorHandling = TRUE THEN
                 SocketSend client_socket \Str:=("Error Number:" + ValtoStr(errorNumber) + "\0A");
