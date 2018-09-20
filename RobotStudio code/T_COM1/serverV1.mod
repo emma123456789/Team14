@@ -1,4 +1,5 @@
-MODULE MTRN4230_Server_Sample    
+
+    MODULE MTRN4230_Server_Sample    
 
     ! The socket connected to the client.
     VAR socketdev client_socket;
@@ -74,7 +75,7 @@ MODULE MTRN4230_Server_Sample
             stringFound := FALSE;
             
             IF received_strSeg = "moveert" THEN
-                WHILE numIndex <= 7 DO
+                WHILE numIndex <= 6 DO
                 numStart := strFind(received_str,index,STR_WHITE);
                 numTotal{numIndex} := strPart(received_str,index,numStart-index);
                 numIndex := numIndex+1;
@@ -86,7 +87,7 @@ MODULE MTRN4230_Server_Sample
             ENDIF 
             
             IF received_strSeg = "moveerc" THEN
-                WHILE numIndex <= 7 DO
+                WHILE numIndex <= 6 DO
                 numStart := strFind(received_str,index,STR_WHITE);
                 numTotal{numIndex} := strPart(received_str,index,numStart-index);
                 numIndex := numIndex+1;
@@ -129,9 +130,15 @@ MODULE MTRN4230_Server_Sample
             ENDIF
             
             IF received_strSeg = "endEffectorXposSTART" THEN
-                SocketSend client_socket \Str:=("conveyer frame jogX started" + "\0A");
+                SocketSend client_socket \Str:=("effector frame jogX started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "exPlus"; 
+                checkCom := TRUE;
+            ENDIF
+            IF received_strSeg = "endEffectorXnegSTART" THEN
+                SocketSend client_socket \Str:=("effector frame -jogX started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "exMinus"; 
                 checkCom := TRUE;
             ENDIF
             
@@ -143,9 +150,15 @@ MODULE MTRN4230_Server_Sample
             ENDIF
             
             IF received_strSeg = "endEffectorYposSTART" THEN 
-                SocketSend client_socket \Str:=("conveyer frame jogY started" + "\0A"); 
+                SocketSend client_socket \Str:=("coneffectorveyer frame jogY started" + "\0A"); 
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "eyPlus";
+                checkCom := TRUE;
+            ENDIF
+            IF received_strSeg = "endEffectorYnegSTART" THEN 
+                SocketSend client_socket \Str:=("effector frame -jogY started" + "\0A"); 
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "eyMinus";
                 checkCom := TRUE;
             ENDIF
 
@@ -157,9 +170,16 @@ MODULE MTRN4230_Server_Sample
             ENDIF
             
             IF received_strSeg = "endEffectorZposSTART" THEN 
-                SocketSend client_socket \Str:=("conveyer frame jogZ started" + "\0A"); 
+                SocketSend client_socket \Str:=("effector frame jogZ started" + "\0A"); 
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "ezPlus";
+                checkCom := TRUE;
+            ENDIF
+            
+            IF received_strSeg = "endEffectorZnegSTART" THEN 
+                SocketSend client_socket \Str:=("effector frame -jogZ started" + "\0A"); 
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "ezMinus";
                 checkCom := TRUE;
             ENDIF
             
@@ -203,12 +223,78 @@ MODULE MTRN4230_Server_Sample
                 checkCom := TRUE;
             ENDIF 
             
-            IF received_str = "jogQ1posSTART" THEN
+            IF received_strSeg = "jogQ1posSTART" THEN
                 SocketSend client_socket \Str:=("jog1 started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "jog1";
                 checkCom := TRUE;
             ENDIF 
-            
+            IF received_strSeg = "jogQ1negSTART" THEN
+                SocketSend client_socket \Str:=("-jog1 started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "-jog1";
+                checkCom := TRUE;
+            ENDIF 
+            IF received_strSeg = "jogQ2posSTART" THEN
+                SocketSend client_socket \Str:=("jog2 started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "jog2";
+                checkCom := TRUE;
+            ENDIF 
+            IF received_strSeg = "jogQ2negSTART" THEN
+                SocketSend client_socket \Str:=("-jog2 started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "-jog2";
+                checkCom := TRUE;
+            ENDIF 
+            IF received_strSeg = "jogQ3posSTART" THEN
+                SocketSend client_socket \Str:=("jog3 started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "jog3";
+                checkCom := TRUE;
+            ENDIF 
+            IF received_strSeg = "jogQ3negSTART" THEN
+                SocketSend client_socket \Str:=("-jog3 started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "-jog3";
+                checkCom := TRUE;
+            ENDIF 
+            IF received_strSeg = "jogQ4posSTART" THEN
+                SocketSend client_socket \Str:=("jog4 started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "jog4";
+                checkCom := TRUE;
+            ENDIF 
+            IF received_strSeg = "jogQ4negSTART" THEN
+                SocketSend client_socket \Str:=("-jog4 started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "-jog4";
+                checkCom := TRUE;
+            ENDIF 
+            IF received_strSeg = "jogQ5posSTART" THEN
+                SocketSend client_socket \Str:=("jog5 started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "jog5";
+                checkCom := TRUE;
+            ENDIF 
+            IF received_strSeg = "jogQ5negSTART" THEN
+                SocketSend client_socket \Str:=("-jog5 started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "-jog5";
+                checkCom := TRUE;
+            ENDIF 
+            IF received_strSeg = "jogQ6posSTART" THEN
+                SocketSend client_socket \Str:=("jog6 started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "jog6";
+                checkCom := TRUE;
+            ENDIF 
+            IF received_strSeg = "jogQ6negSTART" THEN
+                SocketSend client_socket \Str:=("-jog6 started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "-jog6";
+                checkCom := TRUE;
+            ENDIF 
             IF received_str = "moveToPose" THEN
                 SocketSend client_socket \Str:=("moveToPose started" + "\0A");
                 current_state := "moveToPose";
@@ -283,7 +369,16 @@ MODULE MTRN4230_Server_Sample
             
             IF received_strSeg<> "baseFrameXposSTART" AND received_strSeg<> "baseFrameYposSTART" AND
             received_strSeg<>"baseFrameZposSTART" AND received_strSeg<>"baseFrameXnegSTART" AND
-            received_strSeg<>"baseFrameYnegSTART" AND received_strSeg<>"baseFrameZnegSTART" AND received_str<>"jogQ1posSTART" AND
+            received_strSeg<>"baseFrameYnegSTART" AND received_strSeg<>"baseFrameZnegSTART" AND
+            received_strSeg<>"endEffectorXposSTART" AND received_strSeg<>"endEffectorXnegSTART" AND
+            received_strSeg<>"endEffectorYposSTART" AND received_strSeg<>"endEffectorYnegSTART" AND
+            received_strSeg<>"endEffectorZposSTART" AND received_strSeg<>"endEffectorZnegSTART" AND
+            received_strSeg<>"jogQ1posSTART" AND received_strSeg<>"jogQ1negSTART" AND
+            received_strSeg<>"jogQ2posSTART" AND received_strSeg<>"jogQ2negSTART" AND
+            received_strSeg<>"jogQ3posSTART" AND received_strSeg<>"jogQ3negSTART" AND
+            received_strSeg<>"jogQ4posSTART" AND received_strSeg<>"jogQ4negSTART" AND
+            received_strSeg<>"jogQ5posSTART" AND received_strSeg<>"jogQ5negSTART" AND
+            received_strSeg<>"jogQ6posSTART" AND received_strSeg<>"jogQ6negSTART" AND
             received_str<>"vacuumPumpOn" AND received_str<>"vacuumPumpOff" AND
             received_str<>"vacuumSolenoidOn" AND received_str<>"vacuumSolenoidOff" AND
             received_str<>"conveyorRunOn" AND received_str<>"conveyorRunOff" AND 
@@ -400,7 +495,7 @@ MODULE MTRN4230_Server_Sample
         pos_array{7}:=pos_current.rot.q4;
         pos_string := "endEffector";
         FOR index FROM 1 TO 7 DO
-            pos_string:=pos_string+" "+ ValtoStr(pos_array{index});
+            pos_string:=pos_string+" "+ ValtoStr(Round(pos_array{index}\Dec:=3));
         ENDFOR
     SocketSend client_socket \Str:=pos_string + "\0A";
     ENDPROC
@@ -419,7 +514,7 @@ MODULE MTRN4230_Server_Sample
         thetas_array{6}:=thetas_current.robax.rax_6;
         thetas_string := "jointAngle";
         FOR index FROM 1 TO 6 DO
-            thetas_string:=thetas_string+ " " + ValtoStr(thetas_array{index});
+            thetas_string:=thetas_string+ " " + ValtoStr(Round(thetas_array{index}\Dec:=3));
         ENDFOR
         SocketSend client_socket \Str:=thetas_string+ "\0A";
     ENDPROC

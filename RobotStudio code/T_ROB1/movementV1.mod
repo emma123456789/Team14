@@ -1,4 +1,5 @@
-MODULE Assignment2
+
+    MODULE Assignment2
     
     !PERS socketdev client_socket;
     ! The host and port that we will be listening for a connection on.
@@ -19,7 +20,7 @@ MODULE Assignment2
     PERS num errorNumber;
     VAR intnum pauseTrigger;
     VAR intnum cancelTrigger;
-    PERS bool paused:=FALSE;
+    PERS bool paused:=TRUE;
     PERS bool cancelled := TRUE;
     PERS string numTotal{7};
     PERS string modeSpeed;
@@ -54,7 +55,7 @@ MODULE Assignment2
         
         !IF current_state <> "cancel" THEN
             IF current_state = "moveerc" THEN
-                wobjCurrent := wConv;
+                wobjCurrent := wConveyer;
                 MoveTargetConveyer numTotal;
                 done:= TRUE;
                 current_state := "None";
@@ -71,68 +72,135 @@ MODULE Assignment2
                 current_state:="None";
             ENDIF
             IF current_state = "bxPlus" THEN
+                wobjCurrent := wBase;
                 JogX(jog_inc);
                 done:= TRUE;
                 current_state := "None";
             ENDIF
             IF current_state = "exPlus" THEN
-                !JogX(jog_inc);
+                wobjCurrent := wEffector;
+                JogX(jog_inc);
                 done:= TRUE;
                 current_state := "None";
             ENDIF
             IF current_state = "byPlus" THEN
+                wobjCurrent := wBase;
                 JogY(jog_inc);
                 done:=TRUE;
                 current_state := "None";
             ENDIF
             IF current_state = "eyPlus" THEN
-                !JogY(jog_inc);
+                wobjCurrent := wEffector;
+                JogY(jog_inc);
                 done:=TRUE;
                 current_state := "None";
             ENDIF
             IF current_state = "bzPlus" THEN
+                wobjCurrent := wBase;
                 JogZ(jog_inc);
                 done:=TRUE;
                 current_state := "None";
             ENDIF
             IF current_state = "ezPlus" THEN
-                !JogZ(jog_inc);
+                wobjCurrent := wEffector;
+                JogZ(jog_inc);
                 done:=TRUE;
                 current_state := "None";
             ENDIF
             IF current_state = "bxMinus" THEN
+                wobjCurrent := wBase;
                 JogX(-jog_inc);
                 done:=TRUE;
                 current_state := "None";
             ENDIF
             IF current_state = "exMinus" THEN
-                !JogX(-jog_inc);
+                wobjCurrent := wEffector;
+                JogX(-jog_inc);
                 done:=TRUE;
                 current_state := "None";
             ENDIF
             IF current_state = "byMinus" THEN
+                wobjCurrent := wBase;
                 JogY(-jog_inc);
                 done:=TRUE;
                 current_state := "None";
             ENDIF
             IF current_state = "eyMinus" THEN
-                !JogY(-jog_inc);
+                wobjCurrent := wEffector;
+                JogY(-jog_inc);
                 done:=TRUE;
                 current_state := "None";
             ENDIF
             IF current_state = "bzMinus" THEN
+                wobjCurrent := wBase;
                 JogZ(-jog_inc);
                 done:=TRUE;
                 current_state := "None";
             ENDIF
             IF current_state = "ezMinus" THEN
-                !JogZ(-jog_inc);
+                wobjCurrent := wEffector;
+                JogZ(-jog_inc);
                 done:=TRUE;
                 current_state := "None";
             ENDIF
             
             IF current_state = "jog1" THEN
-                Jog1(jog_inc_deg);
+                JogJoint 1, jog_inc_deg;
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+            IF current_state = "-jog1" THEN
+                JogJoint 1, -jog_inc_deg;
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+            IF current_state = "jog2" THEN
+                JogJoint 2, jog_inc_deg;
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+            IF current_state = "-jog2" THEN
+                JogJoint 2, -jog_inc_deg;
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+            IF current_state = "jog3" THEN
+                JogJoint 3, jog_inc_deg;
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+            IF current_state = "-jog3" THEN
+                JogJoint 3, -jog_inc_deg;
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+            IF current_state = "jog4" THEN
+                JogJoint 4, jog_inc_deg;
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+            IF current_state = "-jog4" THEN
+                JogJoint 4, -jog_inc_deg;
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+            IF current_state = "jog5" THEN
+                JogJoint 5, jog_inc_deg;
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+            IF current_state = "-jog5" THEN
+                JogJoint 5, -jog_inc_deg;
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+            IF current_state = "jog6" THEN
+                JogJoint 6, jog_inc_deg;
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+            IF current_state = "-jog6" THEN
+                JogJoint 6, -jog_inc_deg;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
@@ -225,99 +293,240 @@ MODULE Assignment2
     
     !ENDWHILE
     
-    PROC JogX(num jog_inc)
+     PROC JogX( num jog_inc)
         VAR robtarget pos_current;
         VAR robtarget pos_new;
         VAR jointtarget jog_target;
-        VAR errnum err_val;
+        VAR errnum err_val:=0;
+        VAR speeddata move_speed;
+        VAR pos jog:= [0,0,0];
+        VAR pose workObjectRot := [[0,0,0], [0,0,0,0]];
         !get current pos
-        pos_current:=CRobT(\WObj:=wobjCurrent);
-        
-        !calculate new pos
+        pos_current:=CRobT(\WObj:=wBase);
         pos_new:=pos_current;
-        pos_new.trans.x:=pos_current.trans.x+jog_inc;
-        
-        jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wobjCurrent\ErrorNumber:=err_val);
-        IF err_val<>0THEN
-            errorNumber := err_val;
-            errorHandling := TRUE;
-            WaitTime 1;
+        !invert rotation
+        IF wobjCurrent = wEffector THEN
+            workObjectRot.rot := pos_current.rot;
+            !workObjectRot:=PoseInv(workObjectRot);
         ELSE
-            !move to calculated pos
-            MoveL pos_new,jog_speed,fine,tSCup \WObj:=wobjCurrent;
+            workObjectRot := PoseInv(wobjCurrent.uframe);
+            workObjectRot.trans := [0,0,0];
         ENDIF
+        jog.x := jog_inc;
+        jog := PoseVect(workObjectRot, jog);
+        !recalculate new pose untill out of limits
+        WHILE err_val = 0 DO
+            pos_new.trans:=pos_new.trans + jog;
+            jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wBase\ErrorNumber:=err_val);
+        ENDWHILE
+       !move to calculated pos
+        move_speed:= getSpeed(modeSpeed);
+        pos_new.trans:=pos_new.trans-jog;
+        MoveL pos_new,move_speed,fine,tSCup\WObj:=wBase;
         ERROR
-            done:=TRUE;
-            current_state:="None";
     ENDPROC   
-    
-    PROC JogY(num jog_inc)
+
+      PROC JogY( num jog_inc)
         VAR robtarget pos_current;
         VAR robtarget pos_new;
         VAR jointtarget jog_target;
-        VAR errnum err_val;
+        VAR errnum err_val:=0;
+        VAR speeddata move_speed;
+        VAR pos jog:= [0,0,0];
+        VAR pose workObjectRot := [[0,0,0], [0,0,0,0]];
         !get current pos
-        pos_current:=CRobT(\WObj:=wobjCurrent);
-        !calculate new pos
+        pos_current:=CRobT(\WObj:=wBase);
         pos_new:=pos_current;
-        pos_new.trans.y:=pos_current.trans.y+jog_inc;
-        !check if reachable
-        jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wobjCurrent\ErrorNumber:=err_val);
-        IF err_val <> 0 THEN
-            errorNumber := err_val;
-            errorHandling := TRUE;
-            WaitTime 1;
+        !invert rotation
+        IF wobjCurrent = wEffector THEN
+            workObjectRot.rot := pos_current.rot;
+            !workObjectRot:=PoseInv(workObjectRot);
         ELSE
-            !move to calculated pos
-            MoveL pos_new,jog_speed,fine,tSCup\WObj:=wobjCurrent;
+            workObjectRot := PoseInv(wobjCurrent.uframe);
+            workObjectRot.trans := [0,0,0];
         ENDIF
-    ENDPROC   
-    
-    PROC JogZ(num jog_inc)
-        VAR robtarget pos_current;
-        VAR robtarget pos_new;
-        VAR jointtarget jog_target;
-        VAR errnum err_val;
-        !get current pos
-        pos_current:=CRobT(\WObj:=wobjCurrent);
-        
-        !calculate new pos
-        pos_new:=pos_current;
-        pos_new.trans.z:=pos_current.trans.z+jog_inc;
-        
-        jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wobjCurrent\ErrorNumber:=err_val);
-        IF err_val<>0 THEN
-            errorNumber := err_val;
-            errorHandling := TRUE;
-            WaitTime 1;
-        ELSE
-            !move to calculated pos
-            MoveL pos_new,jog_speed,fine,tSCup\WObj:=wobjCurrent;
-        ENDIF
+        jog.y := jog_inc;
+        jog := PoseVect(workObjectRot, jog);
+        !recalculate new pose untill out of limits
+        WHILE err_val = 0 DO
+            pos_new.trans:=pos_new.trans + jog;
+            jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wBase\ErrorNumber:=err_val);
+        ENDWHILE
+       !move to calculated pos
+        move_speed:= getSpeed(modeSpeed);
+        pos_new.trans:=pos_new.trans-jog;
+        MoveL pos_new,move_speed,fine,tSCup\WObj:=wBase;
         ERROR
     ENDPROC   
     
-    !Jog Joint 1
-    PROC Jog1(num jog_inc_deg)
+     PROC JogZ( num jog_inc)
+        VAR robtarget pos_current;
+        VAR robtarget pos_new;
+        VAR jointtarget jog_target;
+        VAR errnum err_val:=0;
+        VAR speeddata move_speed;
+        VAR pos jog:= [0,0,0];
+        VAR pose workObjectRot := [[0,0,0], [0,0,0,0]];
+        !get current pos
+        pos_current:=CRobT(\WObj:=wBase);
+        pos_new:=pos_current;
+        !invert rotation
+        IF wobjCurrent = wEffector THEN
+            workObjectRot.rot := pos_current.rot;
+            !workObjectRot:=PoseInv(workObjectRot);
+        ELSE
+            workObjectRot := PoseInv(wobjCurrent.uframe);
+            workObjectRot.trans := [0,0,0];
+        ENDIF
+        jog.z := jog_inc;
+        jog := PoseVect(workObjectRot, jog);
+        !recalculate new pose untill out of limits
+        WHILE err_val = 0 DO
+            pos_new.trans:=pos_new.trans + jog;
+            jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wBase\ErrorNumber:=err_val);
+        ENDWHILE
+       !move to calculated pos
+        move_speed:= getSpeed(modeSpeed);
+        pos_new.trans:=pos_new.trans-jog;
+        MoveL pos_new,move_speed,fine,tSCup\WObj:=wBase;
+        ERROR
+    ENDPROC   
+    
+!    PROC JogY(num jog_inc)
+!        VAR robtarget pos_current;
+!        VAR robtarget pos_new;
+!        VAR jointtarget jog_target;
+!        VAR errnum err_val:=0;
+!         VAR speeddata move_speed;
+!         move_speed:= getSpeed(modeSpeed);
+!        !get current pos
+!        pos_current:=CRobT(\WObj:=wobjCurrent);
+!        pos_new:=pos_current;
+!        !recalculate new pose untill out of limits
+!        WHILE err_val = 0 DO
+!            pos_new.trans.y:=pos_new.trans.y+jog_inc;
+!            jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wobjCurrent\ErrorNumber:=err_val);
+!        ENDWHILE
+!       !move to calculated pos
+       
+!        pos_new.trans.y:=pos_new.trans.y-jog_inc;
+!        MoveL pos_new,move_speed,fine,tSCup\WObj:=wobjCurrent;
+!        ERROR
+!    ENDPROC   
+    
+!    PROC JogZ(num jog_inc)
+!        VAR robtarget pos_current;
+!        VAR robtarget pos_new;
+!        VAR jointtarget jog_target;
+!        VAR errnum err_val;
+!        VAR speeddata move_speed;
+!        move_speed:= getSpeed(modeSpeed);
+!        !get current pos
+!        pos_current:=CRobT(\WObj:=wobjCurrent);
+!        pos_new:=pos_current;
+!        !recalculate new pose untill out of limits
+!        WHILE err_val = 0 DO
+!            pos_new.trans.z:=pos_new.trans.z+jog_inc;
+!            jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wobjCurrent\ErrorNumber:=err_val);
+!        ENDWHILE
+!       !move to calculated pos
+!        pos_new.trans.z:=pos_new.trans.z-jog_inc;
+!        MoveL pos_new,move_speed,fine,tSCup\WObj:=wobjCurrent;
+!        ERROR
+!    ENDPROC   
+    
+    PROC JogYaw (num jog_inc)
+        VAR robtarget pos_current;
+        VAR robtarget pos_new;
+        VAR jointtarget jog_target;
+        VAR errnum err_val;
+        VAR num roll;
+        !get current pos
+        pos_current:=CRobT(\WObj:=wobjCurrent);
+        pos_new:=pos_current;
+        !recalculate new pose untill out of limits
+        WHILE err_val = 0 DO
+            roll := EulerZYX(\X, pos_current.rot);
+            roll:= roll + jog_inc;
+            pos_new.trans.z:=pos_new.trans.z+jog_inc;
+            jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wobjCurrent\ErrorNumber:=err_val);
+        ENDWHILE
+       !move to calculated pos
+        pos_new.trans.x:=pos_new.trans.z-jog_inc;
+        MoveL pos_new,jog_speed,fine,tSCup\WObj:=wobjCurrent;
+        ERROR
+    ENDPROC
+    !Jog Joint 
+    PROC JogJoint(num jointNumber, num jog_inc_deg)
         VAR jointtarget thetas_current;
         VAR jointtarget thetas_new;
         VAR robtarget pos_new;
+        VAR robtarget check_target;
+        VAR jointtarget check_joints;
         VAR errnum err_val;
+        VAR speeddata move_speed;
         
-        !get current
+        move_speed := getSpeed(modeSpeed);
         thetas_current:=CJointT();
         thetas_new:=thetas_current;
         !increment new
-        thetas_new.robax.rax_1:=thetas_new.robax.rax_1+jog_inc_deg;
-    
-        pos_new:=CalcRobT(thetas_new,tSCup);
-        thetas_current:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
-        IF err_val<>0 THEN
-            errorNumber := err_val;
-            errorHandling := TRUE;
-        ELSE
-            MoveAbsJ thetas_new,jog_speed,fine,tSCup;
+        IF jointNumber = 1 THEN
+            IF jog_inc_deg < 0  THEN
+                thetas_new.robax.rax_1:=-165;
+                MoveAbsJ thetas_new,move_speed,fine,tSCup;
+            ELSEIF jog_inc_deg > 0 THEN
+                thetas_new.robax.rax_1:=165;
+                MoveAbsJ thetas_new,move_speed,fine,tSCup;
+            ENDIF
+        ELSEIF jointNumber = 2 THEN
+            IF jog_inc_deg < 0  THEN
+                thetas_new.robax.rax_2:=-110;
+                MoveAbsJ thetas_new,move_speed,fine,tSCup;
+            ELSEIF jog_inc_deg > 0 THEN
+                thetas_new.robax.rax_2:=110;
+                MoveAbsJ thetas_new,move_speed,fine,tSCup;
+            ENDIF
+        ELSEIF jointNumber = 3 THEN
+            IF jog_inc_deg < 0  THEN
+                thetas_new.robax.rax_3:=-110;
+                MoveAbsJ thetas_new,move_speed,fine,tSCup;
+            ELSEIF jog_inc_deg > 0 THEN
+                thetas_new.robax.rax_3:=70;
+                MoveAbsJ thetas_new,move_speed,fine,tSCup;
+            ENDIF
+        ELSEIF jointNumber = 4 THEN
+            IF jog_inc_deg < 0  THEN
+                thetas_new.robax.rax_4:=-160;
+                MoveAbsJ thetas_new,move_speed,fine,tSCup;
+            ELSEIF jog_inc_deg > 0 THEN
+                thetas_new.robax.rax_4:=160;
+                MoveAbsJ thetas_new,move_speed,fine,tSCup;
+            ENDIF
+        ELSEIF jointNumber = 5 THEN
+            IF jog_inc_deg < 0  THEN
+                thetas_new.robax.rax_5:=-110;
+                MoveAbsJ thetas_new,move_speed,fine,tSCup;
+            ELSEIF jog_inc_deg > 0 THEN
+                thetas_new.robax.rax_5:=110;
+                MoveAbsJ thetas_new,move_speed,fine,tSCup;
+            ENDIF
+        ELSEIF jointNumber = 6 THEN
+            IF jog_inc_deg < 0  THEN
+                thetas_new.robax.rax_6:=-160;
+                MoveAbsJ thetas_new,move_speed,fine,tSCup;
+            ELSEIF jog_inc_deg > 0 THEN
+                thetas_new.robax.rax_6:=160;
+                MoveAbsJ thetas_new,move_speed,fine,tSCup;
+            ENDIF
         ENDIF
+!        pos_new:=CalcRobT(thetas_new,tSCup);
+!        thetas_current:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
+!        IF err_val<>0 THEN
+!            errorNumber := err_val;
+!            errorHandling := TRUE;
+!        ELSE
+!            MoveAbsJ thetas_new,jog_speed,fine,tSCup;
+!        ENDIF
         ERROR
     ENDPROC
     

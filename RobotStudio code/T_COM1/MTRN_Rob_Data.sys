@@ -2,6 +2,10 @@ MODULE MTRN_Rob_Data (SYSMODULE, NOSTEPIN, READONLY)
 
  ! PREDEFINED DATA AND ROBOT CELL INFORMATION
  !*******************************************
+ 
+     CONST num tableHeight := 147;
+    CONST num tileHeight := 5;
+    
 
  ! For the ABB IRB120 Robot in the Mechatronics Blockhouse Lab for the MTRN4230 Robotics Course 2014
 
@@ -12,7 +16,7 @@ MODULE MTRN_Rob_Data (SYSMODULE, NOSTEPIN, READONLY)
  CONST jointtarget jtCalibPos:=[[-90,0,0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
 
  ! Home Position of the Table (T1) with tSCup touching Table
- CONST robtarget pTableHome:=[[175,0,147],[0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+ CONST robtarget pTableHome:=[[175,0,147],[1,0,0,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
 
  ! Home Position of the Conveyor (C1) with tSCup touching Conveyor
  CONST robtarget pConvHome:=[[0,409,22],[0,-0.7071068,0.7071068,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
@@ -83,6 +87,11 @@ MODULE MTRN_Rob_Data (SYSMODULE, NOSTEPIN, READONLY)
  !                                    [Uframe User co-ord System] [Oframe Object Co-ord System]
  PERS wobjdata wTable:=[FALSE,TRUE,"",[[175,0,147],[1,0,0,0]],[[0,0,0],[1,0,0,0]]];
  PERS wobjdata wConv:=[FALSE,TRUE,"",[[50,184,22],[0.5,-0.5,0.5,0.5]],[[1,1,1],[1,0,0,0]]];
+    PERS wobjdata Workobject_2:=[FALSE,TRUE,"",[[175,0,147],[1,0,0,0]],[[0,0,0],[1,0,0,0]]];
+	PERS wobjdata wConveyer:=[FALSE,TRUE,"",[[0,409,22],[0.707106781,0,0,0.707106781]],[[0,0,0],[1,0,0,0]]];
+	PERS wobjdata wConveyerCamera:=[FALSE,TRUE,"",[[-71,429,1110],[1,0,0,0]],[[0,0,0],[1,0,0,0]]];
+	PERS wobjdata wTableCamera:=[FALSE,TRUE,"",[[309,19,1110],[1,0,0,0]],[[0,0,0],[1,0,0,0]]];
+	PERS wobjdata wWorld:=[FALSE,TRUE,"",[[-3025,-3282,-585],[1,0,0,0]],[[0,0,0],[1,0,0,0]]];
 
  ! WorkObject orientations for the Table and Conveyor
  !
