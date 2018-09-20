@@ -73,7 +73,7 @@ MODULE MTRN4230_Server_Sample
             
             stringFound := FALSE;
             
-            IF received_strSeg = "moveert" OR received_strSeg = "moveerc" THEN
+            IF received_strSeg = "moveert" THEN
                 WHILE numIndex <= 7 DO
                 numStart := strFind(received_str,index,STR_WHITE);
                 numTotal{numIndex} := strPart(received_str,index,numStart-index);
@@ -82,10 +82,21 @@ MODULE MTRN4230_Server_Sample
                 ENDWHILE
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "moveert";
-                checkCom := TRUE;
-                
+                checkCom := TRUE;  
             ENDIF 
             
+            IF received_strSeg = "moveerc" THEN
+                WHILE numIndex <= 7 DO
+                numStart := strFind(received_str,index,STR_WHITE);
+                numTotal{numIndex} := strPart(received_str,index,numStart-index);
+                numIndex := numIndex+1;
+                index := numStart+1;
+                ENDWHILE
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "moveerc";
+                checkCom := TRUE;  
+            ENDIF 
+              
             IF received_strSeg = "movejas" THEN
                 WHILE numIndex <= 6 DO
                 numStart := strFind(received_str,index,STR_WHITE);
@@ -99,7 +110,7 @@ MODULE MTRN4230_Server_Sample
             ENDIF 
  
             IF received_strSeg = "moveree" THEN
-                WHILE numIndex <= 4 DO
+                WHILE numIndex <= 3 DO
                 numStart := strFind(received_str,index,STR_WHITE);
                 numTotal{numIndex} := strPart(received_str,index,numStart-index);
                 numIndex := numIndex+1;
@@ -110,38 +121,85 @@ MODULE MTRN4230_Server_Sample
                 checkCom := TRUE;
             ENDIF 
             
-            IF received_str = "baseFrameXposSTART" THEN
-                SocketSend client_socket \Str:=("jogX started" + "\0A");
-                current_state := "xPlus"; 
+            IF received_strSeg = "baseFrameXposSTART" THEN
+                SocketSend client_socket \Str:=("base frame jogX started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "bxPlus"; 
                 checkCom := TRUE;
             ENDIF
-            IF received_str = "baseFrameYposSTART" THEN 
-                SocketSend client_socket \Str:=("jogY started" + "\0A"); 
-                current_state := "yPlus";
+            
+            IF received_strSeg = "endEffectorXposSTART" THEN
+                SocketSend client_socket \Str:=("conveyer frame jogX started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "exPlus"; 
+                checkCom := TRUE;
+            ENDIF
+            
+            IF received_strSeg = "baseFrameYposSTART" THEN 
+                SocketSend client_socket \Str:=("base frame jogY started" + "\0A"); 
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "byPlus";
+                checkCom := TRUE;
+            ENDIF
+            
+            IF received_strSeg = "endEffectorYposSTART" THEN 
+                SocketSend client_socket \Str:=("conveyer frame jogY started" + "\0A"); 
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "eyPlus";
                 checkCom := TRUE;
             ENDIF
 
-            IF received_str = "baseFrameZposSTART" THEN
-                SocketSend client_socket \Str:=("jogZ started" + "\0A");
-                current_state := "zPlus";
+            IF received_strSeg = "baseFrameZposSTART" THEN
+                SocketSend client_socket \Str:=("base frame jogZ started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "bzPlus";
                 checkCom := TRUE;
             ENDIF
             
-            IF received_str = "baseFrameXnegSTART" THEN
-                SocketSend client_socket \Str:=("-jogX started" + "\0A");
-                current_state := "xMinus";
+            IF received_strSeg = "endEffectorZposSTART" THEN 
+                SocketSend client_socket \Str:=("conveyer frame jogZ started" + "\0A"); 
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "ezPlus";
+                checkCom := TRUE;
+            ENDIF
+            
+            IF received_strSeg = "baseFrameXnegSTART" THEN
+                SocketSend client_socket \Str:=("base frame -jogX started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "bxMinus";
+                checkCom := TRUE;
+            ENDIF 
+            IF received_strSeg = "conveyerFrameXnegSTART" THEN
+                SocketSend client_socket \Str:=("conveyer frame -jogX started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "exMinus";
                 checkCom := TRUE;
             ENDIF 
                 
-            IF received_str = "baseFrameYnegSTART" THEN
-                SocketSend client_socket \Str:=("-jogY started" + "\0A");
-                current_state := "yMinus";
+            IF received_strSeg = "baseFrameYnegSTART" THEN
+                SocketSend client_socket \Str:=("base frame -jogY started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "byMinus";
+                checkCom := TRUE;
+            ENDIF 
+            IF received_strSeg = "conveyerFrameYnegSTART" THEN
+                SocketSend client_socket \Str:=("conveyer frame -jogY started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "eyMinus";
                 checkCom := TRUE;
             ENDIF 
             
-            IF received_str = "baseFrameZnegSTART" THEN
-                SocketSend client_socket \Str:=("-jogZ started" + "\0A");
-                current_state := "zMinus";
+            IF received_strSeg = "baseFrameZnegSTART" THEN
+                SocketSend client_socket \Str:=("base frame -jogZ started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "bzMinus";
+                checkCom := TRUE;
+            ENDIF 
+            
+            IF received_strSeg = "conveyerFrameZnegSTART" THEN
+                SocketSend client_socket \Str:=("conveyer frame -jogZ started" + "\0A");
+                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                current_state := "ezMinus";
                 checkCom := TRUE;
             ENDIF 
             
@@ -223,9 +281,9 @@ MODULE MTRN4230_Server_Sample
                 checkCom := TRUE;
             ENDIF 
             
-            IF received_str<> "baseFrameXposSTART" AND received_str<> "baseFrameYposSTART" AND
-            received_str<>"baseFrameZposSTART" AND received_str<>"baseFrameXnegSTART" AND
-            received_str<>"baseFrameYnegSTART" AND received_str<>"baseFrameZnegSTART" AND received_str<>"jogQ1posSTART" AND
+            IF received_strSeg<> "baseFrameXposSTART" AND received_strSeg<> "baseFrameYposSTART" AND
+            received_strSeg<>"baseFrameZposSTART" AND received_strSeg<>"baseFrameXnegSTART" AND
+            received_strSeg<>"baseFrameYnegSTART" AND received_strSeg<>"baseFrameZnegSTART" AND received_str<>"jogQ1posSTART" AND
             received_str<>"vacuumPumpOn" AND received_str<>"vacuumPumpOff" AND
             received_str<>"vacuumSolenoidOn" AND received_str<>"vacuumSolenoidOff" AND
             received_str<>"conveyorRunOn" AND received_str<>"conveyorRunOff" AND 
@@ -258,9 +316,9 @@ MODULE MTRN4230_Server_Sample
                 checkCom := TRUE;
             ENDIF
             
-            IF received_str = "quit" THEN
+            IF received_str = "shutdown" THEN
                 SocketSend client_socket \Str:=("quit" + "\0A");
-                current_state := "quit";
+                current_state := "shutdown";
                 checkCom := TRUE;
             ENDIF
             

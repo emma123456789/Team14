@@ -45,7 +45,7 @@ MODULE Assignment2
         !obtain current status
         
         !only use this if the position can deviate to avoid singularities
-        !SingArea \Wrist;
+        SingArea \Wrist;
         
         !absolute position
         confj  \On;
@@ -70,36 +70,67 @@ MODULE Assignment2
                 done:=TRUE;
                 current_state:="None";
             ENDIF
-            IF current_state = "xPlus" THEN
+            IF current_state = "bxPlus" THEN
                 JogX(jog_inc);
                 done:= TRUE;
                 current_state := "None";
             ENDIF
-            IF current_state = "yPlus" THEN
+            IF current_state = "exPlus" THEN
+                !JogX(jog_inc);
+                done:= TRUE;
+                current_state := "None";
+            ENDIF
+            IF current_state = "byPlus" THEN
                 JogY(jog_inc);
                 done:=TRUE;
                 current_state := "None";
             ENDIF
-            IF current_state = "zPlus" THEN
+            IF current_state = "eyPlus" THEN
+                !JogY(jog_inc);
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+            IF current_state = "bzPlus" THEN
                 JogZ(jog_inc);
                 done:=TRUE;
                 current_state := "None";
             ENDIF
-            IF current_state = "xMinus" THEN
+            IF current_state = "ezPlus" THEN
+                !JogZ(jog_inc);
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+            IF current_state = "bxMinus" THEN
                 JogX(-jog_inc);
                 done:=TRUE;
                 current_state := "None";
             ENDIF
-            IF current_state = "yMinus" THEN
+            IF current_state = "exMinus" THEN
+                !JogX(-jog_inc);
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+            IF current_state = "byMinus" THEN
                 JogY(-jog_inc);
                 done:=TRUE;
                 current_state := "None";
             ENDIF
-            IF current_state = "zMinus" THEN
+            IF current_state = "eyMinus" THEN
+                !JogY(-jog_inc);
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+            IF current_state = "bzMinus" THEN
                 JogZ(-jog_inc);
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+            IF current_state = "ezMinus" THEN
+                !JogZ(-jog_inc);
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+            
             IF current_state = "jog1" THEN
                 Jog1(jog_inc_deg);
                 done:=TRUE;
@@ -166,7 +197,11 @@ MODULE Assignment2
                 done:=TRUE;
                 current_state := "None";
             ENDIF
-            IF current_state = "quit" THEN
+            IF current_state = "shutdown" THEN
+                MoveToCalibPos;
+                vacPwrOff;
+                vacSolOff;
+                conRunOff;
                 quit:=TRUE;
                 done:=TRUE;
                 current_state := "None";
