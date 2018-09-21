@@ -7,13 +7,13 @@
     VAR num jog_inc:=30;                    !increment for linear jogging
     VAR num jog_inc_deg:= 5;                !increment for axis jogging
     PERS string current_state := "";        !Current state for the main loop conditional statements, set in T_COM1
-    PERS bool quit := TRUE;                !quit flag
+    PERS bool quit := TRUE;                 !quit flag
     PERS bool done := FALSE;                !command finished flag
     PERS bool checkCom := FALSE;            !COM checked flag
     PERS bool errorHandling := FALSE;       !error flag
     PERS num errorNumber;                   !error number for range calculations
-    VAR intnum pauseTrigger;
-    VAR intnum cancelTrigger;
+    VAR intnum pauseTrigger;                !trigger for pausing robot path
+    VAR intnum cancelTrigger;               !trigger for cancelling robot path
     PERS bool paused:=TRUE;                 !pause flag
     PERS bool cancelled := TRUE;            !cancel flag
     PERS string numTotal{7};                !string arguments array
@@ -35,13 +35,13 @@
         SingArea \Wrist;                    !Allow wrist position to deviate to avoid singularities
         confj  \On;                         !Aim for absolute position, if not possible stop execution
         
-    CONNECT pauseTrigger WITH pauseRoutine;
-    IPers paused, pauseTrigger;
-    CONNECT cancelTrigger WITH cancelRoutine;
-    IPers cancelled, cancelTrigger;
-    WHILE quit = FALSE DO
+    CONNECT pauseTrigger WITH pauseRoutine;     !connect pause trigger with pause interrupt routine
+    IPers paused, pauseTrigger;                 !change in value of paused will activate the pause trigger
+    CONNECT cancelTrigger WITH cancelRoutine;   !connect cancel trigger with cancel interrupt routine
+    IPers cancelled, cancelTrigger;             !change in value of cancel will avtivate the cancel trigger
+    WHILE quit = FALSE DO                       !robot action will run continuously when the shutdown button is not pressed
         
-        WaitUntil checkCom = TRUE;
+        WaitUntil checkCom = TRUE;              !wait until the server has received message from MATLAB
         !obtain current status
         
         
@@ -52,8 +52,8 @@
                 move_speed :=getSpeed(modeSpeed);     !convert speed argument string to speeddata
                 target:=getTarget(numTotal);          !convert argument string array to target (uses wobjCurrent)
                 MoveTarget target, move_speed;        !Move to target
-                done:= TRUE;
-                current_state := "None";
+                done:= TRUE;                          !the flag for action done is set as TRUE
+                current_state := "None";              !the current state is reset after the motion is finished
             ENDIF
                                                     !if asked to move to a target relative to table home
             IF current_state = "moveert"THEN
@@ -61,16 +61,16 @@
                 move_speed :=getSpeed(modeSpeed);     !convert speed argument string to usable move_speed
                 target:=getTarget(numTotal);          !convert argument string array to usable target (uses wobjCurrent)
                 MoveTarget target, move_speed;        !Move to target
-                done:=TRUE;
-                current_state:="None";
+                done:=TRUE;                           !the flag for action done is set as TRUE
+                current_state:="None";                !the current state is reset after the motion is finished
             ENDIF
                                                     !if asked to set the joint angles
             IF current_state = "movejas"THEN
-                joints:=getPose(numTotal);              !convert argument string array to usable pose
+                joints:=getPose(numTotal);            !convert argument string array to usable pose
                 move_speed := getSpeed(modeSpeed);    !convert speed argument string to move_speed
-                MoveToPose joints, move_speed;          !move to the given joint angles
-                done:=TRUE;
-                current_state:="None";
+                MoveToPose joints, move_speed;        !move to the given joint angles
+                done:=TRUE;                           !the flag for action done is set as TRUE
+                current_state:="None";                !the current state is reset after the motion is finished
             ENDIF
                                                     !if asked to jog x in base frame
             IF current_state = "bxPlus" THEN
@@ -303,24 +303,24 @@
             ENDIF
                                                     !if asked to pause
             IF current_state = "paused" THEN
-                paused:=TRUE;
-                StopMove;
-                StorePath;
+                paused:=TRUE;                       !the paused bool is set to TRUE to activate the paused trigger
+                StopMove;                           !stopMove stops the robot's current path
+                StorePath;                          !stores the robot's current path so that the robot can resume when needed
                 done:=TRUE;
                 current_state := "None";
             ENDIF
                                                     !if asked to resume
             IF current_state = "resume" THEN
-                paused:=FALSE;
-                RestoPath;
-                StartMove;
+                paused:=FALSE;                      !the paused bool is set to FALSE to activate the paused trigger again
+                RestoPath;                          !RestoPath restores the path saved from StorePath
+                StartMove;                          !robot starts moving again in the stored path
                 done:=TRUE;
                 current_state := "None";
             ENDIF
                                                     !if asked to cancel
             IF current_state = "cancel" THEN
-                cancelled:=TRUE;
-                !RestoPath;
+                cancelled:=TRUE;                    !the cancelled bool iss et to TRUE to activate the cancel trigger
+                !RestoPath;                         
                 !StartMove;
                 done:=TRUE;
                 current_state := "None";
@@ -338,8 +338,8 @@
                 done:=TRUE;
                 current_state := "None";
             ENDIF
-            IF current_state = "unknown" THEN
-                TPWrite "Unknown command";
+            IF current_state = "unknown" THEN        !if an unknown command is read
+                TPWrite "Unknown command";               !write "Unknown command" on the FlexPendant
                 done:=TRUE;
                 current_state := "None";
             !ENDIF
@@ -633,20 +633,20 @@
     ENDPROC
     
 
-    TRAP pauseRoutine
-        IF paused =TRUE THEN
-            StopMove;
-            StorePath;
-        ELSE
-            RestoPath;
-            StartMove;
+    TRAP pauseRoutine               !the pause interrupt is called for pausing
+        IF paused =TRUE THEN            !if the robot is set to the paused state
+            StopMove;                   !robot still first stop moving in the current path
+            StorePath;                  !the current path is stored for resuming later
+        ELSE                        !the pause interrupt is called for resuming
+            RestoPath;                  !robot restores the path stored earlier      
+            StartMove;                  !robot will move along the restored path
         ENDIF
     ENDTRAP
     
-    TRAP cancelRoutine
-        IF cancelled =TRUE THEN
-            StopMove;
-            ClearPath;
+    TRAP cancelRoutine              !the cancel interrupt is called for cancelling
+        IF cancelled =TRUE THEN         !if the robot is set to cancelled state
+            StopMove;                   !robot still stop moving in the current path
+            ClearPath;                  !robot will delete the current path so that it cannot be restored
         ENDIF
     ENDTRAP
 
