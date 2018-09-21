@@ -1,13 +1,13 @@
 
-    MODULE MTRN4230_Server_Sample    
+    MODULE SERVER_MAIN    
 
     ! The socket connected to the client.
     VAR socketdev client_socket;
     ! The host and port that we will be listening for a connection on.
     PERS string host := "127.0.0.1";
-    PERS string current_state := "None";
+    PERS string current_state := "";
     CONST num port := 1025;
-    PERS bool quit := FALSE;
+    PERS bool quit := TRUE;
     PERS bool checkCom := FALSE;
     PERS bool done := FALSE;
     VAR num stringLength;
@@ -457,8 +457,8 @@
         ! Listen on the welcome socket.
         SocketListen welcome_socket;
         
-        ! Accept a connection on the host and port.
-        SocketAccept welcome_socket, client_socket; !\Time:=WAIT_MAX;
+        ! Accept a connection on the host and port. infinite wait
+        SocketAccept welcome_socket, client_socket \Time:=WAIT_MAX;
         
         ERROR 
             IF ERRNO=ERR_SOCK_CLOSED THEN
@@ -480,61 +480,60 @@
         SocketClose client_socket;
     ENDPROC
     
+    !sends the current end effector target to the client
+    !format: [tx, ty, tz, roll, pitch, yaw]
     PROC target()
-        VAR robtarget pos_current;
-        VAR num pos_array{7};
-        VAR string pos_string:="";
-        pos_current:=CRobT(\Tool:=tsCup);
+        VAR robtarget pos_current;              !current position
+        VAR num pos_array{6};                   !array of components
+        VAR string pos_string:="";              !string to send
+        
+        pos_current:=CRobT(\Tool:=tsCup);       !get position from robot
         
         pos_array{1}:=pos_current.trans.x;
         pos_array{2}:=pos_current.trans.y;
         pos_array{3}:=pos_current.trans.z;
-        pos_array{4}:=pos_current.rot.q1;
-        pos_array{5}:=pos_current.rot.q2;
-        pos_array{6}:=pos_current.rot.q3;
-        pos_array{7}:=pos_current.rot.q4;
-        pos_string := "endEffector";
-        FOR index FROM 1 TO 7 DO
+        pos_array{4}:=EulerZYX(\Z, pos_current.rot);!convert from quarternion to euler rotations (order roll pitch yaw i.e. zyx)
+        pos_array{5}:=EulerZYX(\Y, pos_current.rot);
+        pos_array{6}:=EulerZYX(\X, pos_current.rot);
+        pos_string := "endEffector";            !string opener
+        FOR index FROM 1 TO 6 DO                !append each value seperated by whitespace and rounded to 3 decimal places
             pos_string:=pos_string+" "+ ValtoStr(Round(pos_array{index}\Dec:=3));
         ENDFOR
-    SocketSend client_socket \Str:=pos_string + "\0A";
+    SocketSend client_socket \Str:=pos_string + "\0A";  !send to client
     ENDPROC
 
-    ! 
+    ! Send the current joint angles to matlab
+    !format: [q1, q2, q3, q4, q5, q6]
     PROC angles()
-        VAR jointtarget thetas_current;
-        VAR num thetas_array{6};
-        VAR string thetas_string;
-        thetas_current:=CJointT();
+        VAR jointtarget thetas_current;                 !for storing the current joint angles
+        VAR num thetas_array{6};                        !joint angle aray
+        VAR string thetas_string;                       !string for sending joint angles
+        
+        thetas_current:=CJointT();                      !get current joint angles from robot
         thetas_array{1}:=thetas_current.robax.rax_1;
         thetas_array{2}:=thetas_current.robax.rax_2;
         thetas_array{3}:=thetas_current.robax.rax_3;
         thetas_array{4}:=thetas_current.robax.rax_4;
         thetas_array{5}:=thetas_current.robax.rax_5;
         thetas_array{6}:=thetas_current.robax.rax_6;
-        thetas_string := "jointAngle";
-        FOR index FROM 1 TO 6 DO
+        thetas_string := "jointAngle";                  !string opener
+        FOR index FROM 1 TO 6 DO                        !append each value seperated by whitespace and rounded to 3 decimal places
             thetas_string:=thetas_string+ " " + ValtoStr(Round(thetas_array{index}\Dec:=3));
         ENDFOR
-        SocketSend client_socket \Str:=thetas_string+ "\0A";
+        SocketSend client_socket \Str:=thetas_string+ "\0A";!send the string to the client
     ENDPROC
     
     
     PROC GetIO()
-        VAR num io_array{4};
+        VAR num io_array{5};
         VAR string io_string;
-        !io_array{1}:=DOutput(DO10_1); !Vac Power Status
-        !io_array{2}:=DOutput(DO10_2); !Vac Solenoid Status
-        !io_array{3}:=DOutput(DO10_3); !ConvPower Status
-        !io_array{4}:=DOutput(DO10_4); !Conv Direcion Status
-        !io_array{5}:=DInput(DI10_1);  !Conv Status Value
-        !io_array{1}:=DInput(DI10_1); !Enable Conveyor
         io_array{1}:=DOutput(DO10_3); !Conveyor Run
         io_array{2}:=DOutput(DO10_4); !Convyor Reverse
         io_array{3}:=DOutput(DO10_1); !Vacuum Pump
         io_array{4}:=DOutput(DO10_2);  !Vacuum solenoid
+        io_array{5}:=DInput(DI10_1);   !Enable Conveyor
         io_string := "DIO";
-        FOR index FROM 1 TO 4 DO
+        FOR index FROM 1 TO 5 DO
             io_string:=io_string+" "+ ValtoStr(io_array{index});
         ENDFOR
         SocketSend client_socket \Str:=io_string + "\0A";

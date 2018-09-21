@@ -1,30 +1,26 @@
-
-    MODULE Assignment2
+    MODULE ROB_MAIN
     
-    !PERS socketdev client_socket;
-    ! The host and port that we will be listening for a connection on.
-    !PERS string host := "127.0.0.1";
-    
-    VAR num effectorHeight:= 147;
-    PERS robtarget testTarget := [[175, -100, 147],[0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+    VAR num effectorHeight:= 147;! The height of the table
+    PERS robtarget target := [[175, 0, 147],[0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];! test target initialised to touch the table home
+    PERS robjoint joints:= [-90, 0, 0, 0, 0, 0]; !test pose initialised to calib position
    
-    VAR num jog_inc:=30;
-    VAR num jog_inc_deg:= 5;
-    VAR speeddata jog_speed:=v100;
-    VAR speeddata pose_speed:= v100;
-    PERS string current_state := "None";
-    PERS bool quit := FALSE;
-    PERS bool done := FALSE;
-    PERS bool checkCom := FALSE;
-    PERS bool errorHandling := FALSE;
-    PERS num errorNumber;
+    VAR num jog_inc:=30;                    !increment for linear jogging
+    VAR num jog_inc_deg:= 5;                !increment for axis jogging
+    PERS string current_state := "";        !Current state for the main loop conditional statements, set in T_COM1
+    PERS bool quit := TRUE;                !quit flag
+    PERS bool done := FALSE;                !command finished flag
+    PERS bool checkCom := FALSE;            !COM checked flag
+    PERS bool errorHandling := FALSE;       !error flag
+    PERS num errorNumber;                   !error number for range calculations
     VAR intnum pauseTrigger;
     VAR intnum cancelTrigger;
-    PERS bool paused:=TRUE;
-    PERS bool cancelled := TRUE;
-    PERS string numTotal{7};
-    PERS string modeSpeed;
-    PERS wobjdata wobjCurrent;
+    PERS bool paused:=TRUE;                 !pause flag
+    PERS bool cancelled := TRUE;            !cancel flag
+    PERS string numTotal{7};                !string arguments array
+    PERS string modeSpeed;                  !speed data string
+    PERS speeddata move_speed;              !speed data for poses
+    PERS speeddata jog_speed;               !speed data for jogging
+    PERS wobjdata wobjCurrent;              !current work object (can be used to calculate positions relative to different rotational frames)
 
     
    
@@ -32,9 +28,13 @@
     PROC Main()
                 
         ! Program Starts
-        MoveToCalibPos;
-        current_state:="";
-        wobjCurrent:=wTable;
+        MoveToCalibPos;                     !Start in calib position
+        current_state:="";                  !initialise current state
+        wobjCurrent:=wTable;                !initialise current frame to table reference
+        
+        SingArea \Wrist;                    !Allow wrist position to deviate to avoid singularities
+        confj  \On;                         !Aim for absolute position, if not possible stop execution
+        
     CONNECT pauseTrigger WITH pauseRoutine;
     IPers paused, pauseTrigger;
     CONNECT cancelTrigger WITH cancelRoutine;
@@ -42,208 +42,266 @@
     WHILE quit = FALSE DO
         
         WaitUntil checkCom = TRUE;
-
         !obtain current status
         
-        !only use this if the position can deviate to avoid singularities
-        SingArea \Wrist;
-        
-        !absolute position
-        confj  \On;
-        
-        !VelSet 70, 800;
         
         !IF current_state <> "cancel" THEN
-            IF current_state = "moveerc" THEN
-                wobjCurrent := wConveyer;
-                MoveTargetConveyer numTotal;
+                                                    !if asked to move to a target relative to conveyer home
+            IF current_state = "moveerc" THEN       
+                wobjCurrent := wConveyer;             !set current work object to conveyer
+                move_speed :=getSpeed(modeSpeed);     !convert speed argument string to speeddata
+                target:=getTarget(numTotal);          !convert argument string array to target (uses wobjCurrent)
+                MoveTarget target, move_speed;        !Move to target
                 done:= TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to move to a target relative to table home
             IF current_state = "moveert"THEN
-                wobjCurrent:=wTable;
-                MoveTargetTable numTotal;
+                wobjCurrent:=wTable;                  !set current work object to table
+                move_speed :=getSpeed(modeSpeed);     !convert speed argument string to usable move_speed
+                target:=getTarget(numTotal);          !convert argument string array to usable target (uses wobjCurrent)
+                MoveTarget target, move_speed;        !Move to target
                 done:=TRUE;
                 current_state:="None";
             ENDIF
+                                                    !if asked to set the joint angles
             IF current_state = "movejas"THEN
-                MoveToPose;
+                joints:=getPose(numTotal);              !convert argument string array to usable pose
+                move_speed := getSpeed(modeSpeed);    !convert speed argument string to move_speed
+                MoveToPose joints, move_speed;          !move to the given joint angles
                 done:=TRUE;
                 current_state:="None";
             ENDIF
+                                                    !if asked to jog x in base frame
             IF current_state = "bxPlus" THEN
                 wobjCurrent := wBase;
-                JogX(jog_inc);
+                jog_speed:=getSpeed(modeSpeed);
+                JogLinear "x", +jog_inc, jog_speed;
                 done:= TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to jog x in end effector frame
             IF current_state = "exPlus" THEN
                 wobjCurrent := wEffector;
-                JogX(jog_inc);
+                jog_speed:=getSpeed(modeSpeed);
+                JogLinear "x", +jog_inc, jog_speed;
                 done:= TRUE;
                 current_state := "None";
             ENDIF
-            IF current_state = "byPlus" THEN
-                wobjCurrent := wBase;
-                JogY(jog_inc);
-                done:=TRUE;
-                current_state := "None";
-            ENDIF
-            IF current_state = "eyPlus" THEN
-                wobjCurrent := wEffector;
-                JogY(jog_inc);
-                done:=TRUE;
-                current_state := "None";
-            ENDIF
-            IF current_state = "bzPlus" THEN
-                wobjCurrent := wBase;
-                JogZ(jog_inc);
-                done:=TRUE;
-                current_state := "None";
-            ENDIF
-            IF current_state = "ezPlus" THEN
-                wobjCurrent := wEffector;
-                JogZ(jog_inc);
-                done:=TRUE;
-                current_state := "None";
-            ENDIF
+                                                    !if asked to jog -x in base frame
             IF current_state = "bxMinus" THEN
                 wobjCurrent := wBase;
-                JogX(-jog_inc);
+                jog_speed:=getSpeed(modeSpeed);
+                JogLinear "x", -jog_inc, jog_speed;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to jog -x in end effector frame
             IF current_state = "exMinus" THEN
                 wobjCurrent := wEffector;
-                JogX(-jog_inc);
+                jog_speed:=getSpeed(modeSpeed);
+                JogLinear "x", -jog_inc, jog_speed;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
-            IF current_state = "byMinus" THEN
+                                                    !if asked to jog y in base frame
+            IF current_state = "byPlus" THEN
                 wobjCurrent := wBase;
-                JogY(-jog_inc);
+                jog_speed:=getSpeed(modeSpeed);
+                JogLinear "y", jog_inc, jog_speed;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
-            IF current_state = "eyMinus" THEN
+                                                    !if asked to jog y in end effector frame
+            IF current_state = "eyPlus" THEN
                 wobjCurrent := wEffector;
-                JogY(-jog_inc);
-                done:=TRUE;
-                current_state := "None";
-            ENDIF
-            IF current_state = "bzMinus" THEN
-                wobjCurrent := wBase;
-                JogZ(-jog_inc);
-                done:=TRUE;
-                current_state := "None";
-            ENDIF
-            IF current_state = "ezMinus" THEN
-                wobjCurrent := wEffector;
-                JogZ(-jog_inc);
+                jog_speed:=getSpeed(modeSpeed);
+                JogLinear "y", jog_inc, jog_speed;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
             
+                                                    !if asked to jog -y in base frame
+            IF current_state = "byMinus" THEN
+                wobjCurrent := wBase;
+                jog_speed:=getSpeed(modeSpeed);
+                JogLinear "y", -jog_inc, jog_speed;
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+                                                    !if asked to jog -y in end effector frame
+            IF current_state = "eyMinus" THEN
+                wobjCurrent := wEffector;
+                jog_speed:=getSpeed(modeSpeed);
+                JogLinear "y", -jog_inc, jog_speed;
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+                                                    !if asked to jog z in base frame
+            IF current_state = "bzPlus" THEN
+                wobjCurrent := wBase;
+                jog_speed:=getSpeed(modeSpeed);
+                JogLinear "z", jog_inc, jog_speed;
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+                                                    !if asked to jog z in end effector frame
+            IF current_state = "ezPlus" THEN
+                wobjCurrent := wEffector;
+                jog_speed:=getSpeed(modeSpeed);
+                JogLinear "z", jog_inc, jog_speed;
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+                                                    !if asked to jog -z in base frame
+            IF current_state = "bzMinus" THEN
+                wobjCurrent := wBase;
+                jog_speed:=getSpeed(modeSpeed);
+                JogLinear "z", -jog_inc, jog_speed;
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+                                                    !if asked to jog -z in end effector frame
+            IF current_state = "ezMinus" THEN
+                wobjCurrent := wEffector;
+                jog_speed:=getSpeed(modeSpeed);
+                JogLinear "z", -jog_inc, jog_speed;
+                done:=TRUE;
+                current_state := "None";
+            ENDIF
+                                                    !if asked to jog joint1
             IF current_state = "jog1" THEN
+                jog_speed:=getSpeed(modeSpeed);
                 JogJoint 1, jog_inc_deg;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to jog -joint1
             IF current_state = "-jog1" THEN
+                jog_speed:=getSpeed(modeSpeed);
                 JogJoint 1, -jog_inc_deg;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to jog joint2
             IF current_state = "jog2" THEN
+                jog_speed:=getSpeed(modeSpeed);
                 JogJoint 2, jog_inc_deg;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to jog -joint2
             IF current_state = "-jog2" THEN
+                jog_speed:=getSpeed(modeSpeed);
                 JogJoint 2, -jog_inc_deg;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to jog joint3
             IF current_state = "jog3" THEN
+                jog_speed:=getSpeed(modeSpeed);
                 JogJoint 3, jog_inc_deg;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to jog -joint3
             IF current_state = "-jog3" THEN
+                jog_speed:=getSpeed(modeSpeed);
                 JogJoint 3, -jog_inc_deg;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to jog joint4
             IF current_state = "jog4" THEN
+                jog_speed:=getSpeed(modeSpeed);
                 JogJoint 4, jog_inc_deg;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to jog -joint4
             IF current_state = "-jog4" THEN
+                jog_speed:=getSpeed(modeSpeed);
                 JogJoint 4, -jog_inc_deg;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to jog joint5
             IF current_state = "jog5" THEN
+                jog_speed:=getSpeed(modeSpeed);
                 JogJoint 5, jog_inc_deg;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to jog -joint5
             IF current_state = "-jog5" THEN
+                jog_speed:=getSpeed(modeSpeed);
                 JogJoint 5, -jog_inc_deg;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to jog joint6
             IF current_state = "jog6" THEN
+                jog_speed:=getSpeed(modeSpeed);
                 JogJoint 6, jog_inc_deg;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to jog -joint6
             IF current_state = "-jog6" THEN
+                jog_speed:=getSpeed(modeSpeed);
                 JogJoint 6, -jog_inc_deg;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to turn on conveyer
             IF current_state = "conOn" THEN
                 conRunOn;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to turn off conveyer
             IF current_state = "conOff" THEN
                 conRunOff;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to make conveyer go to home
             IF current_state = "conReverseOn" THEN
                 conDirHome;
                 done:=TRUE;
                 current_state := "None";
             ENDIF 
+                                                    !if asked to make conveyer go to robot
             IF current_state = "conReverseOff" THEN
                 conDirRob;
                 done:=TRUE;
                 current_state := "None";
             ENDIF 
+                                                    !if asked to turn on vacuum solenoid
             IF current_state = "vacSolOn" THEN
                 vacSolOn;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to turn off vacuum solenoid
             IF current_state = "vacSolOff" THEN
                 vacSolOff;
                 done:=TRUE;
                 current_state := "None";
             ENDIF 
+                                                    !if asked to turn on vacuum pump
             IF current_state = "vacPumpOn" THEN
                 vacPwrOn;
                 done:=TRUE;
                 current_state := "None";
             ENDIF 
+                                                    !if asked to turn off vacuum pump
             IF current_state = "vacPumpOff" THEN
                 vacPwrOff;
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to pause
             IF current_state = "paused" THEN
                 paused:=TRUE;
                 StopMove;
@@ -251,6 +309,7 @@
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to resume
             IF current_state = "resume" THEN
                 paused:=FALSE;
                 RestoPath;
@@ -258,6 +317,7 @@
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to cancel
             IF current_state = "cancel" THEN
                 cancelled:=TRUE;
                 !RestoPath;
@@ -265,11 +325,15 @@
                 done:=TRUE;
                 current_state := "None";
             ENDIF
+                                                    !if asked to shutdown
             IF current_state = "shutdown" THEN
-                MoveToCalibPos;
-                vacPwrOff;
-                vacSolOff;
+                wobjCurrent:=wWorld;
+                MoveToPose [90, 0, 0, 0, 0, 0], v100;   !First lift to above conveyer to avoid collision with table
+                MoveToCalibPos;                         !Move to calib
+                vacPwrOff;                              !reset DIOs
+                vacSolOff;                          
                 conRunOff;
+                conDirRob;
                 quit:=TRUE;
                 done:=TRUE;
                 current_state := "None";
@@ -289,191 +353,93 @@
         
     ENDPROC
     
-    !WHILE quit = FALSE DO
-    
-    !ENDWHILE
-    
-     PROC JogX( num jog_inc)
-        VAR robtarget pos_current;
-        VAR robtarget pos_new;
-        VAR jointtarget jog_target;
-        VAR errnum err_val:=0;
-        VAR speeddata move_speed;
-        VAR pos jog:= [0,0,0];
-        VAR pose workObjectRot := [[0,0,0], [0,0,0,0]];
-        !get current pos
-        pos_current:=CRobT(\WObj:=wBase);
+    !Jog continuously in an axis (X,Y,or Z) untill paused elsewhere or the limits are reached
+    !Will calculate the axis based on the current frame of reference set by wobjCurrent
+    !PARAM axis:            the axis to use
+    !PARAM jog_inc:         num to continuously increment the axis by to find the robot's limit. Negative increment will jog in negative axis direction
+    !PARAM move_speed:      speed data
+    PROC JogLinear(string axis, num jog_inc, speeddata move_speed)
+        VAR robtarget pos_current;                      !current robot target
+        VAR robtarget pos_new;                          !new robot target to be calculated
+        VAR jointtarget check_joint;                    !joint variable for range checking
+        VAR errnum err_val:=0;                          !error variable for range checking
+        VAR pos jog:= [0,0,0];                          !vector to be incremented and rotated before adding to new_pos
+        VAR pose workObjectRot := [[0,0,0], [0,0,0,0]];    !rotation to transform the jog vector by based on the current work object
+        
+        pos_current:=CRobT(\WObj:=wBase);               !get current pos
         pos_new:=pos_current;
-        !invert rotation
-        IF wobjCurrent = wEffector THEN
-            workObjectRot.rot := pos_current.rot;
-            !workObjectRot:=PoseInv(workObjectRot);
+        
+        IF wobjCurrent = wEffector THEN                 !check if frame is the dynamic end effector frame based off link 6
+            workObjectRot.rot := pos_current.rot;           !if so use link 6's frame for axis rotation
         ELSE
-            workObjectRot := PoseInv(wobjCurrent.uframe);
+            workObjectRot := PoseInv(wobjCurrent.uframe);!else use the current work objects frame.
             workObjectRot.trans := [0,0,0];
         ENDIF
-        jog.x := jog_inc;
-        jog := PoseVect(workObjectRot, jog);
-        !recalculate new pose untill out of limits
-        WHILE err_val = 0 DO
+        
+        IF axis = "x" OR axis = "X" THEN                 !apply increment to axis indicated in argument
+            jog.x := jog_inc;
+        ELSEIF axis = "y" or axis = "Y" THEN
+            jog.y:= jog_inc;
+        ELSEIF axis = "z" or axis = "Z" THEN 
+            jog.z:= jog_inc;
+        ENDIF
+        
+        jog := PoseVect(workObjectRot, jog);            !transform vector by the rotation matrix for the work object
+        
+                                                       
+        WHILE err_val = 0 DO                            !recalculate new pose by incrementing untill out of limits
             pos_new.trans:=pos_new.trans + jog;
-            jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wBase\ErrorNumber:=err_val);
+            check_joint:=CalcJointT(pos_new,tSCup,\WObj:=wBase\ErrorNumber:=err_val);
         ENDWHILE
-       !move to calculated pos
-        move_speed:= getSpeed(modeSpeed);
-        pos_new.trans:=pos_new.trans-jog;
-        MoveL pos_new,move_speed,fine,tSCup\WObj:=wBase;
+        pos_new.trans:=pos_new.trans-jog;               !deincrement once to move back in range
+                                                         
+        MoveL pos_new,move_speed,fine,tSCup\WObj:=wBase;!move to calculated pos by linear pathing 
         ERROR
     ENDPROC   
 
-      PROC JogY( num jog_inc)
-        VAR robtarget pos_current;
-        VAR robtarget pos_new;
-        VAR jointtarget jog_target;
-        VAR errnum err_val:=0;
-        VAR speeddata move_speed;
-        VAR pos jog:= [0,0,0];
-        VAR pose workObjectRot := [[0,0,0], [0,0,0,0]];
-        !get current pos
-        pos_current:=CRobT(\WObj:=wBase);
-        pos_new:=pos_current;
-        !invert rotation
-        IF wobjCurrent = wEffector THEN
-            workObjectRot.rot := pos_current.rot;
-            !workObjectRot:=PoseInv(workObjectRot);
-        ELSE
-            workObjectRot := PoseInv(wobjCurrent.uframe);
-            workObjectRot.trans := [0,0,0];
-        ENDIF
-        jog.y := jog_inc;
-        jog := PoseVect(workObjectRot, jog);
-        !recalculate new pose untill out of limits
-        WHILE err_val = 0 DO
-            pos_new.trans:=pos_new.trans + jog;
-            jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wBase\ErrorNumber:=err_val);
-        ENDWHILE
-       !move to calculated pos
-        move_speed:= getSpeed(modeSpeed);
-        pos_new.trans:=pos_new.trans-jog;
-        MoveL pos_new,move_speed,fine,tSCup\WObj:=wBase;
-        ERROR
-    ENDPROC   
-    
-     PROC JogZ( num jog_inc)
-        VAR robtarget pos_current;
-        VAR robtarget pos_new;
-        VAR jointtarget jog_target;
-        VAR errnum err_val:=0;
-        VAR speeddata move_speed;
-        VAR pos jog:= [0,0,0];
-        VAR pose workObjectRot := [[0,0,0], [0,0,0,0]];
-        !get current pos
-        pos_current:=CRobT(\WObj:=wBase);
-        pos_new:=pos_current;
-        !invert rotation
-        IF wobjCurrent = wEffector THEN
-            workObjectRot.rot := pos_current.rot;
-            !workObjectRot:=PoseInv(workObjectRot);
-        ELSE
-            workObjectRot := PoseInv(wobjCurrent.uframe);
-            workObjectRot.trans := [0,0,0];
-        ENDIF
-        jog.z := jog_inc;
-        jog := PoseVect(workObjectRot, jog);
-        !recalculate new pose untill out of limits
-        WHILE err_val = 0 DO
-            pos_new.trans:=pos_new.trans + jog;
-            jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wBase\ErrorNumber:=err_val);
-        ENDWHILE
-       !move to calculated pos
-        move_speed:= getSpeed(modeSpeed);
-        pos_new.trans:=pos_new.trans-jog;
-        MoveL pos_new,move_speed,fine,tSCup\WObj:=wBase;
-        ERROR
-    ENDPROC   
-    
-!    PROC JogY(num jog_inc)
-!        VAR robtarget pos_current;
-!        VAR robtarget pos_new;
-!        VAR jointtarget jog_target;
-!        VAR errnum err_val:=0;
-!         VAR speeddata move_speed;
-!         move_speed:= getSpeed(modeSpeed);
-!        !get current pos
-!        pos_current:=CRobT(\WObj:=wobjCurrent);
-!        pos_new:=pos_current;
-!        !recalculate new pose untill out of limits
-!        WHILE err_val = 0 DO
-!            pos_new.trans.y:=pos_new.trans.y+jog_inc;
-!            jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wobjCurrent\ErrorNumber:=err_val);
-!        ENDWHILE
-!       !move to calculated pos
-       
-!        pos_new.trans.y:=pos_new.trans.y-jog_inc;
-!        MoveL pos_new,move_speed,fine,tSCup\WObj:=wobjCurrent;
-!        ERROR
-!    ENDPROC   
-    
-!    PROC JogZ(num jog_inc)
-!        VAR robtarget pos_current;
-!        VAR robtarget pos_new;
-!        VAR jointtarget jog_target;
-!        VAR errnum err_val;
-!        VAR speeddata move_speed;
-!        move_speed:= getSpeed(modeSpeed);
-!        !get current pos
-!        pos_current:=CRobT(\WObj:=wobjCurrent);
-!        pos_new:=pos_current;
-!        !recalculate new pose untill out of limits
-!        WHILE err_val = 0 DO
-!            pos_new.trans.z:=pos_new.trans.z+jog_inc;
-!            jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wobjCurrent\ErrorNumber:=err_val);
-!        ENDWHILE
-!       !move to calculated pos
-!        pos_new.trans.z:=pos_new.trans.z-jog_inc;
-!        MoveL pos_new,move_speed,fine,tSCup\WObj:=wobjCurrent;
-!        ERROR
-!    ENDPROC   
-    
+    !Work in progress (should work but has not been tested because no comms statements for it)
     PROC JogYaw (num jog_inc)
         VAR robtarget pos_current;
         VAR robtarget pos_new;
         VAR jointtarget jog_target;
         VAR errnum err_val;
         VAR num roll;
-        !get current pos
-        pos_current:=CRobT(\WObj:=wobjCurrent);
+        VAR num pitch;
+        VAR num yaw;
+        pos_current:=CRobT(\WObj:=wobjCurrent);          !get current pos 
         pos_new:=pos_current;
+        roll := EulerZYX(\Z, pos_current.rot);           !get current roll
+        pitch:= EulerZYX(\Y, pos_current.rot);           !get current pitch
+        yaw := EulerZYX(\X, pos_current.rot);            !get current yaw
         !recalculate new pose untill out of limits
         WHILE err_val = 0 DO
-            roll := EulerZYX(\X, pos_current.rot);
-            roll:= roll + jog_inc;
-            pos_new.trans.z:=pos_new.trans.z+jog_inc;
-            jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wobjCurrent\ErrorNumber:=err_val);
+            yaw  := yaw + jog_inc;                       !increment yaw
+            pos_new.rot := OrientZYX(roll, pitch, yaw);  !apply rotations
+            jog_target:=CalcJointT(pos_new,tSCup,\WObj:=wobjCurrent\ErrorNumber:=err_val);! check for errors
         ENDWHILE
-       !move to calculated pos
-        pos_new.trans.x:=pos_new.trans.z-jog_inc;
-        MoveL pos_new,jog_speed,fine,tSCup\WObj:=wobjCurrent;
+        pos_new.trans.x:=pos_new.trans.z-jog_inc;        !decrement yaw once to get back in range
+        MoveJ pos_new,jog_speed,fine,tSCup\WObj:=wobjCurrent;!move joints.
         ERROR
     ENDPROC
-    !Jog Joint 
+    
+    !Jog specified Joint to positive or negative limit
+    !PARAM jointNumber: joint number 1 to 6
+    !PARAM jog_inc_deg: increment to use to reach robot limit (mainly used to specify direction of joint) 
     PROC JogJoint(num jointNumber, num jog_inc_deg)
-        VAR jointtarget thetas_current;
-        VAR jointtarget thetas_new;
-        VAR robtarget pos_new;
-        VAR robtarget check_target;
-        VAR jointtarget check_joints;
-        VAR errnum err_val;
-        VAR speeddata move_speed;
+        VAR jointtarget thetas_current;                 !current joint angles
+        VAR jointtarget thetas_new;                     !new joint angles
+        VAR speeddata jog_speed;                        !speed used for joint jogging
         
-        move_speed := getSpeed(modeSpeed);
-        thetas_current:=CJointT();
-        thetas_new:=thetas_current;
-        !increment new
-        IF jointNumber = 1 THEN
-            IF jog_inc_deg < 0  THEN
-                thetas_new.robax.rax_1:=-165;
-                MoveAbsJ thetas_new,move_speed,fine,tSCup;
+        jog_speed := getSpeed(modeSpeed);               !get speed from string argument
+        thetas_current:=CJointT();                      !get current joint angles
+        thetas_new:=thetas_current;                     !new joint angles for incrementing
+        
+        !IF statement to determine first join number and then joint direction. Each joint limit is hardcoded in to the iff statements. 
+        !see first example
+        IF jointNumber = 1 THEN                                 !joint  1?
+            IF jog_inc_deg < 0  THEN                                !negative increment?
+                thetas_new.robax.rax_1:=-165;                           !set joint 1 to negative limit (hardcoded)
+                MoveAbsJ thetas_new,move_speed,fine,tSCup;              !move to new angles
             ELSEIF jog_inc_deg > 0 THEN
                 thetas_new.robax.rax_1:=165;
                 MoveAbsJ thetas_new,move_speed,fine,tSCup;
@@ -519,111 +485,59 @@
                 MoveAbsJ thetas_new,move_speed,fine,tSCup;
             ENDIF
         ENDIF
-!        pos_new:=CalcRobT(thetas_new,tSCup);
-!        thetas_current:=CalcJointT(pos_new,tSCup,\ErrorNumber:=err_val);
-!        IF err_val<>0 THEN
-!            errorNumber := err_val;
-!            errorHandling := TRUE;
-!        ELSE
-!            MoveAbsJ thetas_new,jog_speed,fine,tSCup;
-!        ENDIF
         ERROR
     ENDPROC
     
-     PROC MoveToPose()
-        VAR robjoint pose;!
-        VAR speeddata move_speed;
-        VAR jointtarget thetas_new_formatted;
-        !errror checking
-        VAR robtarget check_target;
-        VAR jointtarget check_joints;
-        VAR errnum err_val;
-        pose:=getPose(numTotal);
-        move_speed := getSpeed(modeSpeed);
-        thetas_new_formatted:= [pose, [9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];!the formatted joint angles for moving the robot
-        !check if in range
-        check_target:=CalcRobT(thetas_new_formatted,tSCup);
-        check_joints:=CalcJointT(check_target,tSCup\ErrorNumber:=err_val);
-         IF err_val<>0 THEN
-            errorNumber := err_val;
-            errorHandling := TRUE;
+     !Move to specified joint angles
+     !PARAM pose:               joint angles 1 to 6, e.g [90,0,0,0,0,0]
+     !PARAM move_speed:         speed to move at, e.g v100
+     PROC MoveToPose(robjoint pose, speeddata move_speed)
+        VAR jointtarget thetas_new_formatted;       !We will need the joint angles formatted to a joint target for moving the robot
+        VAR robtarget check_target;                 !target for error checking
+        VAR jointtarget check_joints;               !joints for error cecking
+        VAR errnum err_val;                         !error variable
+        
+        thetas_new_formatted:= [pose, [9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];       !pad the desired robot joint angles to a jointtarget variable
+        check_target:=CalcRobT(thetas_new_formatted,tSCup);                         !check if in range step 1
+        check_joints:=CalcJointT(check_target,tSCup\ErrorNumber:=err_val);          !check if in range step 2
+         IF err_val<>0 THEN                                                             !error found in position?
+            errorNumber := err_val; 
+            errorHandling := TRUE;                                                      !flag for error handling
         ELSE
-            MoveAbsJ thetas_new_formatted, move_speed, fine, tSCup;
+            MoveAbsJ thetas_new_formatted, move_speed, fine, tSCup;                 !move joint angles if no errors
          ENDIF
         ERROR
     ENDPROC
 
 
-    PROC MoveTargetGlobal(string numTotal{*})
-        VAR robtarget target;
-        VAR speeddata move_speed;
-        VAR jointtarget check_joints;
-        VAR errnum err_val;
+    ! Move to a target relative to the current work object
+    ! PARAM target: target position and orientation
+    ! PARAM move_speed: speed to move at
+    PROC MoveTarget(robtarget target, speeddata move_speed)
+        VAR jointtarget check_joints;                       !error checking target
+        VAR errnum err_val;                                 !error variable
         
-        !get data from strings
-        move_speed:=getSpeed(modeSpeed);
-        target:= getTarget(numTotal);
-        
-        !error checking before move
-        check_joints:=CalcJointT(target,tSCup \WObj:=wobjCurrent\ErrorNumber:=err_val);
+        check_joints:=CalcJointT(target,tSCup\WObj:=wobjCurrent\ErrorNumber:=err_val); !error checking before move
          IF err_val<>0 THEN
             errorNumber := err_val;
             errorHandling := TRUE;
         ELSE
-            MoveJ target, move_speed, fine, tSCup\WObj:=wobjCurrent;
+            MoveJ target, move_speed, fine, tSCup, \WObj:=wobjCurrent;      !move joint angles
          ENDIF
          ERROR
     ENDPROC
     
-    PROC MoveTargetTable(string numTotal{*})
-        VAR robtarget target;
-        VAR speeddata move_speed;
-        VAR jointtarget check_joints;
-        VAR errnum err_val;
-        
-        !get data from strings
-        move_speed:=getSpeed(modeSpeed);
-        target:= getTarget(numTotal);
-        
-        !error checking before move
-        check_joints:=CalcJointT(target,tSCup\WObj:=wobjCurrent \ErrorNumber:=err_val);
-        IF err_val<>0 THEN
-            errorNumber := err_val;
-            errorHandling := TRUE;
-        ELSE
-            MoveJ target, move_speed, fine, tSCup, \WObj:=wobjCurrent;
-        ENDIF
-        ERROR
-    ENDPROC
     
-    PROC MoveTargetConveyer(string numTotal{*})
-        VAR robtarget target;
-        VAR speeddata move_speed;
-        
-        VAR jointtarget check_joints;
-        VAR errnum err_val;
-        
-        !get data from strings
-        move_speed:=getSpeed(modeSpeed);
-        target:= getTarget(numTotal);
-        
-        !error checking before move
-        check_joints:=CalcJointT(target,tSCup\WObj:=wobjCurrent\ErrorNumber:=err_val);
-         IF err_val<>0 THEN
-            errorNumber := err_val;
-            errorHandling := TRUE;
-        ELSE
-            MoveJ target, move_speed, fine, tSCup, \WObj:=wobjCurrent;
-         ENDIF
-         ERROR
-    ENDPROC
-    
+    !move to a linear offset of the target. no error checking as this is just for testing
     PROC MoveTargetOffset(robtarget target, num x, num y, num z)
         
               MoveL Offs(target, x, y, z), v100, fine, tSCup;
     ENDPROC
     
     !converts the string fragments from the comms server to a robtarget
+    !PARAM numTotal: string array with 6 arguments, expected to be [xt,yt,zt,zr,yr,xr] 
+    !where t is translational component and r is rotational component
+    !RETURN robtarget:
     FUNC robtarget getTarget(string numTotal{*})
         VAR robtarget newTarget;
         VAR bool conversion_outcome;
@@ -632,22 +546,22 @@
         VAR num pitch;
         VAR num yaw;
         
+        !convert strings to numbers
         conversion_outcome := StrtoVal(numTotal{1}, newTarget.trans.x);
         conversion_outcome := StrtoVal(numTotal{2}, newTarget.trans.y);
         conversion_outcome := StrtoVal(numTotal{3}, newTarget.trans.z);
-!        conversion_outcome := StrtoVal(numTotal{4}, newTarget.rot.q1);
-!        conversion_outcome := StrtoVal(numTotal{5}, newTarget.rot.q2);
-!        conversion_outcome := StrtoVal(numTotal{6}, newTarget.rot.q3);
-!        conversion_outcome := StrtoVal(numTotal{7}, newTarget.rot.q4);
         conversion_outcome := StrtoVal(numTotal{4}, roll);
         conversion_outcome := StrtoVal(numTotal{5}, pitch);
         conversion_outcome := StrtoVal(numTotal{6}, yaw);
-        newTarget.rot := OrientZYX(roll, pitch, yaw); 
+        newTarget.rot := OrientZYX(roll, pitch, yaw);                       !convert euler angles to quarternion for the robot
         
         RETURN newTarget;
     ENDFUNC
     
-    !converts the string fragments from the comms server to a robtarget
+    !converts the string fragments from the comms server to joint angles
+    !PARAM numTotal: string array with 6 arguments, expected to be [q1,q2,q3,q4,q5,q6] 
+    !where qs are the joint angles
+    !RETURN robtarget:
     FUNC robjoint getPose(string numTotal{*})
         VAR robjoint pose;
         VAR bool conversion_outcome;
@@ -663,46 +577,57 @@
     ENDFUNC
     
     !switch statement for the speed string from matlab
+    !originally set to v50, v100, and v500 this has been reduced on just the rapid side as the robot cannot move that fast.
     FUNC speeddata getSpeed(string modeSpeed)
       VAR speeddata move_speed;
       IF modeSpeed = "v50" THEN
-          move_speed := v50;
+          move_speed := v10;
       ELSEIF modeSpeed = "v100" THEN
-          move_speed := v100;
+          move_speed := v50;
       ELSEIF modeSpeed = "v500" THEN
-          move_speed := v500;
+          move_speed := v100;
       ENDIF
       RETURN move_speed;
     ENDFUNC
     
+    !turn on vacuum pump
     PROC vacPwrOn()
         SetDO DO10_1, 1;
     ENDPROC
     
+    !turn off vacuum pump
     PROC vacPwrOff()
         SetDO DO10_1, 0;
     ENDPROC
     
+    !turn on vacuum solenoid
     PROC vacSolOn()
         SetDO DO10_2, 1;
     ENDPROC
     
+    !turn off vacuum solenoid
     PROC vacSolOff()
         SetDO DO10_2, 0;
     ENDPROC
     
+    !turn on conveyer
     PROC conRunOn()
-        SetDO DO10_3, 1;
+        IF DInput(DI10_1)= 1 THEN          !first check if conveyer is enabled
+            SetDO DO10_3, 1;
+        ENDIF
     ENDPROC
     
+    !turn off conveyer
     PROC conRunOff()
         SetDO DO10_3, 0;
     ENDPROC
     
+    !set the conveyer to move towards the robot
     PROC conDirRob()
         SetDO DO10_4, 1;
     ENDPROC
     
+    !set the conveyer to move towards the hatch
     PROC conDirHome()
         SetDO DO10_4, 0;
     ENDPROC

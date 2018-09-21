@@ -92,6 +92,8 @@ MODULE MTRN_Rob_Data (SYSMODULE, NOSTEPIN, READONLY)
 	PERS wobjdata wConveyerCamera:=[FALSE,TRUE,"",[[-71,429,1110],[1,0,0,0]],[[0,0,0],[1,0,0,0]]];
 	PERS wobjdata wTableCamera:=[FALSE,TRUE,"",[[309,19,1110],[1,0,0,0]],[[0,0,0],[1,0,0,0]]];
 	PERS wobjdata wWorld:=[FALSE,TRUE,"",[[-3025,-3282,-585],[1,0,0,0]],[[0,0,0],[1,0,0,0]]];
+    PERS wobjdata wEffector:=[FALSE,TRUE,"",[[401.362715792,45.961925887,184.649812471],[0.277815883,0.115075154,-0.881119559,0.364971733]],[[0,0,0],[1,0,0,0]]];
+    PERS wobjdata wBase:=[FALSE,TRUE,"",[[0,0,0],[1,0,0,0]],[[0,0,0],[1,0,0,0]]];
 
  ! WorkObject orientations for the Table and Conveyor
  !
