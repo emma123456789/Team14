@@ -1,3 +1,5 @@
+2% DouglasPeucker.m used to detect corners of blocks for Assignment 
+
 function PointList_reduced = DouglasPeucker(PointList, epsilon, showdata)
 % DOUGLASPEUCKER Reduce density of points in vector data using the 
 %  Ramer-Douglas-Peucker algorithm. 
