@@ -232,14 +232,14 @@ end
             set(g_handles.Joint5Status,'string',copy_split(6));
             set(g_handles.Joint6Status,'string',copy_split(7));
             
-        elseif (strcmp(copy_split(1),'endEffector'))     
+        elseif (strcmp(copy_split(1),'endEffector'))   
+%             threeDecX = str2num(copy_split(2));
             set(g_handles.XStatus,'string',copy_split(2));
             set(g_handles.YStatus,'string',copy_split(3));
             set(g_handles.ZStatus,'string',copy_split(4));
-            set(g_handles.q1Status,'string',copy_split(5));
-            set(g_handles.q2Status,'string',copy_split(6));
-            set(g_handles.q3Status,'string',copy_split(7));
-            set(g_handles.q4Status,'string',copy_split(8));
+            set(g_handles.rollStatus,'string',copy_split(5));
+            set(g_handles.pitchStatus,'string',copy_split(6));
+            set(g_handles.yawStatus,'string',copy_split(7));
             
         elseif (strcmp(copy_split(1),'DIO'))            
             if (strcmp(copy_split(2),'1'))
@@ -340,27 +340,29 @@ end
 		
 		str = sprintf(' IP: %s \n Port: %d',sim_robot_IP_address,robot_port);
 		set(g_handles.portNumber, 'String', str);
-		set(g_handles.portNumber, 'BackgroundColor', [0 0 0]);
+		set(g_handles.portNumber, 'BackgroundColor', [0.94 0.94 0.94]);
 		
 		if (buttonNo==1)
 			start(s_timer);
 			start(r_timer);
-		end
- %     % Start Cameras
-%     axes(handles.TableCamera);
-%     axes(handles.ConveyorCamera);
-%     vid = videoinput('winvideo',1, 'MJPG_1600x1200'); 
-%     video_resolution1 = vid.VideoResolution;
-%     nbands1 = vid.NumberOfBands;
-%     vid2 = videoinput('winvideo',2,'MJPG_1600x1200'); 
-%     video_resolution2 = vid2.VideoResolution;
-%     nbands2 = vid2.NumberOfBands;
-% 
-%     % sguideet image handle
-%     hImage=image(zeros([video_resolution1(2), video_resolution1(1), nbands1]),'Parent',handles.TableCamera);
-%     hImage2=image(zeros([video_resolution2(2), video_resolution2(1), nbands2]),'Parent',handles.ConveyorCamera);
-%     preview(vid,hImage);
-%     preview(vid2,hImage2);
+        end
+        
+         % Start Cameras
+        axes(handles.TableCamera);
+        axes(handles.ConveyorCamera);
+        vid = videoinput('winvideo',1, 'MJPG_1600x1200'); 
+        video_resolution1 = vid.VideoResolution;
+        nbands1 = vid.NumberOfBands;
+        vid2 = videoinput('winvideo',2,'MJPG_1600x1200'); 
+        video_resolution2 = vid2.VideoResolution;
+        nbands2 = vid2.NumberOfBands;
+
+        % sguideet image handle
+        hImage=image(zeros([video_resolution1(2), video_resolution1(1), nbands1]),'Parent',handles.TableCamera);
+        hImage2=image(zeros([video_resolution2(2), video_resolution2(1), nbands2]),'Parent',handles.ConveyorCamera);
+        preview(vid,hImage);
+        preview(vid2,hImage2);
+    
      % Check if the connection is valid.+6
      if(~isequal(get(socket, 'Status'), 'open'))
         warning(['Could not open TCP connection to ', sim_robot_IP_address, ' on port ', robot_port]);
@@ -688,22 +690,24 @@ global vid2;
  			start(s_timer);
 			start(r_timer);
 			
-% 			% Start Cameras
-% 			axes(handles.TableCamera);
-% 			axes(handles.ConveyorCamera);
-%   			vid = videoinput('winvideo',1, 'MJPG_1600x1200'); 
-%             video_resolution1 = vid.VideoResolution;
-%             nbands1 = vid.NumberOfBands;
-% 			vid2 = videoinput('winvideo',2,'MJPG_1600x1200'); 
-%             video_resolution2 = vid2.VideoResolution;
-%             nbands2 = vid2.NumberOfBands;
-% 
-% 			% sguideet image handle
-%  			hImage=image(zeros([video_resolution1(2), video_resolution1(1), nbands1]),'Parent',handles.TableCamera);
-% 			hImage2=image(zeros([video_resolution2(2), video_resolution2(1), nbands2]),'Parent',handles.ConveyorCamera);
-%  			preview(vid,hImage);
-%  			preview(vid2,hImage2);
-			
+			% Start Cameras
+			axes(handles.TableCamera);
+			axes(handles.ConveyorCamera);
+  			vid = videoinput('winvideo',1, 'MJPG_1600x1200'); 
+            video_resolution1 = vid.VideoResolution;
+            nbands1 = vid.NumberOfBands;
+			vid2 = videoinput('winvideo',2,'MJPG_1600x1200'); 
+            video_resolution2 = vid2.VideoResolution;
+            nbands2 = vid2.NumberOfBands;
+
+			% sguideet image handle
+ 			hImage=image(zeros([video_resolution1(2), video_resolution1(1), nbands1]),'Parent',handles.TableCamera);
+			hImage2=image(zeros([video_resolution2(2), video_resolution2(1), nbands2]),'Parent',handles.ConveyorCamera);
+ 			preview(vid,hImage);
+ 			preview(vid2,hImage2);
+			src1 = getselectedsource(vid);
+            src1.ExposureMode = 'manual';
+            src1.Exposure = -5;
 			% Check if the connection is valid.+6
  % 			if(~isequal(get(socket, 'Status'), 'open'))
 % 				warning(['Could not open TCP connection to ', real_robot_IP_address, ' on port ', robot_port]);
@@ -1286,7 +1290,7 @@ global jaQ1 jaQ2 jaQ3 jaQ4 jaQ5 jaQ6;
 			pitch = eePITCH;
 			yaw = eeYAW;
 			
-	        commandStr = sprintf('moveerc %d %d %d %d %d %d %s', eex,eey,eez,roll,pitch,yaw,speed);
+	        commandStr = sprintf('moveerc %.3f %.3f %.3f %.3f %.3f %.3f %s', eex,eey,eez,roll,pitch,yaw,speed);
 	        queue.add(commandStr);
 		case 2
 			eex = eeX;
@@ -1295,7 +1299,7 @@ global jaQ1 jaQ2 jaQ3 jaQ4 jaQ5 jaQ6;
 			roll = eeROLL;
 			pitch = eePITCH;
 			yaw = eeYAW;
-            commandStr = sprintf('moveert %d %d %d %d %d %d %s', eex,eey,eez,roll,pitch,yaw,speed);
+            commandStr = sprintf('moveert %.3f %.3f %.3f %.3f %.3f %.3f %s', eex,eey,eez,roll,pitch,yaw,speed);
             queue.add(commandStr);
 		case 3
 			q1 = jaQ1;
@@ -1304,13 +1308,13 @@ global jaQ1 jaQ2 jaQ3 jaQ4 jaQ5 jaQ6;
 			q4 = jaQ4;
 			q5 = jaQ5;
 			q6 = jaQ6;
-            commandStr = sprintf('movejas %d %d %d %d %d %d %s', q1,q2,q3,q4,q5,q6,speed);
+            commandStr = sprintf('movejas %.3f %.3f %.3f %.3f %.3f %.3f %s', q1,q2,q3,q4,q5,q6,speed);
             queue.add(commandStr);
 		case 4
 			roll = eeROLL;
 			pitch = eePITCH;
 			yaw = eeYAW;
-            commandStr = sprintf('moveree %d %d %d %s', roll,pitch,yaw,speed);
+            commandStr = sprintf('moveree %.3f %.3f %.3f %s', roll,pitch,yaw,speed);
             queue.add(commandStr);
 	end
  end
@@ -2031,6 +2035,9 @@ function TableCamSS_Callback(hObject, eventdata, handles)
     global vid
     global tableParam
     global tableCameraR
+    global queue;
+    
+    
      Rot = tableCameraR.R;
     Trans = [-114.9484  337.2691  831.0543] %initial more accurate
     %Trans = [-362.2664002845348	-42.383249883396594	903.6546791412422]%later 
@@ -2065,6 +2072,9 @@ function TableCamSS_Callback(hObject, eventdata, handles)
                 disp(eex)
                 disp(eey)
                 disp(eez)
+                
+                commandStr = sprintf('videocoor %.3f %.3f %.3f',eex,eey,eez);
+                queue.add(commandStr);
         end
     end
 end
@@ -2094,7 +2104,7 @@ function ConveyorCamSS_Callback(hObject, eventdata, handles)
         if x1 < 0 | x1 >1200
             flag = 0;
         else
-            worldPoints = pointsToWorld(convParam.mainCameraParams, Rot, Trans, [x1 y1])
+            worldPoints = pointsToWorld(convParam.ConvCameraParams, Rot, Trans, [x1 y1])
             flag = 1;
         end
     
@@ -2174,7 +2184,7 @@ global vid;
 if get(hObject,'Value') == 1
    
     snapshot = getsnapshot(vid);
-    image = ycbcr2rgb(snapshot);
+    image = snapshot;
      figure(1);
     imshow(image); hold on;
     [angles, position, letter, finalText] = useBlocks(image); 

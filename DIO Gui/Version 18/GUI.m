@@ -70,22 +70,22 @@ convCameraT = load('cameraT_conveyor');
 global vid;
 global vid2;
 
- 			% Start Cameras
- 			axes(handles.TableCamera);
- 			axes(handles.ConveyorCamera);
-  			vid = videoinput('winvideo',1, 'MJPG_1600x1200'); 
-            video_resolution1 = vid.VideoResolution;
-            nbands1 = vid.NumberOfBands;
-			vid2 = videoinput('winvideo',2,'MJPG_1600x1200'); 
-            video_resolution2 = vid2.VideoResolution;
-            nbands2 = vid2.NumberOfBands;
- 
- 			% sguideet image handle
- 			hImage=image(zeros([video_resolution1(2), video_resolution1(1), nbands1]),'Parent',handles.TableCamera);
-			hImage2=image(zeros([video_resolution2(2), video_resolution2(1), nbands2]),'Parent',handles.ConveyorCamera);
- 			preview(vid,hImage);
- 			preview(vid2,hImage2);
-
+%  			% Start Cameras
+%  			axes(handles.TableCamera);
+%  			axes(handles.ConveyorCamera);
+%   			vid = videoinput('winvideo',1, 'MJPG_1600x1200'); 
+%             video_resolution1 = vid.VideoResolution;
+%             nbands1 = vid.NumberOfBands;
+% 			vid2 = videoinput('winvideo',2,'MJPG_1600x1200'); 
+%             video_resolution2 = vid2.VideoResolution;
+%             nbands2 = vid2.NumberOfBands;
+%  
+%  			% sguideet image handle
+%  			hImage=image(zeros([video_resolution1(2), video_resolution1(1), nbands1]),'Parent',handles.TableCamera);
+% 			hImage2=image(zeros([video_resolution2(2), video_resolution2(1), nbands2]),'Parent',handles.ConveyorCamera);
+%  			preview(vid,hImage);
+%  			preview(vid2,hImage2);
+% 
 
 
 % Update handles structure
@@ -772,22 +772,22 @@ global vid2;
 			start(s_timer);
 			start(r_timer);
 			
-			% Start Cameras
-			axes(handles.TableCamera);
-			axes(handles.ConveyorCamera);
-  			vid = videoinput('winvideo',1, 'MJPG_1600x1200'); 
-            video_resolution1 = vid.VideoResolution;
-            nbands1 = vid.NumberOfBands;
-			vid2 = videoinput('winvideo',2,'MJPG_1600x1200'); 
-            video_resolution2 = vid2.VideoResolution;
-            nbands2 = vid2.NumberOfBands;
-
-			% sguideet image handle
- 			hImage=image(zeros([video_resolution1(2), video_resolution1(1), nbands1]),'Parent',handles.TableCamera);
-			hImage2=image(zeros([video_resolution2(2), video_resolution2(1), nbands2]),'Parent',handles.ConveyorCamera);
- 			preview(vid,hImage);
- 			preview(vid2,hImage2);
-			
+% 			% Start Cameras
+% 			axes(handles.TableCamera);
+% 			axes(handles.ConveyorCamera);
+%   			vid = videoinput('winvideo',1, 'MJPG_1600x1200'); 
+%             video_resolution1 = vid.VideoResolution;
+%             nbands1 = vid.NumberOfBands;
+% 			vid2 = videoinput('winvideo',2,'MJPG_1600x1200'); 
+%             video_resolution2 = vid2.VideoResolution;
+%             nbands2 = vid2.NumberOfBands;
+% 
+% 			% sguideet image handle
+%  			hImage=image(zeros([video_resolution1(2), video_resolution1(1), nbands1]),'Parent',handles.TableCamera);
+% 			hImage2=image(zeros([video_resolution2(2), video_resolution2(1), nbands2]),'Parent',handles.ConveyorCamera);
+%  			preview(vid,hImage);
+%  			preview(vid2,hImage2);
+% 			
 			% Check if the connection is valid.+6
 
 % 			if(~isequal(get(socket, 'Status'), 'open'))
