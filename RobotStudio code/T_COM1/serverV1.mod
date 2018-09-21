@@ -4,24 +4,22 @@
     ! The socket connected to the client.
     VAR socketdev client_socket;
     ! The host and port that we will be listening for a connection on.
-    PERS string host := "127.0.0.1";
-    PERS string current_state := "";
-    CONST num port := 1025;
-    PERS bool quit := TRUE;
-    PERS bool checkCom := FALSE;
-    PERS bool done := FALSE;
-    VAR num stringLength;
-    VAR num stringStart;
-    VAR num numStart;
-    VAR string stringTotal;
-    VAR num index := 1;
-    VAR bool stringFound;
-    VAR num numIndex := 1;
-    VAR bool stringDecoded := FALSE;
-    PERS bool errorHandling := FALSE;
-    PERS num errorNumber;
-    PERS string numTotal{7};
-    PERS string modeSpeed;
+    PERS string current_state := "";   !current state of the robot which is initialised as an empty string
+    CONST num port := 1025;            !the port used for connection between RobotStudio and MATLAB
+    PERS bool quit;                    !the quit flag                 
+    PERS bool checkCom := FALSE;       !flag to jump to the movement file to decide its next move
+    PERS bool done := FALSE;           !flag that indicates action is done
+    VAR num stringLength;              !number that returns the total length of the message received from MATLAB
+    VAR num stringStart;               !number that stores the index of the first character
+    VAR num numStart;                  !number that stores the index of the first digit
+    VAR num index := 1;                !number that stores the current index for string segmentation
+    VAR bool stringFound;              !flag that indicates the characters have been segmented 
+    VAR num numIndex := 1;             !number of values that should be segmented
+    VAR bool stringDecoded := FALSE;   !flag that indicates the whole message has been segmented
+    PERS bool errorHandling := FALSE;  !flag that indicates there are errors received from jog functions
+    PERS num errorNumber;              !number that stores the error value received
+    PERS string numTotal{7};           !array that stores the numeric section of the message received from MATLAB
+    PERS string modeSpeed;             !string that stores the speed needed for jog functions
    
     
     
@@ -29,13 +27,13 @@
         !this is just for testing        
         !current_state := "";
         IF RobOS() THEN
-            host := "192.168.125.1";
+            host := "192.168.125.1";   !IP of the real robot
         ELSE
-            host := "127.0.0.1";
+            host := "127.0.0.1";       !IP for simulation
         ENDIF
         
-        ListenForAndAcceptConnection;
-        MainServer;
+        ListenForAndAcceptConnection;  !waiting to establish connection between MATLAB and RobotStudio
+        MainServer;                    !jumps to server operations
         
     ENDPROC
 
@@ -44,49 +42,49 @@
         !VAR bool isJogging;
         
         
-        VAR string received_str := "";
-        VAR string received_strSeg := "";
-        current_state:="";
-        
-        WHILE quit=FALSE DO
+        VAR string received_str := "";      !initialises the received string from MATLAB
+        VAR string received_strSeg := "";   !initialises the segmented string from MATLAB
+        current_state:="";                  !initialises current state
+                
+        WHILE quit=FALSE DO                 !while the shutdown button is not pressed, server will read messages from MATLAB
             
             !getStatus
-            target;
-            angles;
-            getIO;
-            getError;
-            WaitTime 1;
+            target;                         !get the current XYZ coordinates and Euler angles from the robot
+            angles;                         !get the 6 joint angles from the robot
+            getIO;                          !get the IO status of conveyor, vacuum pump and vacuum solenoid
+            getError;                       !get the status returned from the error IO signals
+            !WaitTime 1;
             
             ! Receive a string from the client.            
-            SocketReceive client_socket \Str:=received_str \Time:=WAIT_MAX;
+            SocketReceive client_socket \Str:=received_str \Time:=WAIT_MAX;     !server will remain connected while waiting for messages
             
             !for testing, needed later for string separation
-            stringLength := strLen(received_str);
-            index := 1;
-            numIndex:=1;
-            received_strSeg:="";
-            IF stringFound = FALSE THEN
-                stringStart :=  strFind(received_str,index,STR_WHITE);
-                received_strSeg :=  strPart(received_str,index,stringStart-index);
-                index := stringStart+1;
-                stringFound := TRUE;
-            ENDIF 
+            stringLength := strLen(received_str);               !the length of the message received is stored in stringLength
+            index := 1;                                         !current index is initialized as 1
+            numIndex:=1;                                        !the number of values to store is initialised as 1
+            received_strSeg:="";                                !segmented string is initialised
+            WHILE stringFound = FALSE DO                        !if the characters has not been segmented from the message received
+                stringStart :=  strFind(received_str,index,STR_WHITE);                  !the index before the first blank character (space) is found
+                received_strSeg :=  strPart(received_str,index,stringStart-index);      !the string is the section between the first character and the index before space
+                index := stringStart+1;                                                 !updates current index
+                stringFound := TRUE;                                                    !flag updates to TRUE since characters have been segmented  
+            ENDWHILE 
             
-            stringFound := FALSE;
+            stringFound := FALSE;  
             
-            IF received_strSeg = "moveert" THEN
-                WHILE numIndex <= 6 DO
-                numStart := strFind(received_str,index,STR_WHITE);
+            IF received_strSeg = "moveert" THEN         !if asked to move to a target relative to table home
+                WHILE numIndex <= 6 DO                      !stores the 6 values (xyz+euler angles) for move function
+                numStart := strFind(received_str,index,STR_WHITE);      
                 numTotal{numIndex} := strPart(received_str,index,numStart-index);
                 numIndex := numIndex+1;
                 index := numStart+1;
                 ENDWHILE
-                modeSpeed := strPart(received_str,index,stringLength-index+1);
+                modeSpeed := strPart(received_str,index,stringLength-index+1);  !stores the speed of moving
                 current_state := "moveert";
                 checkCom := TRUE;  
             ENDIF 
             
-            IF received_strSeg = "moveerc" THEN
+            IF received_strSeg = "moveerc" THEN         !if asked to move to a target relative to coveyer home
                 WHILE numIndex <= 6 DO
                 numStart := strFind(received_str,index,STR_WHITE);
                 numTotal{numIndex} := strPart(received_str,index,numStart-index);
@@ -98,8 +96,8 @@
                 checkCom := TRUE;  
             ENDIF 
               
-            IF received_strSeg = "movejas" THEN
-                WHILE numIndex <= 6 DO
+            IF received_strSeg = "movejas" THEN         !if asked to set the joint angles
+                WHILE numIndex <= 6 DO                      !stores the 6 joint angles for move function
                 numStart := strFind(received_str,index,STR_WHITE);
                 numTotal{numIndex} := strPart(received_str,index,numStart-index);
                 numIndex := numIndex+1;
@@ -109,259 +107,247 @@
                 current_state := "movejas";
                 checkCom := TRUE;
             ENDIF 
- 
-            IF received_strSeg = "moveree" THEN
-                WHILE numIndex <= 3 DO
-                numStart := strFind(received_str,index,STR_WHITE);
-                numTotal{numIndex} := strPart(received_str,index,numStart-index);
-                numIndex := numIndex+1;
-                index := numStart+1;
-                ENDWHILE
-                modeSpeed := strPart(received_str,index,stringLength-index+1);
-                current_state := "moveree";
-                checkCom := TRUE;
-            ENDIF 
             
-            IF received_strSeg = "baseFrameXposSTART" THEN
+            IF received_strSeg = "baseFrameXposSTART" THEN  !if asked to move in the positive X direction relative to base frame
                 SocketSend client_socket \Str:=("base frame jogX started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "bxPlus"; 
                 checkCom := TRUE;
             ENDIF
             
-            IF received_strSeg = "endEffectorXposSTART" THEN
+            IF received_strSeg = "endEffectorXposSTART" THEN    !if asked to move in the positive X direction relative to end effector frame
                 SocketSend client_socket \Str:=("effector frame jogX started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "exPlus"; 
                 checkCom := TRUE;
             ENDIF
-            IF received_strSeg = "endEffectorXnegSTART" THEN
+            IF received_strSeg = "endEffectorXnegSTART" THEN    !if asked to move in the negative X direction relative to base frame
                 SocketSend client_socket \Str:=("effector frame -jogX started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "exMinus"; 
                 checkCom := TRUE;
             ENDIF
             
-            IF received_strSeg = "baseFrameYposSTART" THEN 
+            IF received_strSeg = "baseFrameYposSTART" THEN      !if asked to move in the positive Y direction relative to base frame
                 SocketSend client_socket \Str:=("base frame jogY started" + "\0A"); 
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "byPlus";
                 checkCom := TRUE;
             ENDIF
             
-            IF received_strSeg = "endEffectorYposSTART" THEN 
+            IF received_strSeg = "endEffectorYposSTART" THEN    !if asked to jog in the positive Y direction relative to end effector frame
                 SocketSend client_socket \Str:=("coneffectorveyer frame jogY started" + "\0A"); 
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "eyPlus";
                 checkCom := TRUE;
             ENDIF
-            IF received_strSeg = "endEffectorYnegSTART" THEN 
+            IF received_strSeg = "endEffectorYnegSTART" THEN    !if asked to move in the negative Y direction relative to base frame
                 SocketSend client_socket \Str:=("effector frame -jogY started" + "\0A"); 
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "eyMinus";
                 checkCom := TRUE;
             ENDIF
 
-            IF received_strSeg = "baseFrameZposSTART" THEN
+            IF received_strSeg = "baseFrameZposSTART" THEN   !if asked to move in the negative Y direction relative to end effector frame
                 SocketSend client_socket \Str:=("base frame jogZ started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "bzPlus";
                 checkCom := TRUE;
             ENDIF
-            
-            IF received_strSeg = "endEffectorZposSTART" THEN 
+                
+            IF received_strSeg = "endEffectorZposSTART" THEN    !if asked to move in the positive Z direction relative to base frame
                 SocketSend client_socket \Str:=("effector frame jogZ started" + "\0A"); 
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "ezPlus";
                 checkCom := TRUE;
             ENDIF
             
-            IF received_strSeg = "endEffectorZnegSTART" THEN 
+            IF received_strSeg = "endEffectorZnegSTART" THEN    !if asked to move in the negative Z direction relative to base frame
                 SocketSend client_socket \Str:=("effector frame -jogZ started" + "\0A"); 
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "ezMinus";
                 checkCom := TRUE;
             ENDIF
             
-            IF received_strSeg = "baseFrameXnegSTART" THEN
+            IF received_strSeg = "baseFrameXnegSTART" THEN  !jog -veX in base frame
                 SocketSend client_socket \Str:=("base frame -jogX started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "bxMinus";
                 checkCom := TRUE;
             ENDIF 
-            IF received_strSeg = "conveyerFrameXnegSTART" THEN
+            IF received_strSeg = "conveyerFrameXnegSTART" THEN  !jog -veX in conveyer frame
                 SocketSend client_socket \Str:=("conveyer frame -jogX started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "exMinus";
                 checkCom := TRUE;
             ENDIF 
                 
-            IF received_strSeg = "baseFrameYnegSTART" THEN
+            IF received_strSeg = "baseFrameYnegSTART" THEN  !jog -veY in base frame
                 SocketSend client_socket \Str:=("base frame -jogY started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "byMinus";
                 checkCom := TRUE;
             ENDIF 
-            IF received_strSeg = "conveyerFrameYnegSTART" THEN
+            IF received_strSeg = "conveyerFrameYnegSTART" THEN  !jog -veY in conveyer frame
                 SocketSend client_socket \Str:=("conveyer frame -jogY started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "eyMinus";
                 checkCom := TRUE;
             ENDIF 
             
-            IF received_strSeg = "baseFrameZnegSTART" THEN
+            IF received_strSeg = "baseFrameZnegSTART" THEN  !jog -veZ in base frame
                 SocketSend client_socket \Str:=("base frame -jogZ started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "bzMinus";
                 checkCom := TRUE;
             ENDIF 
             
-            IF received_strSeg = "conveyerFrameZnegSTART" THEN
+            IF received_strSeg = "conveyerFrameZnegSTART" THEN  !jog -veZ in conveyer frame
                 SocketSend client_socket \Str:=("conveyer frame -jogZ started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "ezMinus";
                 checkCom := TRUE;
             ENDIF 
             
-            IF received_strSeg = "jogQ1posSTART" THEN
+            IF received_strSeg = "jogQ1posSTART" THEN   !jog joint 1 in the +ve direction
                 SocketSend client_socket \Str:=("jog1 started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "jog1";
                 checkCom := TRUE;
             ENDIF 
-            IF received_strSeg = "jogQ1negSTART" THEN
+            IF received_strSeg = "jogQ1negSTART" THEN   !jog joint 1 in the -ve direction
                 SocketSend client_socket \Str:=("-jog1 started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "-jog1";
                 checkCom := TRUE;
-            ENDIF 
-            IF received_strSeg = "jogQ2posSTART" THEN
+            ENDIF   
+            IF received_strSeg = "jogQ2posSTART" THEN   !jog joint 2 in the +ve direction
                 SocketSend client_socket \Str:=("jog2 started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "jog2";
                 checkCom := TRUE;
             ENDIF 
-            IF received_strSeg = "jogQ2negSTART" THEN
+            IF received_strSeg = "jogQ2negSTART" THEN   !jog joint 2 in the -ve direction
                 SocketSend client_socket \Str:=("-jog2 started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "-jog2";
                 checkCom := TRUE;
             ENDIF 
-            IF received_strSeg = "jogQ3posSTART" THEN
+            IF received_strSeg = "jogQ3posSTART" THEN   !jog joint 3 in the +ve direction
                 SocketSend client_socket \Str:=("jog3 started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "jog3";
                 checkCom := TRUE;
             ENDIF 
-            IF received_strSeg = "jogQ3negSTART" THEN
+            IF received_strSeg = "jogQ3negSTART" THEN   !jog jonint 3 in the -ve direction
                 SocketSend client_socket \Str:=("-jog3 started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "-jog3";
                 checkCom := TRUE;
             ENDIF 
-            IF received_strSeg = "jogQ4posSTART" THEN
+            IF received_strSeg = "jogQ4posSTART" THEN   !jog joint 4 in the +ve direction
                 SocketSend client_socket \Str:=("jog4 started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "jog4";
                 checkCom := TRUE;
             ENDIF 
-            IF received_strSeg = "jogQ4negSTART" THEN
+            IF received_strSeg = "jogQ4negSTART" THEN   !jog joint 4 in the -ve direction
                 SocketSend client_socket \Str:=("-jog4 started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "-jog4";
                 checkCom := TRUE;
             ENDIF 
-            IF received_strSeg = "jogQ5posSTART" THEN
+            IF received_strSeg = "jogQ5posSTART" THEN   !jog joint 5 in the +ve direction
                 SocketSend client_socket \Str:=("jog5 started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "jog5";
                 checkCom := TRUE;
-            ENDIF 
-            IF received_strSeg = "jogQ5negSTART" THEN
+            ENDIF   
+            IF received_strSeg = "jogQ5negSTART" THEN   !jog joint 5 in the -ve direction
                 SocketSend client_socket \Str:=("-jog5 started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "-jog5";
                 checkCom := TRUE;
             ENDIF 
-            IF received_strSeg = "jogQ6posSTART" THEN
+            IF received_strSeg = "jogQ6posSTART" THEN   !jog joint 6 in the +ve direction
                 SocketSend client_socket \Str:=("jog6 started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "jog6";
                 checkCom := TRUE;
             ENDIF 
-            IF received_strSeg = "jogQ6negSTART" THEN
+            IF received_strSeg = "jogQ6negSTART" THEN   !jog joint 6 in the -ve direction
                 SocketSend client_socket \Str:=("-jog6 started" + "\0A");
                 modeSpeed := strPart(received_str,index,stringLength-index+1);
                 current_state := "-jog6";
                 checkCom := TRUE;
             ENDIF 
-            IF received_str = "moveToPose" THEN
+            IF received_str = "moveToPose" THEN     !move to a certain pose
                 SocketSend client_socket \Str:=("moveToPose started" + "\0A");
                 current_state := "moveToPose";
                 checkCom := TRUE;
             ENDIF
             
-            IF received_str = "moveAngle" THEN
+            IF received_str = "moveAngle" THEN      !move as the specified 6 joint angles
                 SocketSend client_socket \Str:=("moveAngle started" + "\0A");
                 current_state := "moveAngle";
                 checkCom := TRUE;
             ENDIF 
             
-            IF received_str = "conveyorRunOn" THEN
+            IF received_str = "conveyorRunOn" THEN   !turn conveyer on
                 SocketSend client_socket \Str:=("conveyor turned on" + "\0A");
                 current_state := "conOn";
                 checkCom := TRUE;
             ENDIF 
             
-            IF received_str = "conveyorRunOff" THEN
+            IF received_str = "conveyorRunOff" THEN     !turn conveyer off
                 SocketSend client_socket \Str:=("conveyor turned off" + "\0A");
                 current_state := "conOff";
                 checkCom := TRUE;
             ENDIF 
             
-            IF received_str = "conveyorReverseOn" THEN
+            IF received_str = "conveyorReverseOn" THEN   !reverse conveyer direction
                 SocketSend client_socket \Str:=("conveyor reverse on" + "\0A");
                 current_state := "conReverseOn";
                 checkCom := TRUE;
             ENDIF 
             
-            IF received_str = "conveyorReverseOff" THEN
+            IF received_str = "conveyorReverseOff" THEN  !conveyer usual direction
                 SocketSend client_socket \Str:=("conveyor reverse off" + "\0A");
                 current_state := "conReverseOff";
                 checkCom := TRUE;
             ENDIF 
             
-            IF received_str = "enableConveyorOn" THEN
+            IF received_str = "enableConveyorOn" THEN   !enable conveyer
                 SocketSend client_socket \Str:=("conveyor enabled" + "\0A");
                 current_state := "conEnabled";
                 checkCom := TRUE;
             ENDIF
-            
-            IF received_str = "enableConveyorOff" THEN
+                
+            IF received_str = "enableConveyorOff" THEN  !disable conveyer
                 SocketSend client_socket \Str:=("conveyor disabled" + "\0A");
                 current_state := "conDisabled";
                 checkCom := TRUE;
             ENDIF
             
-            IF received_str = "vacuumSolenoidOn" THEN
+            IF received_str = "vacuumSolenoidOn" THEN   !turn on vacuum solenoid
                 SocketSend client_socket \Str:=("vaccum solenoid on" + "\0A");
                 current_state := "vacSolOn";
                 checkCom := TRUE;
             ENDIF 
             
-            IF received_str = "vacuumSolenoidOff" THEN
+            IF received_str = "vacuumSolenoidOff" THEN  !turn of vacuum solenoid
                 SocketSend client_socket \Str:=("vacuum solenoid off" + "\0A");
                 current_state := "vacSolOff";
                 checkCom := TRUE;
             ENDIF 
             
-            IF received_str = "vacuumPumpOn" THEN
+            IF received_str = "vacuumPumpOn" THEN   !turn on vacuum pump
                 SocketSend client_socket \Str:=("vacuum pump on" + "\0A");
                 current_state := "vacPumpOn";
                 checkCom := TRUE;
             ENDIF 
             
-            IF received_str = "vacuumPumpOff" THEN
+            IF received_str = "vacuumPumpOff" THEN  !turn off vacuum pump
                 SocketSend client_socket \Str:=("vacuum pump off" + "\0A");
                 current_state := "vacPumpOff";
                 checkCom := TRUE;
@@ -387,31 +373,31 @@
             received_str<>"moveToPose" AND received_str<>"moveAngle" AND 
             received_strSeg<>"movejas" AND received_strSeg <> "moveert" AND received_strSeg <> "moveerc" AND 
             received_str<>"" AND received_str<>"pause" AND received_str<>"resume" AND 
-            received_str<>"cancel" AND received_str<>"quit" THEN
+            received_str<>"cancel" AND received_str<>"quit" THEN    !if mesage received is none of the above
                 SocketSend client_socket \Str:=("unknown comand" + "\0A"); 
                 current_state := "unknown";
                 checkCom := TRUE;
             ENDIF
                
-            IF received_str = "pause" THEN
+            IF received_str = "pause" THEN     !if asked to pause
                 SocketSend client_socket \Str:=("paused" + "\0A");
                 current_state := "paused";
                 checkCom := TRUE;
             ENDIF
         
-            IF received_str = "resume" THEN
+            IF received_str = "resume" THEN     !if asked to resume
                 SocketSend client_socket \Str:=("resume" + "\0A");
                 current_state := "resume";
                 checkCom := TRUE;
             ENDIF
             
-            IF received_str = "cancel" THEN
+            IF received_str = "cancel" THEN     !if asked to cancel
                 SocketSend client_socket \Str:=("cancel" + "\0A");
                 current_state := "cancel";
                 checkCom := TRUE;
             ENDIF
             
-            IF received_str = "shutdown" THEN
+            IF received_str = "shutdown" THEN   !if asked to shutdown
                 SocketSend client_socket \Str:=("quit" + "\0A");
                 current_state := "shutdown";
                 checkCom := TRUE;
@@ -419,18 +405,18 @@
             
             !IF received_str <> "cancel" THEN
             !checkCom:=TRUE;
-            WaitUntil current_state = "None" and done = TRUE;
-            IF errorHandling = TRUE THEN
+            WaitUntil current_state = "None" and done = TRUE;   !wait until the current_state is reset and the done flag is set to the true from movementV1
+            IF errorHandling = TRUE THEN       !if error is returned from movementV1 the error value is sent to MATLAB
                 SocketSend client_socket \Str:=("Error Number:" + ValtoStr(errorNumber) + "\0A");
             ENDIF 
-            errorHandling := FALSE;
-            SocketSend client_socket \Str:=("Done" + "\0A");
-            done := FALSE;
+            errorHandling := FALSE;   !reset the errorHandling flag
+            SocketSend client_socket \Str:=("Done" + "\0A");    !display done after movementV1 finished processing
+            done := FALSE;  !reset done flag
                       
         ENDWHILE
-        CloseConnection;
+        CloseConnection;        !if shutdown is pressed, close the connection
         ERROR 
-            IF ERRNO=ERR_SOCK_CLOSED THEN
+            IF ERRNO=ERR_SOCK_CLOSED THEN       !if socket is accidentally closed, try and reconnect to the server
                 CloseConnection;
                 ListenForAndAcceptConnection;
             ELSEIF ERRNO=ERR_SOCK_TIMEOUT THEN
@@ -461,7 +447,7 @@
         SocketAccept welcome_socket, client_socket \Time:=WAIT_MAX;
         
         ERROR 
-            IF ERRNO=ERR_SOCK_CLOSED THEN
+            IF ERRNO=ERR_SOCK_CLOSED THEN       !if socket is accidentally closed, try and reconnect to the server
                 SocketClose welcome_socket;
                 ListenForAndAcceptConnection;
             ELSEIF ERRNO=ERR_SOCK_TIMEOUT THEN
