@@ -378,6 +378,7 @@ end
         end
         
          % Start Cameras
+	 %location the display of video feed
         axes(handles.TableCamera);
         axes(handles.ConveyorCamera);
         vid = videoinput('winvideo',1, 'MJPG_1600x1200'); 
@@ -779,24 +780,26 @@ function SecretButton_Callback(hObject, eventdata, handles)
     start(s_timer);
     start(r_timer);
 
+    %camera test without the access to robot 
+    
     % Start Cameras
-    axes(handles.TableCamera);
-    axes(handles.ConveyorCamera);
-    vid = videoinput('winvideo',1, 'MJPG_1600x1200'); 
-    video_resolution1 = vid.VideoResolution;
-    nbands1 = vid.NumberOfBands;
-    vid2 = videoinput('winvideo',2,'MJPG_1600x1200'); 
-    video_resolution2 = vid2.VideoResolution;
-    nbands2 = vid2.NumberOfBands;
+    %axes(handles.TableCamera);
+    %axes(handles.ConveyorCamera);
+    %vid = videoinput('winvideo',1, 'MJPG_1600x1200'); 
+    %video_resolution1 = vid.VideoResolution;
+    %nbands1 = vid.NumberOfBands;
+    %vid2 = videoinput('winvideo',2,'MJPG_1600x1200'); 
+    %video_resolution2 = vid2.VideoResolution;
+    %nbands2 = vid2.NumberOfBands;
 
     % sguideet image handle
-    hImage=image(zeros([video_resolution1(2), video_resolution1(1), nbands1]),'Parent',handles.TableCamera);
-    hImage2=image(zeros([video_resolution2(2), video_resolution2(1), nbands2]),'Parent',handles.ConveyorCamera);
-    preview(vid,hImage);
-    preview(vid2,hImage2);
-    src1 = getselectedsource(vid);
-    src1.ExposureMode = 'manual';
-    src1.Exposure = -5;
+   % hImage=image(zeros([video_resolution1(2), video_resolution1(1), nbands1]),'Parent',handles.TableCamera);
+   % hImage2=image(zeros([video_resolution2(2), video_resolution2(1), nbands2]),'Parent',handles.ConveyorCamera);
+   % preview(vid,hImage);
+   % preview(vid2,hImage2);
+   % src1 = getselectedsource(vid);
+   % src1.ExposureMode = 'manual';
+   % src1.Exposure = -5;
 
     % Effectly changing 'screens'
     set(handles.CameraPanel,'Visible','On');
@@ -2315,19 +2318,24 @@ function getBox_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     global vid2;
+    %check the if button is pressed
     if get(hObject,'Value') == 1
+       %get one frame from conveyor video feed and apply the edge and oritation detection of box
        box = getsnapshot(vid2);
-        figure(1);
-        imshow(box); hold on;
+       figure(1);
+       imshow(box); hold on;
        box1 = box;
+       %only fucos on the conveyor part in th image
        box1(:,1:580,:)=0;
        box1(:,1180:1600,:)=0;
        box1(710:1200,:,:)=0;
-
+       %detect the edge of box as white pattrn detect 
        greybox1 = rgb2gray(box1);
        bw = imbinarize(greybox1,0.5);
        bw= ~bwareaopen(~bw,152200);
+       %apply regionprops to get orientation and centroid 
        bOrientation = regionprops('table',bw,'Centroid','Image','Orientation');
+       %edge & orientation  plot
        text(bOrientation.Centroid(1,1),bOrientation.Centroid(1,2),num2str(bOrientation.Orientation(1)),'Color','red','FontSize',20);
        contour(bw,'r');
     end
@@ -2340,28 +2348,30 @@ end
  % Hint: get(hObject,'Value') returns toggle state of ConveyorCamSS
     global vid;
     if get(hObject,'Value') == 1
-
+        %get one frame from table video feed and apply the edge,orientation,OCR and reachable detection of blocks
         snapshot = getsnapshot(vid);
         image = snapshot;
-         figure(1);
+        figure(1);
         imshow(image); hold on;
+	%useBlocks is a function to get all imformation required 
         [angles, position, letter, finalText] = useBlocks(image); 
 
         %centroids, reachable
         images = image;
         imHSV = rgb2hsv(images);
-
         imMask = imHSV(:,:,2)<0.25 & imHSV(:,:,3)>0.68;
         imMask(1:250, :, :) = 1;
         imMask(end-20:end, :, :) = 1;
         imMask(:, end-20:end, :) = 1;
         imMask(:, 1:20, :) = 1;
+	%get away noise 
         SE1 = strel('line',3.3,0);
         imMask = imclose(imMask,SE1);
         SE2 = strel('line',3.3,90);
         imMask = imclose(imMask,SE2);
         SE3 = strel('disk',3);
         imMask = imclose(imMask,SE3);
+	%regionprops applied to get centroids
         bCentroid = regionprops('table',imMask,'Centroid');
         centroids = bCentroid.Centroid(:,:);
         N = length(centroids(:,1));
@@ -2391,7 +2401,8 @@ end
         Blocks_final = ~bwareaopen(~Blocks_final,100);
         Blocks_final =~Blocks_final;
         [B,L] = bwboundaries(Blocks_final,'noholes');
-
+	
+	%plot the edge of the blocks showing the reachable within red/blue color (red = unreachable)
        for k = 1:length(B)
            boundary = B{k};
            if (reachableTag(1,k) ==1)
