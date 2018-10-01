@@ -154,15 +154,19 @@ end
 	% Clear the command queue
 	queue.clear();
     
-    % Try stopping timers and if they have been stopped, delete them
+%    Try stopping timers and if they have been stopped, delete them
  	try
 		% Stop the timers	
 		stop(s_timer);
 		stop(r_timer);
         % Delete the timers
 		delete(timerfindall);
+        clear r_timer;
+        clear s_timer;
 	catch
 		delete(timerfindall);
+        clear r_timer;
+        clear s_timer;
 	end
  end
  
@@ -182,7 +186,6 @@ end
         % Try to write to the socket
         try
 			fwrite(socket,commandStr);
-			disp('b');
 			% Update Sent Message Log
 			sentList = [{commandStr}; g_handles.SentMessages.String];
 			set(g_handles.SentMessages, 'String', sentList);
@@ -317,24 +320,24 @@ end
             conveyorEnable = copy_split(8);
             
             % If any of the errors occur, turn on the error panel
-            if (emergencyStop == 1 || lightCurtain == 0 || motorOn == 0 || holdToEnable == 0 || ExecutionError == 1 || motorSupTriggered == 1 || conveyorEnable == 0)
+            if (emergencyStop == '1' || lightCurtain == '0' || motorOn == '0' || holdToEnable == '0' || ExecutionError == '1' || motorSupTriggered == '1')
                 set(g_handles.errorPanel,'Visible','On');
                 command_flag = 0;
                 
                 % depending on the error, change the text colors
-                if (emergencyStop == 1)
+                if (emergencyStop == '1')
 					set(g_handles.emergencyStop, 'BackgroundColor', [1 0 0]);
-                elseif (lightCurtain==0)
+                elseif (lightCurtain=='0')
                     set(g_handles.lightCurtain, 'BackgroundColor', [1 0 0]);
-                elseif (motorOn==0)
+                elseif (motorOn=='0')
                     set(g_handles.motorsAreOff, 'BackgroundColor', [1 0 0]);
-                elseif (holdToEnable==0)
+                elseif (holdToEnable=='0')
                     set(g_handles.holdToEnableNotPressed, 'BackgroundColor', [1 0 0]);
-                elseif (ExecutionError==1)
+                elseif (ExecutionError=='1')
                     set(g_handles.executionError, 'BackgroundColor', [1 0 0]);
-                elseif (motorSupTriggered==1)
+                elseif (motorSupTriggered=='1')
                     set(g_handles.motionSupervisionTriggered, 'BackgroundColor', [1 0 0]);
-                elseif(conveyorEnable==0)
+                elseif(conveyorEnable=='0')
                     set(g_handles.conveyorNotEnabled, 'BackgroundColor', [1 0 0]);
                 end
             end
@@ -359,6 +362,7 @@ end
 	global s_timer;
 	global r_timer;
 	global vid;
+    global vid2;
     global g_handles;
     
  	% Connect to the robot 	
@@ -381,8 +385,8 @@ end
         
          % Start Cameras
 	 %location the display of video feed
-        axes(handles.TableCamera);
-        axes(handles.ConveyorCamera);
+        axes(g_handles.TableCamera);
+        axes(g_handles.ConveyorCamera);
         vid = videoinput('winvideo',1, 'MJPG_1600x1200'); 
         video_resolution1 = vid.VideoResolution;
         nbands1 = vid.NumberOfBands;
@@ -391,8 +395,8 @@ end
         nbands2 = vid2.NumberOfBands;
 
         % sguideet image handle
-        hImage=image(zeros([video_resolution1(2), video_resolution1(1), nbands1]),'Parent',handles.TableCamera);
-        hImage2=image(zeros([video_resolution2(2), video_resolution2(1), nbands2]),'Parent',handles.ConveyorCamera);
+        hImage=image(zeros([video_resolution1(2), video_resolution1(1), nbands1]),'Parent',g_handles.TableCamera);
+        hImage2=image(zeros([video_resolution2(2), video_resolution2(1), nbands2]),'Parent',g_handles.ConveyorCamera);
         preview(vid,hImage);
         preview(vid2,hImage2);
     
@@ -2230,23 +2234,23 @@ function TableCamSS_Callback(hObject, eventdata, handles)
                     if eex>175 
                         %checks that the point is atually on 
                         %the table and not in the middle of no where
-                        disp(eex)
-                        disp(eey)
-                        disp(eez)
+                        fprintf('x = %d', eex)
+                        fprintf('y = %d', eey)
+                        fprintf('z = %d', eez)
                     else 
                         %user clicked on a point not on the table
                         %z coordinate not calculated
                         disp('IS NOT AN ACCEPTABLE POINT FOR ROBOT TO MOVE TO PLS DONT BE LAME')
-                        disp(eex)
-                        disp(eey)
+                        fprintf('x = %d', eex)
+                        fprintf('y = %d', eey)
                     end
                 else %not reachable and z coordinate is not even calculated
-                    disp(eex)
-                    disp(eey)
+                    fprintf('x = %d', eex)
+                    fprintf('y = %d', eey)
                     disp('IS NOT REACHABLE');
                     msgbox('IS NOT REACHABLE');
-                end    
-        end      
+                end
+        end
      end
 end
 
@@ -2500,18 +2504,18 @@ function [trueAngles, centroids, letter, finalTextBefore] = useBlocks(image)
     imMask(:, end-20:end, :) = 1;
     imMask(:, 1:20, :) = 1;
      % Remove grid from image   
-%     for i=1:1200
-%         imMask(i,:) = ~bwareaopen(~imMask(i,:),4);
-%     end
-%     for i=1:1600
-%         imMask(:,i) = ~bwareaopen(~imMask(:,i),4);
-%     end
-    SE1 = strel('line',3.3,0);
-    imMask = imclose(imMask,SE1);
-    SE2 = strel('line',3.3,90);
-    imMask = imclose(imMask,SE2);
-    SE3 = strel('disk',3);
-    imMask = imclose(imMask,SE3);  
+    for i=1:1200
+        imMask(i,:) = ~bwareaopen(~imMask(i,:),4);
+    end
+    for i=1:1600
+        imMask(:,i) = ~bwareaopen(~imMask(:,i),4);
+    end
+%     SE1 = strel('line',3.3,0);
+%     imMask = imclose(imMask,SE1);
+%     SE2 = strel('line',3.3,90);
+%     imMask = imclose(imMask,SE2);
+%     SE3 = strel('disk',3);
+%     imMask = imclose(imMask,SE3);  
      bCentroid = regionprops('table',imMask,'Centroid');
      centroids = bCentroid.Centroid(2:end,:);
     % Remove the letter inside block

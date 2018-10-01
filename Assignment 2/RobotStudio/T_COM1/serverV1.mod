@@ -3,10 +3,11 @@
 
     ! The socket connected to the client.
     VAR socketdev client_socket;
+    PERS string host:= "192.168.125.1";
     ! The host and port that we will be listening for a connection on.
     PERS string current_state := "";   !current state of the robot which is initialised as an empty string
     CONST num port := 1025;            !the port used for connection between RobotStudio and MATLAB
-    PERS bool quit;                    !the quit flag                 
+    PERS bool quit:=TRUE;                    !the quit flag                 
     PERS bool checkCom := FALSE;       !flag to jump to the movement file to decide its next move
     PERS bool done := FALSE;           !flag that indicates action is done
     VAR num stringLength;              !number that returns the total length of the message received from MATLAB
@@ -416,19 +417,19 @@
         ENDWHILE
         CloseConnection;        !if shutdown is pressed, close the connection
         ERROR 
-            IF ERRNO=ERR_SOCK_CLOSED THEN       !if socket is accidentally closed, try and reconnect to the server
-                CloseConnection;
-                ListenForAndAcceptConnection;
-            ELSEIF ERRNO=ERR_SOCK_TIMEOUT THEN
-                ResetRetryCount;
-                CloseConnection;
-                ListenForAndAcceptConnection;
-                RETRY;
-            ELSEIF ERRNO=ERR_SOCK_ADDR_INUSE THEN
-                CloseConnection;
-                ListenForAndAcceptConnection;
-            ENDIF
-            TRYNEXT;
+!            IF ERRNO=ERR_SOCK_CLOSED THEN       !if socket is accidentally closed, try and reconnect to the server
+!                CloseConnection;
+!                ListenForAndAcceptConnection;
+!            ELSEIF ERRNO=ERR_SOCK_TIMEOUT THEN
+!                ResetRetryCount;
+!                CloseConnection;
+!                ListenForAndAcceptConnection;
+!                RETRY;
+!            ELSEIF ERRNO=ERR_SOCK_ADDR_INUSE THEN
+!                CloseConnection;
+!                ListenForAndAcceptConnection;
+!            ENDIF
+!            TRYNEXT;
     ENDPROC
 
     PROC ListenForAndAcceptConnection()
@@ -447,18 +448,21 @@
         SocketAccept welcome_socket, client_socket \Time:=WAIT_MAX;
         
         ERROR 
-            IF ERRNO=ERR_SOCK_CLOSED THEN       !if socket is accidentally closed, try and reconnect to the server
-                SocketClose welcome_socket;
-                ListenForAndAcceptConnection;
-            ELSEIF ERRNO=ERR_SOCK_TIMEOUT THEN
-                ResetRetryCount;
-                SocketClose welcome_socket;
-                ListenForAndAcceptConnection;
-            ELSEIF ERRNO=ERR_SOCK_ADDR_INUSE THEN
-                SocketClose welcome_socket;
-                ListenForAndAcceptConnection;
-            ENDIF
-            TRYNEXT;
+!            IF ERRNO=ERR_SOCK_CLOSED THEN       !if socket is accidentally closed, try and reconnect to the server
+!                SocketClose welcome_socket;
+!                !CloseConnection;
+!                ListenForAndAcceptConnection;
+!            ELSEIF ERRNO=ERR_SOCK_TIMEOUT THEN
+!                ResetRetryCount;
+!                !CloseConnection;
+!                SocketClose welcome_socket;
+!                ListenForAndAcceptConnection;
+!            ELSEIF ERRNO=ERR_SOCK_ADDR_INUSE THEN
+!                SocketClose welcome_socket;
+!                !CloseConnection;
+!                ListenForAndAcceptConnection;
+!            ENDIF
+!            TRYNEXT;
     ENDPROC
     
     ! Close the connection to the client.

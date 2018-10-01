@@ -1,15 +1,16 @@
     MODULE ROB_MAIN
     
     VAR num effectorHeight:= 147;! The height of the table
-    PERS robtarget target := [[175, 0, 147],[0,0,-1,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];! test target initialised to touch the table home
-    PERS robjoint joints:= [-90, 0, 0, 0, 0, 0]; !test pose initialised to calib position
+    PERS robtarget target := [[200, 0, 20],[4.37114E-08,0,-1,0],[0,0,0,0],[0,0,0,0,0,0]];! test target initialised to touch the table home
+    PERS robjoint joints:= [0, 0, 0, 0, 0, 0]; !test pose initialised to calib position
+    PERS jointtarget joints_robot;
    
     VAR num jog_inc:=30;                    !increment for linear jogging
     VAR num jog_inc_deg:= 5;                !increment for axis jogging
     PERS string current_state := "";        !Current state for the main loop conditional statements, set in T_COM1
     PERS bool quit := TRUE;                 !quit flag
     PERS bool done := FALSE;                !command finished flag
-    PERS bool checkCom := FALSE;            !COM checked flag
+    PERS bool checkCom; !:= FALSE;            !COM checked flag
     PERS bool errorHandling := FALSE;       !error flag
     PERS num errorNumber;                   !error number for range calculations
     VAR intnum pauseTrigger;                !trigger for pausing robot path
@@ -35,11 +36,12 @@
         SingArea \Wrist;                    !Allow wrist position to deviate to avoid singularities
         confj  \On;                         !Aim for absolute position, if not possible stop execution
         
-    CONNECT pauseTrigger WITH pauseRoutine;     !connect pause trigger with pause interrupt routine
-    IPers paused, pauseTrigger;                 !change in value of paused will activate the pause trigger
-    CONNECT cancelTrigger WITH cancelRoutine;   !connect cancel trigger with cancel interrupt routine
-    IPers cancelled, cancelTrigger;             !change in value of cancel will avtivate the cancel trigger
-    WHILE quit = FALSE DO                       !robot action will run continuously when the shutdown button is not pressed
+!        CONNECT pauseTrigger WITH pauseRoutine;     !connect pause trigger with pause interrupt routine
+!        IPers paused, pauseTrigger;                 !change in value of paused will activate the pause trigger
+!        CONNECT cancelTrigger WITH cancelRoutine;   !connect cancel trigger with cancel interrupt routine
+!        IPers cancelled, cancelTrigger;             !change in value of cancel will avtivate the cancel trigger
+
+        WHILE quit = FALSE DO                       !robot action will run continuously when the shutdown button is not pressed
         
         WaitUntil checkCom = TRUE;              !wait until the server has received message from MATLAB
         !obtain current status
@@ -328,7 +330,8 @@
                                                     !if asked to shutdown
             IF current_state = "shutdown" THEN
                 wobjCurrent:=wWorld;
-                MoveToPose [90, 0, 0, 0, 0, 0], v100;   !First lift to above conveyer to avoid collision with table
+                joints_robot:=CJointT();
+                MoveToPose [joints_robot.robax.rax_1, 0, 0, 0, 0, 0], v100;   !First lift to above conveyer to avoid collision with table
                 MoveToCalibPos;                         !Move to calib
                 vacPwrOff;                              !reset DIOs
                 vacSolOff;                          
