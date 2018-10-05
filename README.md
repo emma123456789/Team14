@@ -2,6 +2,15 @@
 
 Hi Team!
 
+This is for Assignment 3 
+
+LINK TO MINUTES OF MEETING: https://docs.google.com/document/d/1AoZgzIOXYWTIInVzW30UrZASeCV0eKzPZm2vfldMDt8/edit?usp=sharing
+
+LINK TO TASKS: https://docs.google.com/spreadsheets/d/1TCTr5MdYi8wI19u99qNhtnsQCVoXtOLZzT26y7Ycyuk/edit?usp=sharing
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+Assignment 2
+
 LINK TO TESTING PROCEDURE: https://docs.google.com/document/d/18l4LSGhI4w2722kRD95uhD3a83nOUncC96X1daPCe60/edit?usp=sharing 
 
 LINK TO COMMUNICATION PROTOCOL: https://docs.google.com/document/d/1O6iduPE1t9guzc16y0teOR9_nRrTBAil0phq0-aaOf0/edit?usp=sharing 
