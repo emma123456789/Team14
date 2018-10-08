@@ -3,13 +3,13 @@
 
     ! The socket connected to the client.
     VAR socketdev client_socket;
-    PERS string host:= "192.168.125.1";
     ! The host and port that we will be listening for a connection on.
-    PERS string current_state := "";   !current state of the robot which is initialised as an empty string
+    PERS string current_state := "None";   !current state of the robot which is initialised as an empty string
     CONST num port := 1025;            !the port used for connection between RobotStudio and MATLAB
-    PERS bool quit:=TRUE;                    !the quit flag                 
+    PERS string host := "192.168.125.1";
+    PERS bool quit;                    !the quit flag                 
     PERS bool checkCom := FALSE;       !flag to jump to the movement file to decide its next move
-    PERS bool done := FALSE;           !flag that indicates action is done
+    PERS bool done := TRUE;           !flag that indicates action is done
     VAR num stringLength;              !number that returns the total length of the message received from MATLAB
     VAR num stringStart;               !number that stores the index of the first character
     VAR num numStart;                  !number that stores the index of the first digit
@@ -17,7 +17,7 @@
     VAR bool stringFound;              !flag that indicates the characters have been segmented 
     VAR num numIndex := 1;             !number of values that should be segmented
     VAR bool stringDecoded := FALSE;   !flag that indicates the whole message has been segmented
-    PERS bool errorHandling := FALSE;  !flag that indicates there are errors received from jog functions
+    PERS bool errorHandling := TRUE;  !flag that indicates there are errors received from jog functions
     PERS num errorNumber;              !number that stores the error value received
     PERS string numTotal{7};           !array that stores the numeric section of the message received from MATLAB
     PERS string modeSpeed;             !string that stores the speed needed for jog functions
@@ -46,7 +46,7 @@
         VAR string received_str := "";      !initialises the received string from MATLAB
         VAR string received_strSeg := "";   !initialises the segmented string from MATLAB
         current_state:="";                  !initialises current state
-                
+        
         WHILE quit=FALSE DO                 !while the shutdown button is not pressed, server will read messages from MATLAB
             
             !getStatus
@@ -383,18 +383,24 @@
             IF received_str = "pause" THEN     !if asked to pause
                 SocketSend client_socket \Str:=("paused" + "\0A");
                 current_state := "paused";
+                StopMove;
+                !StorePath;
                 checkCom := TRUE;
             ENDIF
         
             IF received_str = "resume" THEN     !if asked to resume
                 SocketSend client_socket \Str:=("resume" + "\0A");
                 current_state := "resume";
+                !RestoPath;
+                StartMove;
                 checkCom := TRUE;
             ENDIF
             
             IF received_str = "cancel" THEN     !if asked to cancel
                 SocketSend client_socket \Str:=("cancel" + "\0A");
                 current_state := "cancel";
+                StopMove;
+                ClearPath;
                 checkCom := TRUE;
             ENDIF
             
@@ -406,7 +412,7 @@
             
             !IF received_str <> "cancel" THEN
             !checkCom:=TRUE;
-            WaitUntil current_state = "None" and done = TRUE;   !wait until the current_state is reset and the done flag is set to the true from movementV1
+            !WaitUntil current_state = "None" and done = TRUE;   !wait until the current_state is reset and the done flag is set to the true from movementV1
             IF errorHandling = TRUE THEN       !if error is returned from movementV1 the error value is sent to MATLAB
                 SocketSend client_socket \Str:=("Error Number:" + ValtoStr(errorNumber) + "\0A");
             ENDIF 
@@ -415,21 +421,21 @@
             done := FALSE;  !reset done flag
                       
         ENDWHILE
-        CloseConnection;        !if shutdown is pressed, close the connection
+        !CloseConnection;        !if shutdown is pressed, close the connection
         ERROR 
-!            IF ERRNO=ERR_SOCK_CLOSED THEN       !if socket is accidentally closed, try and reconnect to the server
-!                CloseConnection;
-!                ListenForAndAcceptConnection;
-!            ELSEIF ERRNO=ERR_SOCK_TIMEOUT THEN
-!                ResetRetryCount;
-!                CloseConnection;
-!                ListenForAndAcceptConnection;
-!                RETRY;
-!            ELSEIF ERRNO=ERR_SOCK_ADDR_INUSE THEN
-!                CloseConnection;
-!                ListenForAndAcceptConnection;
-!            ENDIF
-!            TRYNEXT;
+            IF ERRNO=ERR_SOCK_CLOSED THEN       !if socket is accidentally closed, try and reconnect to the server
+                CloseConnection;
+                ListenForAndAcceptConnection;
+            ELSEIF ERRNO=ERR_SOCK_TIMEOUT THEN
+                ResetRetryCount;
+                CloseConnection;
+                ListenForAndAcceptConnection;
+                RETRY;
+            ELSEIF ERRNO=ERR_SOCK_ADDR_INUSE THEN
+                CloseConnection;
+                ListenForAndAcceptConnection;
+            ENDIF
+            TRYNEXT;
     ENDPROC
 
     PROC ListenForAndAcceptConnection()
@@ -448,21 +454,18 @@
         SocketAccept welcome_socket, client_socket \Time:=WAIT_MAX;
         
         ERROR 
-!            IF ERRNO=ERR_SOCK_CLOSED THEN       !if socket is accidentally closed, try and reconnect to the server
-!                SocketClose welcome_socket;
-!                !CloseConnection;
-!                ListenForAndAcceptConnection;
-!            ELSEIF ERRNO=ERR_SOCK_TIMEOUT THEN
-!                ResetRetryCount;
-!                !CloseConnection;
-!                SocketClose welcome_socket;
-!                ListenForAndAcceptConnection;
-!            ELSEIF ERRNO=ERR_SOCK_ADDR_INUSE THEN
-!                SocketClose welcome_socket;
-!                !CloseConnection;
-!                ListenForAndAcceptConnection;
-!            ENDIF
-!            TRYNEXT;
+            IF ERRNO=ERR_SOCK_CLOSED THEN       !if socket is accidentally closed, try and reconnect to the server
+                SocketClose welcome_socket;
+                ListenForAndAcceptConnection;
+            ELSEIF ERRNO=ERR_SOCK_TIMEOUT THEN
+                ResetRetryCount;
+                SocketClose welcome_socket;
+                ListenForAndAcceptConnection;
+            ELSEIF ERRNO=ERR_SOCK_ADDR_INUSE THEN
+                SocketClose welcome_socket;
+                ListenForAndAcceptConnection;
+            ENDIF
+            TRYNEXT;
     ENDPROC
     
     ! Close the connection to the client.

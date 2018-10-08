@@ -14,6 +14,8 @@ MODULE MTRN_Rob_Data (SYSMODULE, NOSTEPIN, READONLY)
 
  ! Calibrate Position for all Joints
  CONST jointtarget jtCalibPos:=[[-90,0,0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
+ 
+ CONST jointtarget jtHomePos:=[[0,0,0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];
 
  ! Home Position of the Table (T1) with tSCup touching Table
  CONST robtarget pTableHome:=[[175,0,147],[1,0,0,0],[0,0,0,0],[9E+09,9E+09,9E+09,9E+09,9E+09,9E+09]];

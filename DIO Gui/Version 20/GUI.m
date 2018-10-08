@@ -799,7 +799,7 @@ global vid2;
 			start(s_timer);
 			start(r_timer);
 			
-% 			% Start Cameras
+% % 			% Start Cameras
 % 			axes(handles.TableCamera);
 % 			axes(handles.ConveyorCamera);
 %   			vid = videoinput('winvideo',1, 'MJPG_1600x1200'); 
@@ -812,9 +812,12 @@ global vid2;
 % 			% sguideet image handle
 %  			hImage=image(zeros([video_resolution1(2), video_resolution1(1), nbands1]),'Parent',handles.TableCamera);
 % 			hImage2=image(zeros([video_resolution2(2), video_resolution2(1), nbands2]),'Parent',handles.ConveyorCamera);
-%  			preview(vid,hImage);
+%  			
+%             preview(vid,hImage);
 %  			preview(vid2,hImage2);
-			
+% 			src1 = getselectedsource(vid);
+%             src1.ExposureMode='manual';
+%             src1.Exposure = -5;
 			% Check if the connection is valid.+6
 
 % 			if(~isequal(get(socket, 'Status'), 'open'))
