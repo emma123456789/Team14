@@ -240,6 +240,7 @@ end
     global motorSupTriggered;
     global conveyorEnable;
     global command_flag;
+    global done_flag;
     
 	% Read from the socket if there's a message
     response = [];
@@ -268,6 +269,9 @@ end
             set(g_handles.rollStatus,'string',copy_split(5));
             set(g_handles.pitchStatus,'string',copy_split(6));
             set(g_handles.yawStatus,'string',copy_split(7));
+            
+        elseif(strcmp(copy_split(1), 'done'))
+            done_flag = 1; %set the done flag to 1 to indicate the robot is ready for its next command
             
         elseif (strcmp(copy_split(1),'DIO'))
             % Update DIO status

@@ -240,7 +240,7 @@ end
     global motorSupTriggered;
     global conveyorEnable;
     global command_flag;
-    
+    global done_flag;
 	% Read from the socket if there's a message
     response = [];
     if (socket.BytesAvailable)
@@ -251,7 +251,10 @@ end
 		copy_split = string(strsplit(copy));
         
         % Update Status
-        if (strcmp(copy_split(1),'jointAngle'))
+        if (strcmp(copy_split(1),'done'))
+            done_flag = 1;
+            
+        elseif (strcmp(copy_split(1),'jointAngle'))
             % Update joint angle status
             set(g_handles.Joint1Status,'string',copy_split(2));
             set(g_handles.Joint2Status,'string',copy_split(3));
