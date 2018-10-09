@@ -64,6 +64,8 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     convCameraT = load('cameraT_conveyor');
     global vid;
     global vid2;
+    global MODE;% simulation or real? make sure anything that requires hardware to be connected checks if the mode is imulation first.
+    MODE = 's';
 
      % Update handles structure
     guidata(hObject, handles);
@@ -364,16 +366,22 @@ end
 	global vid;
     global vid2;
     global g_handles;
+    global MODE;
+    if  MODE == 's'
+        IP = sim_robot_IP_address
+    else
+        IP = real_robot_IP_address
+    end
     
  	% Connect to the robot 	
 	try
 		% Open a TCP connection to the robot.
-		socket = tcpip(real_robot_IP_address, robot_port);
+		socket = tcpip(IP, robot_port);
 		set(socket, 'ReadAsyncMode', 'continuous');
 		fopen(socket);
 		
         % Print the IP address and port number on the screen
-		str = sprintf(' IP: %s \n Port: %d',real_robot_IP_address,robot_port);
+		str = sprintf(' IP: %s \n Port: %d',IP,robot_port);
 		set(g_handles.portNumber, 'String', str);
 		set(g_handles.portNumber, 'BackgroundColor', [0.94 0.94 0.94]);
 		
@@ -384,7 +392,8 @@ end
         end
         
          % Start Cameras
-	 %location the display of video feed
+	 %location the display of video feed'
+     if MODE ~= 's' %Only start if we are not in simulation mode. change 's' to anything else if we have the robot
         axes(g_handles.TableCamera);
         axes(g_handles.ConveyorCamera);
         vid = videoinput('winvideo',1, 'MJPG_1600x1200'); 
@@ -399,20 +408,21 @@ end
         hImage2=image(zeros([video_resolution2(2), video_resolution2(1), nbands2]),'Parent',g_handles.ConveyorCamera);
         preview(vid,hImage);
         preview(vid2,hImage2);
-    
+     end
+     
      % Check if the connection is valid.+6
      if(~isequal(get(socket, 'Status'), 'open'))
-        warning(['Could not open TCP connection to ', real_robot_IP_address, ' on port ', robot_port]);
+        warning(['Could not open TCP connection to ', IP, ' on port ', robot_port]);
         return;
      end
     
     % Effectly changing 'screens'
-    set(g_handles.CameraPanel,'Visible','On');
-    set(g_handles.statusPanel,'Visible','On');
-    set(g_handles.DIOPanel,'Visible','On');
-    set(g_handles.RobotStatusPanel,'Visible','On');
-    set(g_handles.SafetyPanel,'Visible','Off');
-    set(g_handles.errorPanel,'Visible','Off');
+    %set(g_handles.CameraPanel,'Visible','On');
+    %set(g_handles.statusPanel,'Visible','On');
+    %set(g_handles.DIOPanel,'Visible','On');
+    %set(g_handles.RobotStatusPanel,'Visible','On');
+    %set(g_handles.SafetyPanel,'Visible','Off');
+    %set(g_handles.errorPanel,'Visible','Off');
     
     % If it fails to connect, return to the safety page and notify users
     catch error
@@ -426,7 +436,8 @@ end
         % If we try to connect in the main gui window, and connection
         % fails, turn off the current windows and show the safety window
 		if (buttonNo==2)
-			set(g_handles.CameraPanel,'Visible','Off');
+
+            set(g_handles.CameraPanel,'Visible','Off');
 			set(g_handles.statusPanel,'Visible','Off');
 			set(g_handles.DIOPanel,'Visible','Off');
 			set(g_handles.RobotStatusPanel,'Visible','Off');
@@ -2876,6 +2887,8 @@ function BPtoBPBlockList_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns BPtoBPBlockList contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from BPtoBPBlockList
+SM_BP2BP(hObject, eventdata, handles);
+
 end
 
 % --- Executes during object creation, after setting all properties.

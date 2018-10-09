@@ -24,6 +24,8 @@ function varargout = GUI(varargin)
      % Edit the above text to modify the response to help GUI
      % Last Modified by GUIDE v2.5 20-Sep-2018 21:21:35
      % Begin initialization code - DO NOT EDIT
+    global MODE;
+    MODE = 's';
     gui_Singleton = 1;
     gui_State = struct('gui_Name',       mfilename, ...
                        'gui_Singleton',  gui_Singleton, ...
@@ -191,7 +193,7 @@ end
 			set(g_handles.SentMessages, 'String', sentList);
 		% If it fails, show connection error	
 		catch
-			set(g_handles.portNumber, 'String', 'Connection Error');
+			set(g_handles.portNumber, 'String', 'ion Error');
 			set(g_handles.portNumber, 'BackgroundColor', [1 0 0]);
             % Stop sending messages
             command_flag = 0;
@@ -364,16 +366,22 @@ end
 	global vid;
     global vid2;
     global g_handles;
+    global MODE;
     
+    if MODE == 's'
+        IP = sim_robot_IP_address;
+    else
+        IP = real_robot_IP_address;
+    end
  	% Connect to the robot 	
 	try
 		% Open a TCP connection to the robot.
-		socket = tcpip(real_robot_IP_address, robot_port);
+		socket = tcpip(IP, robot_port);
 		set(socket, 'ReadAsyncMode', 'continuous');
 		fopen(socket);
 		
         % Print the IP address and port number on the screen
-		str = sprintf(' IP: %s \n Port: %d',real_robot_IP_address,robot_port);
+		str = sprintf(' IP: %s \n Port: %d',IP,robot_port);
 		set(g_handles.portNumber, 'String', str);
 		set(g_handles.portNumber, 'BackgroundColor', [0.94 0.94 0.94]);
 		
@@ -385,6 +393,7 @@ end
         
          % Start Cameras
 	 %location the display of video feed
+     if MODE ~= 's'
         axes(g_handles.TableCamera);
         axes(g_handles.ConveyorCamera);
         vid = videoinput('winvideo',1, 'MJPG_1600x1200'); 
@@ -399,10 +408,10 @@ end
         hImage2=image(zeros([video_resolution2(2), video_resolution2(1), nbands2]),'Parent',g_handles.ConveyorCamera);
         preview(vid,hImage);
         preview(vid2,hImage2);
-    
+     end
      % Check if the connection is valid.+6
      if(~isequal(get(socket, 'Status'), 'open'))
-        warning(['Could not open TCP connection to ', real_robot_IP_address, ' on port ', robot_port]);
+        warning(['Could not open TCP connection to ', IP, ' on port ', robot_port]);
         return;
      end
     
@@ -620,6 +629,9 @@ function SafetyConfimation_Callback(hObject, eventdata, handles)
         msgbox('PLEASE READ AND CHECK ALL BOXES');
     end
 end    
+
+
+
 
  % --- Executes on button press in Decline.
 function Decline_Callback(hObject, eventdata, handles)
