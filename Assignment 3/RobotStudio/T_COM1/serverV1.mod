@@ -6,10 +6,10 @@
     ! The host and port that we will be listening for a connection on.
     PERS string current_state := "None";   !current state of the robot which is initialised as an empty string
     CONST num port := 1025;            !the port used for connection between RobotStudio and MATLAB
-    PERS string host := "192.168.125.1";
+    PERS string host := "127.0.0.1";
     PERS bool quit;                    !the quit flag                 
     PERS bool checkCom := FALSE;       !flag to jump to the movement file to decide its next move
-    PERS bool done := TRUE;           !flag that indicates action is done
+    PERS bool done := FALSE;           !flag that indicates action is done
     VAR num stringLength;              !number that returns the total length of the message received from MATLAB
     VAR num stringStart;               !number that stores the index of the first character
     VAR num numStart;                  !number that stores the index of the first digit
@@ -17,7 +17,7 @@
     VAR bool stringFound;              !flag that indicates the characters have been segmented 
     VAR num numIndex := 1;             !number of values that should be segmented
     VAR bool stringDecoded := FALSE;   !flag that indicates the whole message has been segmented
-    PERS bool errorHandling := TRUE;  !flag that indicates there are errors received from jog functions
+    PERS bool errorHandling := FALSE;  !flag that indicates there are errors received from jog functions
     PERS num errorNumber;              !number that stores the error value received
     PERS string numTotal{7};           !array that stores the numeric section of the message received from MATLAB
     PERS string modeSpeed;             !string that stores the speed needed for jog functions
@@ -35,7 +35,7 @@
         
         ListenForAndAcceptConnection;  !waiting to establish connection between MATLAB and RobotStudio
         MainServer;                    !jumps to server operations
-        
+        ERROR
     ENDPROC
 
     PROC MainServer()
@@ -48,7 +48,7 @@
         current_state:="";                  !initialises current state
         
         WHILE quit=FALSE DO                 !while the shutdown button is not pressed, server will read messages from MATLAB
-            
+            received_str := "";             !reset the string to ensure it is empty.
             !getStatus
             target;                         !get the current XYZ coordinates and Euler angles from the robot
             angles;                         !get the 6 joint angles from the robot
@@ -56,9 +56,17 @@
             getError;                       !get the status returned from the error IO signals
             !WaitTime 1;
             
-            ! Receive a string from the client.            
-            SocketReceive client_socket \Str:=received_str \Time:=WAIT_MAX;     !server will remain connected while waiting for messages
-            
+!            ! Receive a string from the client.           
+!                WHILE received_str = "" DO
+!                    SocketReceive client_socket \Str:=received_str \Time:=0.1;     !server will remain connected while waiting for messages
+!                    IF done = TRUE THEN
+!                        SocketSend client_socket, \Str:= "done\0A";
+!                        done := FALSE;
+!                    ENDIF
+!                ENDWHILE
+
+            SocketReceive client_socket \Str:=received_str \Time:=WAIT_MAX;
+
             !for testing, needed later for string separation
             stringLength := strLen(received_str);               !the length of the message received is stored in stringLength
             index := 1;                                         !current index is initialized as 1
@@ -417,25 +425,28 @@
                 SocketSend client_socket \Str:=("Error Number:" + ValtoStr(errorNumber) + "\0A");
             ENDIF 
             errorHandling := FALSE;   !reset the errorHandling flag
-            SocketSend client_socket \Str:=("Done" + "\0A");    !display done after movementV1 finished processing
+            
+            WaitUntil done = TRUE;
+            SocketSend client_socket \Str:=("done" + "\0A");    !display done after movementV1 finished processing
             done := FALSE;  !reset done flag
                       
         ENDWHILE
         !CloseConnection;        !if shutdown is pressed, close the connection
-        ERROR 
-            IF ERRNO=ERR_SOCK_CLOSED THEN       !if socket is accidentally closed, try and reconnect to the server
-                CloseConnection;
-                ListenForAndAcceptConnection;
-            ELSEIF ERRNO=ERR_SOCK_TIMEOUT THEN
-                ResetRetryCount;
-                CloseConnection;
-                ListenForAndAcceptConnection;
-                RETRY;
-            ELSEIF ERRNO=ERR_SOCK_ADDR_INUSE THEN
-                CloseConnection;
-                ListenForAndAcceptConnection;
-            ENDIF
-            TRYNEXT;
+        ERROR
+        TRYNEXT;
+!            IF ERRNO=ERR_SOCK_CLOSED THEN       !if socket is accidentally closed, try and reconnect to the server
+!                CloseConnection;
+!                ListenForAndAcceptConnection;
+!            ELSEIF ERRNO=ERR_SOCK_TIMEOUT THEN
+!                ResetRetryCount;
+!                CloseConnection;
+!                ListenForAndAcceptConnection;
+!                RETRY;
+!            ELSEIF ERRNO=ERR_SOCK_ADDR_INUSE THEN
+!                CloseConnection;
+!                ListenForAndAcceptConnection;
+!            ENDIF
+!            TRYNEXT;
     ENDPROC
 
     PROC ListenForAndAcceptConnection()
@@ -465,7 +476,7 @@
                 SocketClose welcome_socket;
                 ListenForAndAcceptConnection;
             ENDIF
-            TRYNEXT;
+            !TRYNEXT;
     ENDPROC
     
     ! Close the connection to the client.

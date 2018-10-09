@@ -7,8 +7,8 @@ function SM_BP2BP(X1, Y1, X2, Y2)
     regular = 'v100';
     slow = 'v50';
     done_flag = 0;
-    blockHeight = 15;
-    moveHeight = blockHeight * 2.5;
+    block_height = 15;
+    move_height = block_height * 2.5;
     
     
     %first avoid collision with table
@@ -16,7 +16,7 @@ function SM_BP2BP(X1, Y1, X2, Y2)
     %WIP
     
     %move to block position
-    commandStr = sprintf('moveert %.3f %.3f %.3f %.3f %.3f %.3f %s', X1,Y1,moveHeight,0,180,0,fast);
+    commandStr = sprintf('moveert %.3f %.3f %.3f %.3f %.3f %.3f %s', X1,Y1,move_height,0,180,0,fast);
     queue.add(commandStr);
     waitForRobotDone;
     
@@ -26,7 +26,7 @@ function SM_BP2BP(X1, Y1, X2, Y2)
     waitForRobotDone;
     
     %move down to block
-    commandStr = sprintf('moveert %.3f %.3f %.3f %.3f %.3f %.3f %s', X1,Y1,blockHeight,0,180,0,regular);
+    commandStr = sprintf('moveert %.3f %.3f %.3f %.3f %.3f %.3f %s', X1,Y1,block_height,0,180,0,regular);
     queue.add(commandStr);
     waitForRobotDone;
     
@@ -36,22 +36,27 @@ function SM_BP2BP(X1, Y1, X2, Y2)
     waitForRobotDone;
     
     %lift block
-    commandStr = sprintf('moveert %.3f %.3f %.3f %.3f %.3f %.3f %s', X1,Y1,moveHeight,0,180,0,fast);
+    commandStr = sprintf('moveert %.3f %.3f %.3f %.3f %.3f %.3f %s', X1,Y1,move_height,0,180,0,fast);
     queue.add(commandStr);
     waitForRobotDone;
     
     %move to new BP
-    commandStr = sprintf('moveert %.3f %.3f %.3f %.3f %.3f %.3f %s', X2,Y2,moveHeight,0,180,0,fast);
+    commandStr = sprintf('moveert %.3f %.3f %.3f %.3f %.3f %.3f %s', X2,Y2,move_height,0,180,0,fast);
     queue.add(commandStr);
     waitForRobotDone;
     
     %move down to block
-    commandStr = sprintf('moveert %.3f %.3f %.3f %.3f %.3f %.3f %s', X2,Y2,blockHeight,0,180,0,regular);
+    commandStr = sprintf('moveert %.3f %.3f %.3f %.3f %.3f %.3f %s', X2,Y2,block_height,0,180,0,regular);
     queue.add(commandStr);
     waitForRobotDone;
     
     %turn off solenoid
     commandStr = sprintf('vacuumSolenoidOff');
+    queue.add(commandStr);
+    waitForRobotDone;
+    
+    %move up to move height
+    commandStr = sprintf('moveert %.3f %.3f %.3f %.3f %.3f %.3f %s', X2,Y2,move_height,0,180,0,regular);
     queue.add(commandStr);
     waitForRobotDone;
     
