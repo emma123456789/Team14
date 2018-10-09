@@ -22,7 +22,7 @@ function varargout = GUI(varargin)
 %
     % See also: GUIDE, GUIDATA, GUIHANDLES
      % Edit the above text to modify the response to help GUI
-     % Last Modified by GUIDE v2.5 06-Oct-2018 22:04:52
+     % Last Modified by GUIDE v2.5 09-Oct-2018 18:24:06
      % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
     gui_State = struct('gui_Name',       mfilename, ...
@@ -119,6 +119,13 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     
     % Define the port that the robot will be listening on
     robot_port = 1025;
+    
+    % Define table and conveyor data of blocks
+    global tableBlockData
+    global conveyorBlockData
+    % initially create an empty string array
+    tableBlockData = strings(0);
+    conveyorBlockData = strings(0);
 end
  
  % --- Executes when send timer is called
@@ -2987,6 +2994,9 @@ function BPtoConveyorBlockList_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns BPtoConveyorBlockList contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from BPtoConveyorBlockList
+   % global tableBlockData
+
+    %set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -3058,6 +3068,8 @@ function ConveyorBlocksListbox_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns ConveyorBlocksListbox contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from ConveyorBlocksListbox
+    global conveyorIndexSelected
+    conveyorIndexSelected = get(hObject,'Value');
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -3082,6 +3094,8 @@ function TableBlocksListbox_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns TableBlocksListbox contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from TableBlocksListbox
+    global tableIndexSelected
+    tableIndexSelected = get(hObject,'Value');
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -3106,6 +3120,11 @@ function CameraPopupmenu_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns CameraPopupmenu contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from CameraPopupmenu
+    global cameraType
+    
+   contents = cellstr(get(hObject,'String'));
+   cameraType = contents{get(hObject,'Value')};
+    
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -3119,6 +3138,9 @@ function CameraPopupmenu_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+
+    global cameraType
+    cameraType = 'Table';
 end
 
 
@@ -3153,6 +3175,10 @@ function CorrectBlockStatusHereEdit_Callback(hObject, eventdata, handles)
 
 % Hints: get(hObject,'String') returns contents of CorrectBlockStatusHereEdit as text
 %        str2double(get(hObject,'String')) returns contents of CorrectBlockStatusHereEdit as a double
+    global blockInfo 
+    
+    blockInfo = get(hObject,'String');
+
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -3175,4 +3201,73 @@ function CorrectButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
+    %sentList = [{commandStr}; g_handles.SentMessages.String];
+    global blockInfo 
+    global tableBlockData
+    global conveyorBlockData
+    global cameraType
+    
+    tableList = string(blockInfo);
+    %tableList = {1, 2, 3;
+          %'text', rand(5,10,2), {11; 22; 33}};
+          
+    %data = get(handles.listbox1,'String');
+    %data = [data ; cellstr('blue')];
+  %hi = isempty(tableBlockData)
+    
+    switch cameraType
+		case 'Table'
+            if isempty(tableBlockData)
+                tableBlockData = tableList;
+            else
+                tableBlockData = [tableBlockData; tableList];
+            end
+            set(handles.TableBlocksListbox, 'String', tableBlockData);
+            set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+            set(handles.BPtoBPBlockList, 'String', tableBlockData);
+            set(handles.RotateBlockBlockList, 'String', tableBlockData);
+
+        case 'Conveyor'
+            if isempty(conveyorBlockData)
+                conveyorBlockData = tableList;
+            else
+                conveyorBlockData = [conveyorBlockData; tableList];
+            end 
+            set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
+            set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
+           
+    end
+
+end
+
+
+% --- Executes on button press in DeleteSelectedTableBlock.
+function DeleteSelectedTableBlock_Callback(hObject, eventdata, handles)
+% hObject    handle to DeleteSelectedTableBlock (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+    global tableIndexSelected
+    global tableBlockData
+    
+    tableBlockData(tableIndexSelected) = [];
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    
+end
+
+% --- Executes on button press in DeleteSelectedConveyorBlock.
+function DeleteSelectedConveyorBlock_Callback(hObject, eventdata, handles)
+% hObject    handle to DeleteSelectedConveyorBlock (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+    global conveyorIndexSelected
+    global conveyorBlockData
+
+    conveyorBlockData(conveyorIndexSelected) = [];
+    set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
+    set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
+    
 end
