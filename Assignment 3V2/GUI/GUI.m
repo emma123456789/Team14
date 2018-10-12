@@ -79,6 +79,7 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     global s_timer;
     global r_timer;
     global command_flag;
+    global done_flag
     global g_handles;
     global real_robot_IP_address;
     global sim_robot_IP_address;
@@ -100,15 +101,16 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     % Initialise timers
     s_timer = timer;
     s_timer.TimerFcn = @sendTimer;
-    s_timer.period = 0.1;
+    s_timer.period = 0.5;
     s_timer.ExecutionMode = 'fixedSpacing';
     r_timer = timer;
     r_timer.TimerFcn = @receiveTimer;
-    r_timer.period = 0.1;
+    r_timer.period = 0.5;
     r_timer.ExecutionMode = 'fixedSpacing';
     
     % Set the command flag to 1 when opening gui
     command_flag = 1;
+    done_flag = 1;
     
     % Get a copy of handles
     g_handles = handles;
@@ -132,13 +134,13 @@ end
  function sendTimer(obj, event)
     % Setup global variables
 	global command_flag;
+    global done_flag;
 	global status_queue;
-	disp('timer send tirggered')
     % Send pause/resume/cancel/shutdown instantly when they are pressed
 	if (status_queue.size()>0)
 		send_priorityString();
 	% Otherwise send the command string when the flag is on	
-	elseif (command_flag == 1)
+	elseif (command_flag == 1 && done_flag == 1)
         send_string();
  	end
     
@@ -171,7 +173,7 @@ end
         % Delete the timers
 		delete(timerfindall);
         clear r_timer;
-        clear %s_timer;
+        clear s_timer;
 	catch
 		delete(timerfindall);
         clear r_timer;
@@ -185,7 +187,7 @@ end
 	global queue;
 	global socket;
 	global g_handles;
-    global command_flag;
+    global command_flag done_flag;
     
     % Check if there is anything in the command queue
     if queue.size()>0
@@ -195,6 +197,7 @@ end
         % Try to write to the socket
         try
 			fwrite(socket,commandStr);
+            done_flag = 0;
 			% Update Sent Message Log
 			sentList = [{commandStr}; g_handles.SentMessages.String];
 			set(g_handles.SentMessages, 'String', sentList);
@@ -254,11 +257,12 @@ end
         response = fgetl(socket);
 		
         % Get a copy of the message and split the message
+        disp(response);
 		copy = response;
 		copy_split = string(strsplit(copy));
         
         % Update Status
-        if (strcmp(copy_split(1),'done'))
+        if (strcmp(copy,'Done'))
             done_flag = 1;
             
         elseif (strcmp(copy_split(1),'jointAngle'))
@@ -396,9 +400,9 @@ end
 		set(g_handles.portNumber, 'BackgroundColor', [0.94 0.94 0.94]);
 		
         % If we try to connect in safety panel, start the timers
-		if (buttonNo==1)
-			start(s_timer);
-			start(r_timer);
+        if (buttonNo == 1)
+            start(s_timer);
+            start(r_timer);
         end
         
          % Start Cameras
@@ -447,12 +451,12 @@ end
         % fails, turn off the current windows and show the safety window
 		if (buttonNo==2)
 
-            set(g_handles.CameraPanel,'Visible','Off');
-			set(g_handles.statusPanel,'Visible','Off');
-			set(g_handles.DIOPanel,'Visible','Off');
-			set(g_handles.RobotStatusPanel,'Visible','Off');
-			set(g_handles.SafetyPanel,'Visible','On');
-            set(g_handles.errorPanel,'Visible','Off');
+%             set(g_handles.CameraPanel,'Visible','Off');
+% 			set(g_handles.statusPanel,'Visible','Off');
+% 			set(g_handles.DIOPanel,'Visible','Off');
+% 			set(g_handles.RobotStatusPanel,'Visible','Off');
+% 			set(g_handles.SafetyPanel,'Visible','On');
+%             set(g_handles.errorPanel,'Visible','Off');
 		end
 		
 	end

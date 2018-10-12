@@ -1,10 +1,9 @@
-
     MODULE SERVER_MAIN    
 
     ! The socket connected to the client.
     VAR socketdev client_socket;
     ! The host and port that we will be listening for a connection on.
-    PERS string current_state := "None";   !current state of the robot which is initialised as an empty string
+    PERS string current_state := "";   !current state of the robot which is initialised as an empty string
     CONST num port := 1025;            !the port used for connection between RobotStudio and MATLAB
     PERS string host := "127.0.0.1";
     PERS bool quit;                    !the quit flag                 
@@ -427,7 +426,7 @@
             errorHandling := FALSE;   !reset the errorHandling flag
             
             WaitUntil done = TRUE;
-            SocketSend client_socket \Str:=("done" + "\0A");    !display done after movementV1 finished processing
+            SocketSend client_socket \Str:=("Done" + "\0A");    !display done after movementV1 finished processing
             done := FALSE;  !reset done flag
                       
         ENDWHILE

@@ -1,12 +1,12 @@
     MODULE ROB_MAIN
     
     VAR num effectorHeight:= 147;! The height of the table
-    PERS robtarget target := [[50, 200, 37.5],[4.37114E-8,0,-1,0],[0,0,0,0],[0,0,0,0,0,0]];! test target initialised to touch the table home
+    PERS robtarget target := [[13, 0, 20],[4.37114E-8,0,-1,0],[0,0,0,0],[0,0,0,0,0,0]];! test target initialised to touch the table home
     PERS robjoint joints:= [-90, 0, 0, 0, 0, 0]; !test pose initialised to calib position
    
     VAR num jog_inc:=30;                    !increment for linear jogging
     VAR num jog_inc_deg:= 5;                !increment for axis jogging
-    PERS string current_state := "None";        !Current state for the main loop conditional statements, set in T_COM1
+    PERS string current_state := "";        !Current state for the main loop conditional statements, set in T_COM1
     PERS bool quit := FALSE;                 !quit flag
     PERS bool done := FALSE;                !command finished flag
     PERS bool checkCom := FALSE;            !COM checked flag
@@ -51,7 +51,7 @@
                 paused:=TRUE;                       !the paused bool is set to TRUE to activate the paused trigger
                 !StopMove;                           !stopMove stops the robot's current path
                 StorePath;                          !stores the robot's current path so that the robot can resume when needed
-                !done:=TRUE;
+                done:=TRUE;
                 !current_state := "None";
             ENDIF
                                                     !if asked to resume
@@ -349,7 +349,7 @@
                 current_state := "None";
             !ENDIF
         ELSE
-        !done:= TRUE;
+        done:= TRUE;
         !current_state := "None";
         ENDIF
 
