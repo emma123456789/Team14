@@ -101,11 +101,11 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     % Initialise timers
     s_timer = timer;
     s_timer.TimerFcn = @sendTimer;
-    s_timer.period = 0.5;
+    s_timer.period = 0.1;
     s_timer.ExecutionMode = 'fixedSpacing';
     r_timer = timer;
     r_timer.TimerFcn = @receiveTimer;
-    r_timer.period = 0.5;
+    r_timer.period = 0.1;
     r_timer.ExecutionMode = 'fixedSpacing';
     
     % Set the command flag to 1 when opening gui
