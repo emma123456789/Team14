@@ -257,7 +257,6 @@ end
         response = fgetl(socket);
 		
         % Get a copy of the message and split the message
-        disp(response);
 		copy = response;
 		copy_split = string(strsplit(copy));
         
@@ -400,10 +399,10 @@ end
 		set(g_handles.portNumber, 'BackgroundColor', [0.94 0.94 0.94]);
 		
         % If we try to connect in safety panel, start the timers
-        if (buttonNo == 1)
+        %if (buttonNo == 1)
             start(s_timer);
             start(r_timer);
-        end
+        %end
         
          % Start Cameras
 	 %location the display of video feed'
