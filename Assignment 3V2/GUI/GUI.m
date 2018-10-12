@@ -2998,6 +2998,7 @@ function BPtoBPNumber_Callback(hObject, eventdata, handles)
 	global BP2BP_number;
     contents = cellstr(get(hObject,'String'));
 	BP2BP_number = contents{get(hObject, 'Value')};
+    BP2BP_number = str2double(BP2BP_number);
 end
 
 % --- Executes during object creation, after setting all properties.
