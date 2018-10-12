@@ -2897,7 +2897,7 @@ function BPtoBPBlockList_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns BPtoBPBlockList contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from BPtoBPBlockList
-SM_BP2BP(hObject, eventdata, handles);
+%SM_BP2BP(hObject, eventdata, handles);
 
 end
 

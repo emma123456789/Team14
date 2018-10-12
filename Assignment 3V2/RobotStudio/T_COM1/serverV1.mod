@@ -391,7 +391,7 @@
             received_str<>"enableConveyorOn" AND received_str<>"enableConveyorOff" AND 
             received_str<>"conveyorReverseOn" AND received_str<>"conveyorReverseOff" AND
             received_str<>"moveToPose" AND received_str<>"moveAngle" AND 
-            received_strSeg<>"movejas" AND received_strSeg <> "moveert" AND received_strSeg <> "moveerc" AND received_strSeg <> "moveeerb" AND
+            received_strSeg<>"movejas" AND received_strSeg <> "moveert" AND received_strSeg <> "moveerc" AND received_strSeg <> "moveerb" AND
             received_str<>"" AND received_str<>"pause" AND received_str<>"resume" AND 
             received_str<>"cancel" AND received_str<>"quit" THEN    !if mesage received is none of the above
                 SocketSend client_socket \Str:=("unknown comand" + "\0A"); 

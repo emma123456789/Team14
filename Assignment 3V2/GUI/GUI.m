@@ -22,7 +22,7 @@ function varargout = GUI(varargin)
 %
     % See also: GUIDE, GUIDATA, GUIHANDLES
      % Edit the above text to modify the response to help GUI
-     % Last Modified by GUIDE v2.5 11-Oct-2018 22:00:41
+     % Last Modified by GUIDE v2.5 12-Oct-2018 12:01:26
      % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
     gui_State = struct('gui_Name',       mfilename, ...
@@ -49,7 +49,15 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     % eventdata  reserved - to be defined in a future version of MATLAB
     % handles    structure with handles and user data (see GUIDATA)
     % varargin   command line arguments to GUI (see VARARGIN)
-     % Choose default command line output for GUI
+    % Choose default command line output for GUI
+     
+    % Stop and delete all existing timers
+    try
+        stop(timerfind());
+        delete(timerfind());
+    catch
+    end
+    
     handles.output = hObject;
     
     global tableParam;
@@ -79,6 +87,7 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     global s_timer;
     global r_timer;
     global command_flag;
+    global done_flag
     global g_handles;
     global real_robot_IP_address;
     global sim_robot_IP_address;
@@ -100,15 +109,16 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     % Initialise timers
     s_timer = timer;
     s_timer.TimerFcn = @sendTimer;
-    s_timer.period = 0.5;
+    s_timer.period = 0.1;
     s_timer.ExecutionMode = 'fixedSpacing';
-     r_timer = timer;
+    r_timer = timer;
     r_timer.TimerFcn = @receiveTimer;
-    r_timer.period = 0.5;
+    r_timer.period = 0.1;
     r_timer.ExecutionMode = 'fixedSpacing';
     
     % Set the command flag to 1 when opening gui
     command_flag = 1;
+    done_flag = 1;
     
     % Get a copy of handles
     g_handles = handles;
@@ -132,13 +142,13 @@ end
  function sendTimer(obj, event)
     % Setup global variables
 	global command_flag;
+    global done_flag;
 	global status_queue;
-	
     % Send pause/resume/cancel/shutdown instantly when they are pressed
 	if (status_queue.size()>0)
 		send_priorityString();
 	% Otherwise send the command string when the flag is on	
-	elseif (command_flag == 1)
+	elseif (command_flag == 1 && done_flag == 1)
         send_string();
  	end
     
@@ -185,7 +195,7 @@ end
 	global queue;
 	global socket;
 	global g_handles;
-    global command_flag;
+    global command_flag done_flag;
     
     % Check if there is anything in the command queue
     if queue.size()>0
@@ -195,6 +205,7 @@ end
         % Try to write to the socket
         try
 			fwrite(socket,commandStr);
+            done_flag = 0;
 			% Update Sent Message Log
 			sentList = [{commandStr}; g_handles.SentMessages.String];
 			set(g_handles.SentMessages, 'String', sentList);
@@ -258,7 +269,7 @@ end
 		copy_split = string(strsplit(copy));
         
         % Update Status
-        if (strcmp(copy_split(1),'done'))
+        if (strcmp(copy,'Done'))
             done_flag = 1;
             
         elseif (strcmp(copy_split(1),'jointAngle'))
@@ -396,10 +407,10 @@ end
 		set(g_handles.portNumber, 'BackgroundColor', [0.94 0.94 0.94]);
 		
         % If we try to connect in safety panel, start the timers
-		if (buttonNo==1)
-			start(s_timer);
-			start(r_timer);
-        end
+        %if (buttonNo == 1)
+            start(s_timer);
+            start(r_timer);
+        %end
         
          % Start Cameras
 	 %location the display of video feed'
@@ -447,12 +458,12 @@ end
         % fails, turn off the current windows and show the safety window
 		if (buttonNo==2)
 
-            set(g_handles.CameraPanel,'Visible','Off');
-			set(g_handles.statusPanel,'Visible','Off');
-			set(g_handles.DIOPanel,'Visible','Off');
-			set(g_handles.RobotStatusPanel,'Visible','Off');
-			set(g_handles.SafetyPanel,'Visible','On');
-            set(g_handles.errorPanel,'Visible','Off');
+%             set(g_handles.CameraPanel,'Visible','Off');
+% 			set(g_handles.statusPanel,'Visible','Off');
+% 			set(g_handles.DIOPanel,'Visible','Off');
+% 			set(g_handles.RobotStatusPanel,'Visible','Off');
+% 			set(g_handles.SafetyPanel,'Visible','On');
+%             set(g_handles.errorPanel,'Visible','Off');
 		end
 		
 	end
@@ -2011,7 +2022,6 @@ function connectToPort_Callback(hObject, eventdata, handles)
 % hObject    handle to connectToPort (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    
     % Define the button number
     buttonNo = 2;
     % Call connect to robot function and pass in the button number
@@ -2209,7 +2219,7 @@ function TableCamSS_Callback(hObject, eventdata, handles)
     global tableParam
     global tableCameraR
     
-     Rot = tableCameraR.R;
+    Rot = tableCameraR.R;
     Trans = [-114.9484  337.2691  831.0543]; %initial more accurate
     %Trans = [-362.2664002845348	-42.383249883396594	903.6546791412422]%later 
      if (get(hObject,'Value') == 1)
@@ -2238,7 +2248,7 @@ function TableCamSS_Callback(hObject, eventdata, handles)
                 disp('OUT OF BOUNDS: PLS TAKE PIC WITHIN TABLE CAMERA FRAME');
             case 1 %within bounds of camera frame
                 disp('PRINTING VALUES OF X Y Z');
-                xTol=-10; yTol=-12; zTol=13; 
+                xTol=-10; yTol=12; zTol=13; 
                 %zTol dependednt on item height on table
                 %initially set at 13 because block is 10 and additional
                 %tolerance of 3
@@ -2319,7 +2329,7 @@ function ConveyorCamSS_Callback(hObject, eventdata, handles)
                 disp('PRINTING VALUES OF X Y & MAYBE Z');
                 
                 %zTol dependednt on what item on table
-                xTol=-10; yTol=-12; zTol=13; 
+                xTol=-10; yTol=12; zTol=13; 
                 eex = worldPoints(end,1)+xTol;
                 eey = worldPoints(end,2)+yTol;
                 
@@ -2837,32 +2847,50 @@ function insertBoxButton_Callback(hObject, eventdata, handles)
 end
 
 
-% --- Executes on button press in pushbutton91.
-function pushbutton91_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton91 (see GCBO)
+% --- Executes on button press in ConveyortoBPButton1.
+function ConveyortoBPButton1_Callback(hObject, eventdata, handles)
+% hObject    handle to ConveyortoBPButton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    global conveyor2BP_blocklist;
+    global conveyor2BP_letter;
+    global conveyor2BP_number;
+    
+	x1 = conveyor2BP_blocklist(1);
+    y1 = conveyor2BP_blocklist(2);
+	[x2,y2] = gameboardConversion(conveyor2BP_number,conveyor2BP_letter);
+
+	SM_Conveyor2BP(x1,y1,x2,y2);
+    
 end
 
-% --- Executes on button press in pushbutton90.
-function pushbutton90_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton90 (see GCBO)
+
+% --- Executes on button press in RotateBlockButton1.
+function RotateBlockButton1_Callback(hObject, eventdata, handles)
+% hObject    handle to RotateBlockButton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    global Rotate_blocklist;
+    x1 = Rotate_blocklist(1);
+    y1 = Rotate_blocklist(2);
+    rot = Rotate_blocklist(3);
+    
+    SM_RotateBlock(x1,y1,rot);
 end
 
-% --- Executes on button press in pushbutton89.
-function pushbutton89_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton89 (see GCBO)
+% --- Executes on button press in BPtoConveyorButton1.
+function BPtoConveyorButton1_Callback(hObject, eventdata, handles)
+% hObject    handle to BPtoConveyorButton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-end
 
-% --- Executes on button press in pushbutton88.
-function pushbutton88_Callback(hObject, eventdata, handles)
-% hObject    handle to pushbutton88 (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+	global BP2Conveyor_blocklist;
+	x1 = BP2Conveyor_blocklist(1);
+    y1 = BP2Conveyor_blocklist(2);
+	% Need to know conveyor coordinates
+    x2 = 0;
+    y2 = 409;
+	SM_BP2Conveyor(x1,y1,x2,y2);
 end
 
 % --- Executes on selection change in RotateBlockBlockList.
@@ -2873,6 +2901,14 @@ function RotateBlockBlockList_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns RotateBlockBlockList contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from RotateBlockBlockList
+	global Rotate_blocklist;
+    contents = cellstr(get(hObject,'String'));
+	block_list = contents{get(hObject, 'Value')};
+	list_split = string(strsplit(block_list));
+	x1 = str2double(list_split(1));
+	y1 = str2double(list_split(2));
+    rot = str2double(list_split(3));
+	Rotate_blocklist = [x1,y1,rot];
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -2897,7 +2933,13 @@ function BPtoBPBlockList_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns BPtoBPBlockList contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from BPtoBPBlockList
-SM_BP2BP(hObject, eventdata, handles);
+	global BP2BP_blocklist;
+    contents = cellstr(get(hObject,'String'));
+	block_list = contents{get(hObject, 'Value')};
+	list_split = string(strsplit(block_list));
+	x1 = str2double(list_split(1));
+	y1 = str2double(list_split(2));
+	BP2BP_blocklist = [x1,y1];
 
 end
 
@@ -2922,6 +2964,13 @@ function ConveyortoBPBlockList_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns ConveyortoBPBlockList contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from ConveyortoBPBlockList
+	global conveyor2BP_blocklist;
+    contents = cellstr(get(hObject,'String'));
+	block_list = contents{get(hObject, 'Value')};
+	list_split = string(strsplit(block_list));
+	x1 = str2double(list_split(1));
+	y1 = str2double(list_split(2));
+	conveyor2BP_blocklist = [x1,y1];
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -2946,6 +2995,10 @@ function BPtoBPAlphabet_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns BPtoBPAlphabet contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from BPtoBPAlphabet
+	global BP2BP_letter;
+    contents = cellstr(get(hObject,'String'));
+	BP2BP_letter = contents{get(hObject, 'Value')};
+
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -2970,6 +3023,10 @@ function BPtoBPNumber_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns BPtoBPNumber contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from BPtoBPNumber
+	global BP2BP_number;
+    contents = cellstr(get(hObject,'String'));
+	BP2BP_number = contents{get(hObject, 'Value')};
+    BP2BP_number = str2double(BP2BP_number);
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -2997,6 +3054,13 @@ function BPtoConveyorBlockList_Callback(hObject, eventdata, handles)
    % global tableBlockData
 
     %set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+	global BP2Conveyor_blocklist;
+    contents = cellstr(get(hObject,'String'));
+	block_list = contents{get(hObject, 'Value')};
+	list_split = string(strsplit(block_list));
+	x1 = str2double(list_split(1));
+	y1 = str2double(list_split(2));
+	BP2Conveyor_blocklist = [x1,y1];
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -3020,6 +3084,9 @@ function ConveyortoBPAlphabet_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns ConveyortoBPAlphabet contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from ConveyortoBPAlphabet
+	global conveyor2BP_letter;
+    contents = cellstr(get(hObject,'String'));
+	conveyor2BP_letter = contents{get(hObject, 'Value')};
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -3044,6 +3111,10 @@ function ConveyortoBPNumber_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns ConveyortoBPNumber contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from ConveyortoBPNumber
+	global conveyor2BP_number;
+    contents = cellstr(get(hObject,'String'));
+	BP2BP_number = contents{get(hObject, 'Value')};
+    conveyor2BP_number = str2double(BP2BP_number);
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -4178,4 +4249,22 @@ function StartMaze_Callback(hObject, eventdata, handles)
 % hObject    handle to StartMaze (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+end
+
+
+% --- Executes on button press in BPtoBPButton1.
+function BPtoBPButton1_Callback(hObject, eventdata, handles)
+% hObject    handle to BPtoBPButton1 (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+	global BP2BP_letter;
+	global BP2BP_number;
+	global BP2BP_blocklist;
+	x1 = BP2BP_blocklist(1);
+    y1 = BP2BP_blocklist(2);
+	[x2,y2] = gameboardConversion(BP2BP_number,BP2BP_letter);
+
+	SM_BP2BP(x1,y1,x2,y2);
+
+
 end

@@ -2849,6 +2849,13 @@ function pushbutton90_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton90 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+	global BP2BP_letter;
+	global BP2BP_number;
+	global BP2BP_blocklist;
+	[x1,y1] = gameboardConversion(BP2BP_blocklist(1),BP2BP_blocklist(2));
+	[x2,y2] = gameboardConversion(BP2BP_number,BP2BP_letter);
+
+	SM_BP2BP(x1,y1,x2,y2);
 end
 
 % --- Executes on button press in pushbutton89.
@@ -2863,6 +2870,10 @@ function pushbutton88_Callback(hObject, eventdata, handles)
 % hObject    handle to pushbutton88 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+	global BP2Conveyor_blocklist;
+	[x1,y1] = gameboardConversion(BP2Conveyor_blocklist(1),BP2Conveyor_blocklist(2));
+	% Need to know conveyor coordinates
+	SM_BP2BP(x1,y1,x2,y2);
 end
 
 % --- Executes on selection change in RotateBlockBlockList.
@@ -2897,7 +2908,12 @@ function BPtoBPBlockList_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns BPtoBPBlockList contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from BPtoBPBlockList
-SM_BP2BP(hObject, eventdata, handles);
+	global BP2BP_blocklist;
+	block_list = get(hObject, 'String');
+	list_split = string(strsplit(block_list));
+	letter = list_split(1);
+	num = list_split(2);
+	BP2BP_blocklist = [num,letter];
 
 end
 
@@ -2946,6 +2962,9 @@ function BPtoBPAlphabet_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns BPtoBPAlphabet contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from BPtoBPAlphabet
+	global BP2BP_letter;
+	BP2BP_letter = get(hObject, 'String');
+
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -2970,6 +2989,8 @@ function BPtoBPNumber_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns BPtoBPNumber contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from BPtoBPNumber
+	global BP2BP_number;
+	BP2BP_number = get(hObject, 'Value');
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -2997,6 +3018,12 @@ function BPtoConveyorBlockList_Callback(hObject, eventdata, handles)
    % global tableBlockData
 
     %set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+	global BP2Conveyor_blocklist;
+	block_list = get(hObject, 'String');
+	list_split = string(strsplit(block_list));
+	letter = list_split(1);
+	num = list_split(2);
+	BP2Conveyor_blocklist = [num,letter];
 end
 
 % --- Executes during object creation, after setting all properties.
