@@ -2870,6 +2870,12 @@ function RotateBlockButton1_Callback(hObject, eventdata, handles)
 % hObject    handle to RotateBlockButton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    global Rotate_blocklist;
+    x1 = Rotate_blocklist(1);
+    y1 = Rotate_blocklist(2);
+    rot = Rotate_blocklist(3);
+    
+    SM_RotateBlock(x1,y1,rot);
 end
 
 % --- Executes on button press in BPtoConveyorButton1.
@@ -2895,6 +2901,14 @@ function RotateBlockBlockList_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns RotateBlockBlockList contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from RotateBlockBlockList
+	global Rotate_blocklist;
+    contents = cellstr(get(hObject,'String'));
+	block_list = contents{get(hObject, 'Value')};
+	list_split = string(strsplit(block_list));
+	x1 = str2double(list_split(1));
+	y1 = str2double(list_split(2));
+    rot = str2double(list_split(3));
+	Rotate_blocklist = [x1,y1,rot];
 end
 
 % --- Executes during object creation, after setting all properties.
