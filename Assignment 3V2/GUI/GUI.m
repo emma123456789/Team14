@@ -52,8 +52,11 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     % Choose default command line output for GUI
      
     % Stop and delete all existing timers
-    stop(timerfind());
-    delete(timerfind());
+    try
+        stop(timerfind());
+        delete(timerfind());
+    catch
+    end
     
     handles.output = hObject;
     
