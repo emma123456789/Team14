@@ -2852,22 +2852,18 @@ function ConveyortoBPButton1_Callback(hObject, eventdata, handles)
 % hObject    handle to ConveyortoBPButton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    global conveyor2BP_blocklist;
+    global conveyor2BP_letter;
+    global conveyor2BP_number;
+    
+	x1 = conveyor2BP_blocklist(1);
+    y1 = conveyor2BP_blocklist(2);
+	[x2,y2] = gameboardConversion(conveyor2BP_number,conveyor2BP_letter);
+
+	SM_Conveyor2BP(x1,y1,x2,y2);
+    
 end
 
-% --- Executes on button press in hi.
-function hi_Callback(hObject, eventdata, handles)
-% hObject    handle to hi (see GCBO)
-% eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
-	global BP2BP_letter;
-	global BP2BP_number;
-	global BP2BP_blocklist;
-	x1 = BP2BP_blocklist(1);
-    y1 = BP2BP_blocklist(2);
-	[x2,y2] = gameboardConversion(BP2BP_number,BP2BP_letter);
-
-	SM_BP2BP(x1,y1,x2,y2);
-end
 
 % --- Executes on button press in RotateBlockButton1.
 function RotateBlockButton1_Callback(hObject, eventdata, handles)
@@ -2954,6 +2950,13 @@ function ConveyortoBPBlockList_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns ConveyortoBPBlockList contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from ConveyortoBPBlockList
+	global conveyor2BP_blocklist;
+    contents = cellstr(get(hObject,'String'));
+	block_list = contents{get(hObject, 'Value')};
+	list_split = string(strsplit(block_list));
+	x1 = str2double(list_split(1));
+	y1 = str2double(list_split(2));
+	conveyor2BP_blocklist = [x1,y1];
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -3067,6 +3070,9 @@ function ConveyortoBPAlphabet_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns ConveyortoBPAlphabet contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from ConveyortoBPAlphabet
+	global conveyor2BP_letter;
+    contents = cellstr(get(hObject,'String'));
+	conveyor2BP_letter = contents{get(hObject, 'Value')};
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -3091,6 +3097,10 @@ function ConveyortoBPNumber_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns ConveyortoBPNumber contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from ConveyortoBPNumber
+	global conveyor2BP_number;
+    contents = cellstr(get(hObject,'String'));
+	BP2BP_number = contents{get(hObject, 'Value')};
+    conveyor2BP_number = str2double(BP2BP_number);
 end
 
 % --- Executes during object creation, after setting all properties.
