@@ -49,7 +49,12 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     % eventdata  reserved - to be defined in a future version of MATLAB
     % handles    structure with handles and user data (see GUIDATA)
     % varargin   command line arguments to GUI (see VARARGIN)
-     % Choose default command line output for GUI
+    % Choose default command line output for GUI
+     
+    % Stop and delete all existing timers
+    stop(timerfind());
+    delete(timerfind());
+    
     handles.output = hObject;
     
     global tableParam;
@@ -2873,14 +2878,14 @@ function BPtoConveyorButton1_Callback(hObject, eventdata, handles)
 % hObject    handle to BPtoConveyorButton1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-disp('hi');
+
 	global BP2Conveyor_blocklist;
 	x1 = BP2Conveyor_blocklist(1);
     y1 = BP2Conveyor_blocklist(2);
 	% Need to know conveyor coordinates
     x2 = 0;
     y2 = 409;
-	SM_BP2BP(x1,y1,x2,y2);
+	SM_BP2Conveyor(x1,y1,x2,y2);
 end
 
 % --- Executes on selection change in RotateBlockBlockList.
@@ -3030,10 +3035,11 @@ function BPtoConveyorBlockList_Callback(hObject, eventdata, handles)
 
     %set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
 	global BP2Conveyor_blocklist;
-	block_list = get(hObject, 'String');
+    contents = cellstr(get(hObject,'String'));
+	block_list = contents{get(hObject, 'Value')};
 	list_split = string(strsplit(block_list));
-	x1 = list_split(1);
-	y1 = list_split(2);
+	x1 = str2double(list_split(1));
+	y1 = str2double(list_split(2));
 	BP2Conveyor_blocklist = [x1,y1];
 end
 
