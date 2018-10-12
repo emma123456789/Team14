@@ -417,7 +417,7 @@
             !checkCom:=TRUE;
             !WaitUntil current_state = "None" and done = TRUE;   !wait until the current_state is reset and the done flag is set to the true from movementV1
             IF errorHandling = TRUE THEN       !if error is returned from movementV1 the error value is sent to MATLAB
-                SocketSend client_socket \Str:=("Error Number:" + ValtoStr(errorNumber) + "\0A");
+                SocketSend client_socket \Str:=("movementError:" + ValtoStr(errorNumber) + "\0A");
             ENDIF 
             errorHandling := FALSE;   !reset the errorHandling flag
             
