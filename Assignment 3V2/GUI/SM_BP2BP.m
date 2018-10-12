@@ -5,8 +5,10 @@ function SM_BP2BP(X1, Y1, X2, Y2)
     fast = 'v500';
     regular = 'v100';
     slow = 'v50';
+    table_height = 175;
     block_height = 8;
-    move_height = block_height * 2.5;
+    move_height = table_height + block_height * 2.5;
+    grip_height = table_height + block_height;
     
     
     %first avoid collision with table
@@ -14,7 +16,7 @@ function SM_BP2BP(X1, Y1, X2, Y2)
     %WIP
     
     %move to block position
-    commandStr = sprintf('moveert %.3f %.3f %.3f %.3f %.3f %.3f %s', X1,Y1,move_height,0,180,0,fast);
+    commandStr = sprintf('moveerb %.3f %.3f %.3f %.3f %.3f %.3f %s', X1,Y1,move_height,0,180,0,fast);
     queue.add(commandStr);
     
     %turn on vacuum
@@ -22,7 +24,7 @@ function SM_BP2BP(X1, Y1, X2, Y2)
     queue.add(commandStr);
     
     %move down to block
-    commandStr = sprintf('moveert %.3f %.3f %.3f %.3f %.3f %.3f %s', X1,Y1,block_height,0,180,0,regular);
+    commandStr = sprintf('moveerb %.3f %.3f %.3f %.3f %.3f %.3f %s', X1,Y1,grip_height,0,180,0,regular);
     queue.add(commandStr);
     
     %turn on solenoid
@@ -30,15 +32,15 @@ function SM_BP2BP(X1, Y1, X2, Y2)
     queue.add(commandStr);
     
     %lift block
-    commandStr = sprintf('moveert %.3f %.3f %.3f %.3f %.3f %.3f %s', X1,Y1,move_height,0,180,0,fast);
+    commandStr = sprintf('moveerb %.3f %.3f %.3f %.3f %.3f %.3f %s', X1,Y1,move_height,0,180,0,fast);
     queue.add(commandStr);
     
     %move to new BP
-    commandStr = sprintf('moveert %.3f %.3f %.3f %.3f %.3f %.3f %s', X2,Y2,move_height,0,180,0,fast);
+    commandStr = sprintf('moveerb %.3f %.3f %.3f %.3f %.3f %.3f %s', X2,Y2,move_height,0,180,0,fast);
     queue.add(commandStr);
     
     %move down to block
-    commandStr = sprintf('moveert %.3f %.3f %.3f %.3f %.3f %.3f %s', X2,Y2,block_height,0,180,0,regular);
+    commandStr = sprintf('moveerb %.3f %.3f %.3f %.3f %.3f %.3f %s', X2,Y2,grip_height,0,180,0,regular);
     queue.add(commandStr);
     
     %turn off solenoid
@@ -46,7 +48,7 @@ function SM_BP2BP(X1, Y1, X2, Y2)
     queue.add(commandStr);
     
     %move up to move height
-    commandStr = sprintf('moveert %.3f %.3f %.3f %.3f %.3f %.3f %s', X2,Y2,move_height,0,180,0,regular);
+    commandStr = sprintf('moveerb %.3f %.3f %.3f %.3f %.3f %.3f %s', X2,Y2,move_height,0,180,0,regular);
     queue.add(commandStr);
     
     %turn off pump

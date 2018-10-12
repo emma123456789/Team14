@@ -3,11 +3,11 @@
     ! The socket connected to the client.
     VAR socketdev client_socket;
     ! The host and port that we will be listening for a connection on.
-    PERS string current_state := "";   !current state of the robot which is initialised as an empty string
+    PERS string current_state := "moveert";   !current state of the robot which is initialised as an empty string
     CONST num port := 1025;            !the port used for connection between RobotStudio and MATLAB
     PERS string host := "127.0.0.1";
     PERS bool quit;                    !the quit flag                 
-    PERS bool checkCom := FALSE;       !flag to jump to the movement file to decide its next move
+    PERS bool checkCom := TRUE;       !flag to jump to the movement file to decide its next move
     PERS bool done := FALSE;           !flag that indicates action is done
     VAR num stringLength;              !number that returns the total length of the message received from MATLAB
     VAR num stringStart;               !number that stores the index of the first character
@@ -89,6 +89,18 @@
                 ENDWHILE
                 modeSpeed := strPart(received_str,index,stringLength-index+1);  !stores the speed of moving
                 current_state := "moveert";
+                checkCom := TRUE;  
+            ENDIF 
+            
+            IF received_strSeg = "moveerb" THEN         !if asked to move to a target relative to base home
+                WHILE numIndex <= 6 DO                      !stores the 6 values (xyz+euler angles) for move function
+                numStart := strFind(received_str,index,STR_WHITE);      
+                numTotal{numIndex} := strPart(received_str,index,numStart-index);
+                numIndex := numIndex+1;
+                index := numStart+1;
+                ENDWHILE
+                modeSpeed := strPart(received_str,index,stringLength-index+1);  !stores the speed of moving
+                current_state := "moveerb";
                 checkCom := TRUE;  
             ENDIF 
             
@@ -379,7 +391,7 @@
             received_str<>"enableConveyorOn" AND received_str<>"enableConveyorOff" AND 
             received_str<>"conveyorReverseOn" AND received_str<>"conveyorReverseOff" AND
             received_str<>"moveToPose" AND received_str<>"moveAngle" AND 
-            received_strSeg<>"movejas" AND received_strSeg <> "moveert" AND received_strSeg <> "moveerc" AND 
+            received_strSeg<>"movejas" AND received_strSeg <> "moveert" AND received_strSeg <> "moveerc" AND received_strSeg <> "moveeerb" AND
             received_str<>"" AND received_str<>"pause" AND received_str<>"resume" AND 
             received_str<>"cancel" AND received_str<>"quit" THEN    !if mesage received is none of the above
                 SocketSend client_socket \Str:=("unknown comand" + "\0A"); 

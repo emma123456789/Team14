@@ -1,15 +1,15 @@
     MODULE ROB_MAIN
     
     VAR num effectorHeight:= 147;! The height of the table
-    PERS robtarget target := [[253, 0, 20],[4.37114E-08,0,-1,0],[0,0,0,0],[0,0,0,0,0,0]];! test target initialised to touch the table home
+    PERS robtarget target := [[229, -144, 20],[4.37114E-8,0,-1,0],[0,0,0,0],[0,0,0,0,0,0]];! test target initialised to touch the table home
     PERS robjoint joints:= [-90, 0, 0, 0, 0, 0]; !test pose initialised to calib position
    
     VAR num jog_inc:=30;                    !increment for linear jogging
     VAR num jog_inc_deg:= 5;                !increment for axis jogging
-    PERS string current_state := "";        !Current state for the main loop conditional statements, set in T_COM1
+    PERS string current_state := "moveert";        !Current state for the main loop conditional statements, set in T_COM1
     PERS bool quit := FALSE;                 !quit flag
     PERS bool done := FALSE;                !command finished flag
-    PERS bool checkCom := FALSE;            !COM checked flag
+    PERS bool checkCom := TRUE;            !COM checked flag
     PERS bool errorHandling := FALSE;       !error flag
     PERS num errorNumber;                   !error number for range calculations
     VAR intnum pauseTrigger;                !trigger for pausing robot path
@@ -51,7 +51,7 @@
                 paused:=TRUE;                       !the paused bool is set to TRUE to activate the paused trigger
                 !StopMove;                           !stopMove stops the robot's current path
                 StorePath;                          !stores the robot's current path so that the robot can resume when needed
-                !done:=TRUE;
+                done:=TRUE;
                 !current_state := "None";
             ENDIF
                                                     !if asked to resume
@@ -89,6 +89,16 @@
                                                     !if asked to move to a target relative to conveyer home
             IF current_state = "moveerc" THEN       
                 wobjCurrent := wConveyer;             !set current work object to conveyer
+                move_speed :=getSpeed(modeSpeed);     !convert speed argument string to speeddata
+                target:=getTarget(numTotal);          !convert argument string array to target (uses wobjCurrent)
+                MoveTarget target, move_speed;        !Move to target
+                done:= TRUE;                          !the flag for action done is set as TRUE
+                current_state := "None";              !the current state is reset after the motion is finished
+            ENDIF
+            
+                                                      !if asked to move to a target relative to base frame
+            IF current_state = "moveerb" THEN       
+                wobjCurrent := wBase;                   !set current work object to conveyer
                 move_speed :=getSpeed(modeSpeed);     !convert speed argument string to speeddata
                 target:=getTarget(numTotal);          !convert argument string array to target (uses wobjCurrent)
                 MoveTarget target, move_speed;        !Move to target
@@ -349,7 +359,7 @@
                 current_state := "None";
             !ENDIF
         ELSE
-        !done:= TRUE;
+        done:= TRUE;
         !current_state := "None";
         ENDIF
 
@@ -364,49 +374,6 @@
     !PARAM jog_inc:         num to continuously increment the axis by to find the robot's limit. Negative increment will jog in negative axis direction
     !PARAM move_speed:      speed data
     PROC JogLinear(string axis, num jog_inc, speeddata move_speed)
-        VAR robtarget pos_current;                      !current robot target
-        VAR robtarget pos_new;                          !new robot target to be calculated
-        VAR jointtarget check_joint;                    !joint variable for range checking
-        VAR errnum err_val:=0;                          !error variable for range checking
-        VAR pos jog:= [0,0,0];                          !vector to be incremented and rotated before adding to new_pos
-        VAR pose workObjectRot := [[0,0,0], [0,0,0,0]];    !rotation to transform the jog vector by based on the current work object
-        
-        pos_current:=CRobT(\WObj:=wBase);               !get current pos
-        pos_new:=pos_current;
-        
-        IF wobjCurrent = wEffector THEN                 !check if frame is the dynamic end effector frame based off link 6
-            workObjectRot.rot := pos_current.rot;           !if so use link 6's frame for axis rotation
-        ELSE
-            workObjectRot := PoseInv(wobjCurrent.uframe);!else use the current work objects frame.
-            workObjectRot.trans := [0,0,0];
-        ENDIF
-        
-        IF axis = "x" OR axis = "X" THEN                 !apply increment to axis indicated in argument
-            jog.x := jog_inc;
-        ELSEIF axis = "y" or axis = "Y" THEN
-            jog.y:= jog_inc;
-        ELSEIF axis = "z" or axis = "Z" THEN 
-            jog.z:= jog_inc;
-        ENDIF
-        
-        jog := PoseVect(workObjectRot, jog);            !transform vector by the rotation matrix for the work object
-        
-                                                       
-        pos_new.trans:=pos_new.trans + jog;
-        check_joint:=CalcJointT(pos_new,tSCup,\WObj:=wBase\ErrorNumber:=err_val);
-        
-        !WHILE current_state <> "paused" DO
-            MoveL pos_new,move_speed,fine,tSCup\WObj:=wBase;!move to calculated pos by linear pathing 
-        !ENDWHILE
-        ERROR
-    ENDPROC   
-    
-    !Jog continuously in an axis (X,Y,or Z) untill paused elsewhere or the limits are reached
-    !Will calculate the axis based on the current frame of reference set by wobjCurrent
-    !PARAM axis:            the axis to use
-    !PARAM jog_inc:         num to continuously increment the axis by to find the robot's limit. Negative increment will jog in negative axis direction
-    !PARAM move_speed:      speed data
-    PROC JogLinear2(string axis, num jog_inc, speeddata move_speed)
         VAR robtarget pos_current;                      !current robot target
         VAR robtarget pos_new;                          !new robot target to be calculated
         VAR jointtarget check_joint;                    !joint variable for range checking
