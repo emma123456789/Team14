@@ -5,7 +5,7 @@ function SM_BP2BP(X1, Y1, X2, Y2)
     fast = 'v500';
     regular = 'v100';
     slow = 'v50';
-    table_height = 175;
+    table_height = 147;
     block_height = 8;
     move_height = table_height + block_height * 2.5;
     grip_height = table_height + block_height;
