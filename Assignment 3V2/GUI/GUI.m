@@ -22,7 +22,7 @@ function varargout = GUI(varargin)
 %
     % See also: GUIDE, GUIDATA, GUIHANDLES
      % Edit the above text to modify the response to help GUI
-     % Last Modified by GUIDE v2.5 12-Oct-2018 12:01:26
+     % Last Modified by GUIDE v2.5 15-Oct-2018 14:58:25
      % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
     gui_State = struct('gui_Name',       mfilename, ...
@@ -817,27 +817,6 @@ function SecretButton_Callback(hObject, eventdata, handles)
 % 	fopen(socket);
     start(s_timer);
     start(r_timer);
-
-    %camera test without the access to robot 
-    
-    % Start Cameras
-    %axes(handles.TableCamera);
-    %axes(handles.ConveyorCamera);
-    %vid = videoinput('winvideo',1, 'MJPG_1600x1200'); 
-    %video_resolution1 = vid.VideoResolution;
-    %nbands1 = vid.NumberOfBands;
-    %vid2 = videoinput('winvideo',2,'MJPG_1600x1200'); 
-    %video_resolution2 = vid2.VideoResolution;
-    %nbands2 = vid2.NumberOfBands;
-
-    % sguideet image handle
-   % hImage=image(zeros([video_resolution1(2), video_resolution1(1), nbands1]),'Parent',handles.TableCamera);
-   % hImage2=image(zeros([video_resolution2(2), video_resolution2(1), nbands2]),'Parent',handles.ConveyorCamera);
-   % preview(vid,hImage);
-   % preview(vid2,hImage2);
-   % src1 = getselectedsource(vid);
-   % src1.ExposureMode = 'manual';
-   % src1.Exposure = -5;
 
     % Effectly changing 'screens'
     set(handles.CameraPanel,'Visible','On');
@@ -4265,6 +4244,95 @@ function BPtoBPButton1_Callback(hObject, eventdata, handles)
 	[x2,y2] = gameboardConversion(BP2BP_number,BP2BP_letter);
 
 	SM_BP2BP(x1,y1,x2,y2);
+    
+    % changing the BP INFO
+    global tableIndexSelected;
+    global tableBlockData;
+    
+    % adding new BP: x y theta type BP
+    newBlockInfo = string(0); % x y theta type BP
+    if isempty(tableBlockData)
+        tableBlockData = newBlockInfo;
+    else
+        tableBlockData = [tableBlockData; newBlockInfo];
+    end
+    
+    % deleting orginal BP
+    tableBlockData(tableIndexSelected) = [];
+
+    % updating info to all lists  
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+end
 
 
+% --- Executes on selection change in ControlOrActivitiesPopup.
+function ControlOrActivitiesPopup_Callback(hObject, eventdata, handles)
+% hObject    handle to ControlOrActivitiesPopup (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns ControlOrActivitiesPopup contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from ControlOrActivitiesPopup
+
+    contents = cellstr(get(hObject,'String'));
+    PopupValue = contents{get(hObject,'Value')};
+
+    if (strcmp(PopupValue,'Control'))
+        set(handles.ControlPanel,'Visible','On');
+        set(handles.ActivitiesPanel,'Visible','Off');
+    elseif(strcmp(PopupValue,'Activites'))
+        set(handles.ControlPanel,'Visible','Off');
+        set(handles.ActivitiesPanel,'Visible','On');
+    end
+    
+end
+
+% --- Executes during object creation, after setting all properties.
+function ControlOrActivitiesPopup_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to ControlOrActivitiesPopup (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+end
+
+% --- Executes on selection change in TicOrPosePopup.
+function TicOrPosePopup_Callback(hObject, eventdata, handles)
+% hObject    handle to TicOrPosePopup (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns TicOrPosePopup contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from TicOrPosePopup
+
+    contents = cellstr(get(hObject,'String'));
+    PopupValue = contents{get(hObject,'Value')};
+
+    if (strcmp(PopupValue,'Tic Tac Toe'))
+        set(handles.TicTacToePanel,'Visible','On');
+        set(handles.PosePanel,'Visible','Off');
+    elseif(strcmp(PopupValue,'Pose Control'))
+        set(handles.TicTacToePanel,'Visible','Off');
+        set(handles.PosePanel,'Visible','On');
+    end
+end
+
+% --- Executes during object creation, after setting all properties.
+function TicOrPosePopup_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to TicOrPosePopup (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: popupmenu controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
 end
