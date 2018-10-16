@@ -2840,6 +2840,8 @@ function ConveyortoBPButton1_Callback(hObject, eventdata, handles)
 	[x2,y2] = gameboardConversion(conveyor2BP_number,conveyor2BP_letter);
 
 	SM_Conveyor2BP(x1,y1,x2,y2);
+    Conveyor2BP_updateBlocklist(conveyor2BP_number,conveyor2BP_letter, x2, y2);
+    
     
 end
 
@@ -2854,7 +2856,8 @@ function RotateBlockButton1_Callback(hObject, eventdata, handles)
     y1 = Rotate_blocklist(2);
     rot = Rotate_blocklist(3);
     
-    SM_RotateBlock(x1,y1,rot);
+    SM_RotateBlock(x1,y1);
+    
 end
 
 % --- Executes on button press in BPtoConveyorButton1.
@@ -2870,6 +2873,7 @@ function BPtoConveyorButton1_Callback(hObject, eventdata, handles)
     x2 = 0;
     y2 = 409;
 	SM_BP2Conveyor(x1,y1,x2,y2);
+    BP2Conveyor_updateBlocklist(x2, xy);
 end
 
 % --- Executes on selection change in RotateBlockBlockList.
@@ -4244,27 +4248,9 @@ function BPtoBPButton1_Callback(hObject, eventdata, handles)
 	[x2,y2] = gameboardConversion(BP2BP_number,BP2BP_letter);
 
 	SM_BP2BP(x1,y1,x2,y2);
+    BP2BP_updateBlocklist(BP2BP_number,BP2BP_letter, x2, y2);
     
-    % changing the BP INFO
-    global tableIndexSelected;
-    global tableBlockData;
-    
-    % adding new BP: x y theta type BP
-    newBlockInfo = string(0); % x y theta type BP
-    if isempty(tableBlockData)
-        tableBlockData = newBlockInfo;
-    else
-        tableBlockData = [tableBlockData; newBlockInfo];
-    end
-    
-    % deleting orginal BP
-    tableBlockData(tableIndexSelected) = [];
 
-    % updating info to all lists  
-    set(handles.TableBlocksListbox, 'String', tableBlockData);
-    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
-    set(handles.BPtoBPBlockList, 'String', tableBlockData);
-    set(handles.RotateBlockBlockList, 'String', tableBlockData);
 end
 
 
