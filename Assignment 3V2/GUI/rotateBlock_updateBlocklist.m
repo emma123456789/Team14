@@ -18,12 +18,6 @@ function rotateBlock_updateBlocklist(x1,y1)
     end
     
     % deleting orginal BP
-    tableBlockData(tableIndexSelected) = [];
-
-    % updating info to all lists  
-    set(handles.TableBlocksListbox, 'String', tableBlockData);
-    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
-    set(handles.BPtoBPBlockList, 'String', tableBlockData);
-    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    tableBlockData(Rotate_index) = [];
     
 end

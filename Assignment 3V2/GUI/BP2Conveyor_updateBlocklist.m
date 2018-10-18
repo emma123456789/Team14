@@ -20,14 +20,7 @@ function BP2Conveyor_updateBlocklist(x2,y2)
     end
     
     % deleting orginal BP
-    conveyorBlockData(conveyorIndexSelected) = [];
+    conveyorBlockData(BP2Conveyor_index) = [];
 
-    % updating info to all lists  
-    set(handles.TableBlocksListbox, 'String', tableBlockData);
-    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
-    set(handles.BPtoBPBlockList, 'String', tableBlockData);
-    set(handles.RotateBlockBlockList, 'String', tableBlockData);
-    set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
-    set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
     
 end

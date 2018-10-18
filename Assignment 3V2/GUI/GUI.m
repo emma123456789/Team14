@@ -2834,6 +2834,8 @@ function ConveyortoBPButton1_Callback(hObject, eventdata, handles)
     global conveyor2BP_blocklist;
     global conveyor2BP_letter;
     global conveyor2BP_number;
+    global tableBlockData;
+    global conveyorBlockData;
     
 	x1 = conveyor2BP_blocklist(1);
     y1 = conveyor2BP_blocklist(2);
@@ -2842,6 +2844,13 @@ function ConveyortoBPButton1_Callback(hObject, eventdata, handles)
 	SM_Conveyor2BP(x1,y1,x2,y2);
     Conveyor2BP_updateBlocklist(conveyor2BP_number,conveyor2BP_letter, x2, y2);
     
+    % updating info to all lists  
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
+    set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
     
 end
 
@@ -2852,11 +2861,19 @@ function RotateBlockButton1_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     global Rotate_blocklist;
+    global tableBlockData;
     x1 = Rotate_blocklist(1);
     y1 = Rotate_blocklist(2);
     rot = Rotate_blocklist(3);
     
     SM_RotateBlock(x1,y1);
+    rotateBlock_updateBlocklist(x1,y1);
+    
+    % updating info to all lists  
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
     
 end
 
@@ -2867,6 +2884,8 @@ function BPtoConveyorButton1_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 
 	global BP2Conveyor_blocklist;
+    global tableBlockData;
+    global conveyorBlockData;
 	x1 = BP2Conveyor_blocklist(1);
     y1 = BP2Conveyor_blocklist(2);
 	% Need to know conveyor coordinates
@@ -2874,6 +2893,15 @@ function BPtoConveyorButton1_Callback(hObject, eventdata, handles)
     y2 = 409;
 	SM_BP2Conveyor(x1,y1,x2,y2);
     BP2Conveyor_updateBlocklist(x2, xy);
+    
+        % updating info to all lists  
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
+    set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
+    
 end
 
 % --- Executes on selection change in RotateBlockBlockList.
@@ -4251,12 +4279,20 @@ function BPtoBPButton1_Callback(hObject, eventdata, handles)
 	global BP2BP_letter;
 	global BP2BP_number;
 	global BP2BP_blocklist;
+    global tableBlockData;
 	x1 = BP2BP_blocklist(1);
     y1 = BP2BP_blocklist(2);
 	[x2,y2] = gameboardConversion(BP2BP_number,BP2BP_letter);
 
 	SM_BP2BP(x1,y1,x2,y2);
     BP2BP_updateBlocklist(BP2BP_number,BP2BP_letter, x2, y2);
+    
+    
+    % updating info to all lists  
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
     
 
 end
