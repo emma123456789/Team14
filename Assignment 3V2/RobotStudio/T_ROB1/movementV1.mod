@@ -6,16 +6,16 @@
    
     VAR num jog_inc:=30;                    !increment for linear jogging
     VAR num jog_inc_deg:= 5;                !increment for axis jogging
-    PERS string current_state := "moveert";        !Current state for the main loop conditional statements, set in T_COM1
+    PERS string current_state := "";        !Current state for the main loop conditional statements, set in T_COM1
     PERS bool quit := FALSE;                 !quit flag
     PERS bool done := FALSE;                !command finished flag
-    PERS bool checkCom := TRUE;            !COM checked flag
+    PERS bool checkCom := FALSE;            !COM checked flag
     PERS bool errorHandling := FALSE;       !error flag
     PERS num errorNumber;                   !error number for range calculations
     VAR intnum pauseTrigger;                !trigger for pausing robot path
     VAR intnum cancelTrigger;               !trigger for cancelling robot path
-    PERS bool paused:=FALSE;                 !pause flag
-    PERS bool cancelled := FALSE;            !cancel flag
+    PERS num paused := 0;                 !pause flag
+    PERS num cancelled := 0;            !cancel flag
     PERS string numTotal{7};                !string arguments array
     PERS string modeSpeed;                  !speed data string
     PERS speeddata move_speed;              !speed data for poses
@@ -39,6 +39,11 @@
     
     WHILE quit = FALSE DO                       !robot action will run continuously when the shutdown button is not pressed
         
+        deletePauseTrap;
+        deleteCancelTrap;
+        addPauseTrap;
+        addCancelTrap;
+        
         WaitUntil checkCom = TRUE; 
         
             !IDelete pauseTrigger;
@@ -48,27 +53,27 @@
             !CONNECT cancelTrigger WITH cancelRoutine;   !connect cancel trigger with cancel interrupt routine
             !IPers cancelled, cancelTrigger; 
             IF current_state = "paused" THEN
-                paused:=TRUE;                       !the paused bool is set to TRUE to activate the paused trigger
+                paused:=1;                       !the paused bool is set to TRUE to activate the paused trigger
                 !StopMove;                           !stopMove stops the robot's current path
-                StorePath;                          !stores the robot's current path so that the robot can resume when needed
+                !StorePath;                          !stores the robot's current path so that the robot can resume when needed
                 done:=TRUE;
-                !current_state := "None";
+                current_state := "None";
             ENDIF
                                                     !if asked to resume
             IF current_state = "resume" THEN
-                paused:=FALSE;                      !the paused bool is set to FALSE to activate the paused trigger again
+                paused:=0;                      !the paused bool is set to FALSE to activate the paused trigger again
                 RestoPath;                          !RestoPath restores the path saved from StorePath
                 !StartMove;                          !robot starts moving again in the stored path
                 done:=TRUE;
-                !current_state := "None";
+                current_state := "None";
             ENDIF
                                                     !if asked to cancel
             IF current_state = "cancel" THEN
-                cancelled:=TRUE;                    !the cancelled bool iss et to TRUE to activate the cancel trigger
-                ClearPath;                         
+                cancelled:=1;                    !the cancelled bool iss et to TRUE to activate the cancel trigger
+                !ClearPath;                         
                 !StartMove;
                 done:=TRUE;
-                !current_state := "None";
+                current_state := "None";
             ENDIF
                                                     !if asked to shutdown
             IF current_state = "shutdown" THEN
@@ -648,6 +653,48 @@
     PROC conDirHome()
         SetDO DO10_4, 0;
     ENDPROC
+    
+    PROC deletePauseTrap()
+        IDelete pauseTrigger;
+    ENDPROC
+    
+    PROC deleteCancelTrap()
+        IDelete cancelTrigger;
+    ENDPROC
+    
+    PROC addPauseTrap()
+        CONNECT pauseTrigger WITH pauseRoutine;
+        IPers paused, pauseTrigger;
+    ENDPROC
+    
+    PROC addCancelTrap()
+        CONNECT cancelTrigger WITH cancelRoutine;
+        IPers cancelled, cancelTrigger;
+    ENDPROC
+        
+    TRAP pauseRoutine               !the pause interrupt is called for pausing
+        IF paused =1 THEN            !if the robot is set to the paused state
+            !StopMove;                   !robot still first stop moving in the current path
+            StorePath;                  !the current path is stored for resuming later
+        ELSE                        !the pause interrupt is called for resuming
+            RestoPath;                  !robot restores the path stored earlier      
+            !StartMove;                  !robot will move along the restored path
+        ENDIF
+        current_state := "None";
+        checkCom := FALSE;
+    ENDTRAP
+   ! 
+    TRAP cancelRoutine              !the cancel interrupt is called for cancelling
+        IF cancelled = 1 THEN         !if the robot is set to cancelled state
+            !StopMove;                   !robot still stop moving in the current path
+            ClearPath;                  !robot will delete the current path so that it cannot be restored
+            StartMove;       
+        ENDIF
+        current_state := "None";
+        checkCom := FALSE;
+        ExitCycle;
+        !cancelled := 0;
+    ENDTRAP
     
 
     !TRAP pauseRoutine               !the pause interrupt is called for pausing

@@ -20,7 +20,10 @@
     PERS num errorNumber;              !number that stores the error value received
     PERS string numTotal{7};           !array that stores the numeric section of the message received from MATLAB
     PERS string modeSpeed;             !string that stores the speed needed for jog functions
-   
+    VAR intnum pauseTrigger;
+    VAR intnum cancelTrigger;
+    PERS num paused:= 0;                 !pause flag
+    PERS num cancelled := 0; 
     
     
     PROC Main ()
@@ -54,6 +57,10 @@
             getIO;                          !get the IO status of conveyor, vacuum pump and vacuum solenoid
             getError;                       !get the status returned from the error IO signals
             !WaitTime 1;
+            deletePauseTrap;
+            deleteCancelTrap;
+            addPauseTrap;
+            addCancelTrap;
             
 !            ! Receive a string from the client.           
 !                WHILE received_str = "" DO
@@ -66,6 +73,11 @@
 
             SocketReceive client_socket \Str:=received_str \Time:=WAIT_MAX;
 
+            IF cancelled = 1 THEN
+                StartMove;
+                cancelled:= 0;
+            ENDIF
+            
             !for testing, needed later for string separation
             stringLength := strLen(received_str);               !the length of the message received is stored in stringLength
             index := 1;                                         !current index is initialized as 1
@@ -391,7 +403,7 @@
             received_str<>"enableConveyorOn" AND received_str<>"enableConveyorOff" AND 
             received_str<>"conveyorReverseOn" AND received_str<>"conveyorReverseOff" AND
             received_str<>"moveToPose" AND received_str<>"moveAngle" AND 
-            received_strSeg<>"movejas" AND received_strSeg <> "moveert" AND received_strSeg <> "moveerc" AND received_strSeg <> "moveerb" AND
+            received_strSeg<>"movejas" AND received_strSeg <> "moveert" AND received_strSeg <> "moveerc" AND received_strSeg <> "moveeerb" AND
             received_str<>"" AND received_str<>"pause" AND received_str<>"resume" AND 
             received_str<>"cancel" AND received_str<>"quit" THEN    !if mesage received is none of the above
                 SocketSend client_socket \Str:=("unknown comand" + "\0A"); 
@@ -401,14 +413,16 @@
                
             IF received_str = "pause" THEN     !if asked to pause
                 SocketSend client_socket \Str:=("paused" + "\0A");
+                paused := 1;
                 current_state := "paused";
-                StopMove;
+                !StopMove;
                 !StorePath;
                 checkCom := TRUE;
             ENDIF
         
             IF received_str = "resume" THEN     !if asked to resume
                 SocketSend client_socket \Str:=("resume" + "\0A");
+                paused := 0;
                 current_state := "resume";
                 !RestoPath;
                 StartMove;
@@ -417,6 +431,7 @@
             
             IF received_str = "cancel" THEN     !if asked to cancel
                 SocketSend client_socket \Str:=("cancel" + "\0A");
+                cancelled := 1;
                 current_state := "cancel";
                 StopMove;
                 ClearPath;
@@ -437,9 +452,9 @@
             ENDIF 
             errorHandling := FALSE;   !reset the errorHandling flag
             
-            WaitUntil done = TRUE;
-            SocketSend client_socket \Str:=("Done" + "\0A");    !display done after movementV1 finished processing
-            done := FALSE;  !reset done flag
+            !WaitUntil done = TRUE;
+            !SocketSend client_socket \Str:=("Done" + "\0A");    !display done after movementV1 finished processing
+            !done := FALSE;  !reset done flag
                       
         ENDWHILE
         !CloseConnection;        !if shutdown is pressed, close the connection
@@ -570,5 +585,45 @@
         ENDFOR
         SocketSend client_socket \Str:=error_string+ "\0A";
     ENDPROC
+    
+    PROC deletePauseTrap()
+        IDelete pauseTrigger;
+    ENDPROC
+    
+    PROC deleteCancelTrap()
+        IDelete cancelTrigger;
+    ENDPROC
+    
+    PROC addPauseTrap()
+        CONNECT pauseTrigger WITH pauseRoutine;
+        IPers paused, pauseTrigger;
+    ENDPROC
+    
+    PROC addCancelTrap()
+        CONNECT cancelTrigger WITH cancelRoutine;
+        IPers cancelled, cancelTrigger;
+    ENDPROC
+    
+    TRAP pauseRoutine               !the pause interrupt is called for pausing
+        IF paused =1 THEN            !if the robot is set to the paused state
+            StopMove;                   !robot still first stop moving in the current path
+            !StorePath;                  !the current path is stored for resuming later
+        ELSE                        !the pause interrupt is called for resuming
+            !RestoPath;                  !robot restores the path stored earlier      
+            StartMove;                  !robot will move along the restored path
+        ENDIF
+        !current_state := "None";
+        !checkCom := FALSE;
+    ENDTRAP
+   
+    TRAP cancelRoutine              !the cancel interrupt is called for cancelling
+        IF cancelled = 1 THEN         !if the robot is set to cancelled state
+            StopMove;                   !robot still stop moving in the current path
+            !ClearPath;                  !robot will delete the current path so that it cannot be restored
+        ENDIF
+        !current_state := "None";
+        !checkCom := FALSE;
+        !cancelled := 0;
+    ENDTRAP
 
 ENDMODULE

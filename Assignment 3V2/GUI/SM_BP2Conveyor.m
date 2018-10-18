@@ -57,8 +57,5 @@ function SM_BP2Conveyor(X1, Y1, X2, Y2)
     commandStr = sprintf('vacuumPumpOff');
     queue.add(commandStr);
     
-    %move to calib
-    commandStr = sprintf('movejas %.3f %.3f %.3f %.3f %.3f %.3f %s',-90,0,0,0,0,0,fast);
-    queue.add(commandStr);   
 
 end
