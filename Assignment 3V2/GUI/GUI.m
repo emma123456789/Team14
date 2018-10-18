@@ -2885,8 +2885,10 @@ function RotateBlockBlockList_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns RotateBlockBlockList contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from RotateBlockBlockList
 	global Rotate_blocklist;
+    global Rotate_index;
     contents = cellstr(get(hObject,'String'));
 	block_list = contents{get(hObject, 'Value')};
+    Rotate_index = find(contents == block_list);
 	list_split = string(strsplit(block_list));
 	x1 = str2double(list_split(1));
 	y1 = str2double(list_split(2));
@@ -2917,8 +2919,10 @@ function BPtoBPBlockList_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns BPtoBPBlockList contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from BPtoBPBlockList
 	global BP2BP_blocklist;
+    global BP2BP_index;
     contents = cellstr(get(hObject,'String'));
 	block_list = contents{get(hObject, 'Value')};
+    BP2BP_index = find(contents == block_list);
 	list_split = string(strsplit(block_list));
 	x1 = str2double(list_split(1));
 	y1 = str2double(list_split(2));
@@ -2948,8 +2952,10 @@ function ConveyortoBPBlockList_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns ConveyortoBPBlockList contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from ConveyortoBPBlockList
 	global conveyor2BP_blocklist;
+    global Conveyor2BP_index;
     contents = cellstr(get(hObject,'String'));
 	block_list = contents{get(hObject, 'Value')};
+    Conveyor2BP_index = find(contents == block_list);
 	list_split = string(strsplit(block_list));
 	x1 = str2double(list_split(1));
 	y1 = str2double(list_split(2));
@@ -3038,8 +3044,10 @@ function BPtoConveyorBlockList_Callback(hObject, eventdata, handles)
 
     %set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
 	global BP2Conveyor_blocklist;
+    global BP2Conveyor_index;
     contents = cellstr(get(hObject,'String'));
 	block_list = contents{get(hObject, 'Value')};
+    BP2Conveyor_index = find(contents == block_list);
 	list_split = string(strsplit(block_list));
 	x1 = str2double(list_split(1));
 	y1 = str2double(list_split(2));

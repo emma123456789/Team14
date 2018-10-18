@@ -3,10 +3,10 @@
 
 function rotateBlock_updateBlocklist(x1,y1)
     % changing the BP INFO
-    global tableIndexSelected;
+    global Rotate_index;
     global tableBlockData;
     %global tableBlockData;
-    stringSplit = strsplit(tableBlockData(tableIndexSelected)); 
+    stringSplit = strsplit(tableBlockData(Rotate_index)); 
     
     % adding new BP: x y theta type BP
     delimiters = [" "," "," "," "];

@@ -3,10 +3,10 @@
 
 function BP2BP_updateBlocklist(conveyor2BP_number,conveyor2BP_letter, x2, y2)
     % changing the BP INFO
-    global tableIndexSelected;
+    global BP2BP_index;
     global tableBlockData;
     %global tableBlockData;
-    stringSplit = strsplit(tableBlockData(tableIndexSelected)); 
+    stringSplit = strsplit(tableBlockData(BP2BP_index)); 
     
     % adding new BP: x y theta type BP
     delimiters = [" "," "," "," ",""];
