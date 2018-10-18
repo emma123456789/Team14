@@ -2888,7 +2888,7 @@ function RotateBlockBlockList_Callback(hObject, eventdata, handles)
     global Rotate_index;
     contents = cellstr(get(hObject,'String'));
 	block_list = contents{get(hObject, 'Value')};
-    Rotate_index = find(contents == block_list);
+    Rotate_index = get(hObject, 'Value');
 	list_split = string(strsplit(block_list));
 	x1 = str2double(list_split(1));
 	y1 = str2double(list_split(2));
@@ -2922,7 +2922,7 @@ function BPtoBPBlockList_Callback(hObject, eventdata, handles)
     global BP2BP_index;
     contents = cellstr(get(hObject,'String'));
 	block_list = contents{get(hObject, 'Value')};
-    BP2BP_index = find(contents == block_list);
+    BP2BP_index = get(hObject, 'Value');
 	list_split = string(strsplit(block_list));
 	x1 = str2double(list_split(1));
 	y1 = str2double(list_split(2));
@@ -2955,7 +2955,7 @@ function ConveyortoBPBlockList_Callback(hObject, eventdata, handles)
     global Conveyor2BP_index;
     contents = cellstr(get(hObject,'String'));
 	block_list = contents{get(hObject, 'Value')};
-    Conveyor2BP_index = find(contents == block_list);
+    Conveyor2BP_index = get(hObject, 'Value');
 	list_split = string(strsplit(block_list));
 	x1 = str2double(list_split(1));
 	y1 = str2double(list_split(2));
@@ -3047,7 +3047,7 @@ function BPtoConveyorBlockList_Callback(hObject, eventdata, handles)
     global BP2Conveyor_index;
     contents = cellstr(get(hObject,'String'));
 	block_list = contents{get(hObject, 'Value')};
-    BP2Conveyor_index = find(contents == block_list);
+    BP2Conveyor_index = get(hObject, 'Value');
 	list_split = string(strsplit(block_list));
 	x1 = str2double(list_split(1));
 	y1 = str2double(list_split(2));
