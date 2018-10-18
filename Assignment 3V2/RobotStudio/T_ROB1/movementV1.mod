@@ -6,6 +6,7 @@
    
     VAR num jog_inc:=30;                    !increment for linear jogging
     VAR num jog_inc_deg:= 5;                !increment for axis jogging
+    VAR num conveyerT:=10;
     PERS string current_state := "";        !Current state for the main loop conditional statements, set in T_COM1
     PERS bool quit := FALSE;                 !quit flag
     PERS bool done := FALSE;                !command finished flag
@@ -88,10 +89,29 @@
                 done:=TRUE;
                 !current_state := "None";
             ENDIF
- 
-        
-        !IF current_state <> "cancel" THEN
-                                                    !if asked to move to a target relative to conveyer home
+			
+			IF current_state = "insert_box" THEN    
+                conDirRob;
+                conRunOn;
+                WaitTime(conveyerT);
+                conRunOff;
+                conDirHome;
+				
+                done:= TRUE;                          !the flag for action done is set as TRUE
+                current_state := "None";              !the current state is reset after the motion is finished
+            ENDIF
+			
+			IF current_state = "reload_box" THEN       
+                conDirHome;
+                conRunOn;
+                WaitTime(conveyerT);
+                conRunOff;
+                conDirRob;
+                done:= TRUE;                          !the flag for action done is set as TRUE
+                current_state := "None";              !the current state is reset after the motion is finished
+            ENDIF
+			
+                                        !if asked to move to a target relative to conveyer home
             IF current_state = "moveerc" THEN       
                 wobjCurrent := wConveyer;             !set current work object to conveyer
                 move_speed :=getSpeed(modeSpeed);     !convert speed argument string to speeddata

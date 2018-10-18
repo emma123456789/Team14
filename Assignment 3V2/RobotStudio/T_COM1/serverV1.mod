@@ -92,6 +92,16 @@
             
             stringFound := FALSE;  
             
+            IF received_strSeg = "insert_box" THEN         !if asked to move to a target relative to table home
+                current_state := "insert_box";
+                checkCom := TRUE;  
+            ENDIF 
+            
+            IF received_strSeg = "reload_box" THEN         !if asked to move conveyer back to home
+                current_state := "reload_box";
+                checkCom := TRUE;  
+                
+            ENDIF 
             IF received_strSeg = "moveert" THEN         !if asked to move to a target relative to table home
                 WHILE numIndex <= 6 DO                      !stores the 6 values (xyz+euler angles) for move function
                 numStart := strFind(received_str,index,STR_WHITE);      
@@ -397,6 +407,7 @@
             received_strSeg<>"jogQ4posSTART" AND received_strSeg<>"jogQ4negSTART" AND
             received_strSeg<>"jogQ5posSTART" AND received_strSeg<>"jogQ5negSTART" AND
             received_strSeg<>"jogQ6posSTART" AND received_strSeg<>"jogQ6negSTART" AND
+            received_strSeg<>"reload_box" AND received_strSeg<>"insert_box" AND
             received_str<>"vacuumPumpOn" AND received_str<>"vacuumPumpOff" AND
             received_str<>"vacuumSolenoidOn" AND received_str<>"vacuumSolenoidOff" AND
             received_str<>"conveyorRunOn" AND received_str<>"conveyorRunOff" AND 
