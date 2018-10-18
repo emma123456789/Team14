@@ -2816,6 +2816,8 @@ function reloadBoxButton_Callback(hObject, eventdata, handles)
 % hObject    handle to reloadBoxButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    commandStr = sprintf('reload_box');
+    queue.add(commandStr);
 end
 
 % --- Executes on button press in insertBoxButton.
@@ -2823,6 +2825,8 @@ function insertBoxButton_Callback(hObject, eventdata, handles)
 % hObject    handle to insertBoxButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    commandStr = sprintf('insert_box');
+    queue.add(commandStr);
 end
 
 
