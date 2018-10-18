@@ -2892,7 +2892,7 @@ function BPtoConveyorButton1_Callback(hObject, eventdata, handles)
     x2 = 0;
     y2 = 409;
 	SM_BP2Conveyor(x1,y1,x2,y2);
-    BP2Conveyor_updateBlocklist(x2, xy);
+    BP2Conveyor_updateBlocklist(x2, y2);
     
         % updating info to all lists  
     set(handles.TableBlocksListbox, 'String', tableBlockData);
