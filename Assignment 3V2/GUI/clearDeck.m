@@ -13,6 +13,7 @@ function clearDeckFcn(x1List, y1List, x2List, y2List)
             % shift the location by a block's size 
                 %repeat until the desired location is not occupied, then DO
         SM_BP2Conveyor(x1List(listCounter),y1List(listCounter),x2List(listCounter),y2List(listCounter));
+        BP2Conveyor_updateBlocklist(x2,y2);
     end
 end
 

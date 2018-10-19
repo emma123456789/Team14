@@ -1,13 +1,13 @@
     MODULE ROB_MAIN
     
     VAR num effectorHeight:= 147;! The height of the table
-    PERS robtarget target := [[229, -144, 20],[4.37114E-8,0,-1,0],[0,0,0,0],[0,0,0,0,0,0]];! test target initialised to touch the table home
+    PERS robtarget target := [[373, -230, 177],[4.37114E-08,0,-1,0],[0,0,0,0],[0,0,0,0,0,0]];! test target initialised to touch the table home
     PERS robjoint joints:= [-90, 0, 0, 0, 0, 0]; !test pose initialised to calib position
    
     VAR num jog_inc:=30;                    !increment for linear jogging
     VAR num jog_inc_deg:= 5;                !increment for axis jogging
     VAR num conveyerT:=10;
-    PERS string current_state := "";        !Current state for the main loop conditional statements, set in T_COM1
+    PERS string current_state := "None";        !Current state for the main loop conditional statements, set in T_COM1
     PERS bool quit := FALSE;                 !quit flag
     PERS bool done := FALSE;                !command finished flag
     PERS bool checkCom := FALSE;            !COM checked flag

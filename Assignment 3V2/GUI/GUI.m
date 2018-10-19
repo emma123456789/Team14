@@ -73,7 +73,7 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     global vid;
     global vid2;
     global MODE;% simulation or real? make sure anything that requires hardware to be connected checks if the mode is imulation first.
-    MODE = 's';
+    MODE = 'r';
 
      % Update handles structure
     guidata(hObject, handles);
@@ -144,12 +144,15 @@ end
 	global command_flag;
     global done_flag;
 	global status_queue;
+    global queue;
+    
     % Send pause/resume/cancel/shutdown instantly when they are pressed
 	if (status_queue.size()>0)
 		send_priorityString();
 	% Otherwise send the command string when the flag is on	
-	elseif (command_flag == 1 && done_flag == 1)
+	elseif (command_flag == 1 && done_flag == 1 && queue.size()>0)
         send_string();
+        done_flag = 0;
  	end
     
  end
@@ -195,7 +198,8 @@ end
 	global queue;
 	global socket;
 	global g_handles;
-    global command_flag done_flag;
+    global command_flag;
+    global done_flag;
     
     % Check if there is anything in the command queue
     if queue.size()>0
@@ -204,8 +208,8 @@ end
         
         % Try to write to the socket
         try
+            
 			fwrite(socket,commandStr);
-            done_flag = 0;
 			% Update Sent Message Log
 			sentList = [{commandStr}; g_handles.SentMessages.String];
 			set(g_handles.SentMessages, 'String', sentList);
@@ -2816,6 +2820,8 @@ function reloadBoxButton_Callback(hObject, eventdata, handles)
 % hObject    handle to reloadBoxButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    global queue;
+    
     commandStr = sprintf('reload_box');
     queue.add(commandStr);
 end
@@ -2825,6 +2831,8 @@ function insertBoxButton_Callback(hObject, eventdata, handles)
 % hObject    handle to insertBoxButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    global queue;
+    
     commandStr = sprintf('insert_box');
     queue.add(commandStr);
 end
@@ -2870,7 +2878,7 @@ function RotateBlockButton1_Callback(hObject, eventdata, handles)
     y1 = Rotate_blocklist(2);
     rot = Rotate_blocklist(3);
     
-    SM_RotateBlock(x1,y1);
+    SM_RotateBlock(x1,y1,rot);
     rotateBlock_updateBlocklist(x1,y1);
     
     % updating info to all lists  

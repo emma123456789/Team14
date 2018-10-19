@@ -3,11 +3,11 @@
     ! The socket connected to the client.
     VAR socketdev client_socket;
     ! The host and port that we will be listening for a connection on.
-    PERS string current_state := "moveert";   !current state of the robot which is initialised as an empty string
+    PERS string current_state := "None";   !current state of the robot which is initialised as an empty string
     CONST num port := 1025;            !the port used for connection between RobotStudio and MATLAB
-    PERS string host := "127.0.0.1";
-    PERS bool quit;                    !the quit flag                 
-    PERS bool checkCom := TRUE;       !flag to jump to the movement file to decide its next move
+    PERS string host := "192.168.125.1";
+    PERS bool quit;                   !the quit flag                 
+    PERS bool checkCom := FALSE;       !flag to jump to the movement file to decide its next move
     PERS bool done := FALSE;           !flag that indicates action is done
     VAR num stringLength;              !number that returns the total length of the message received from MATLAB
     VAR num stringStart;               !number that stores the index of the first character
@@ -29,6 +29,7 @@
     PROC Main ()
         !this is just for testing        
         !current_state := "";
+        quit:= FALSE;
         IF RobOS() THEN
             host := "192.168.125.1";   !IP of the real robot
         ELSE
@@ -414,7 +415,7 @@
             received_str<>"enableConveyorOn" AND received_str<>"enableConveyorOff" AND 
             received_str<>"conveyorReverseOn" AND received_str<>"conveyorReverseOff" AND
             received_str<>"moveToPose" AND received_str<>"moveAngle" AND 
-            received_strSeg<>"movejas" AND received_strSeg <> "moveert" AND received_strSeg <> "moveerc" AND received_strSeg <> "moveeerb" AND
+            received_strSeg<>"movejas" AND received_strSeg <> "moveert" AND received_strSeg <> "moveerc" AND received_strSeg <> "moveerb" AND
             received_str<>"" AND received_str<>"pause" AND received_str<>"resume" AND 
             received_str<>"cancel" AND received_str<>"quit" THEN    !if mesage received is none of the above
                 SocketSend client_socket \Str:=("unknown comand" + "\0A"); 
@@ -463,9 +464,9 @@
             ENDIF 
             errorHandling := FALSE;   !reset the errorHandling flag
             
-            !WaitUntil done = TRUE;
-            !SocketSend client_socket \Str:=("Done" + "\0A");    !display done after movementV1 finished processing
-            !done := FALSE;  !reset done flag
+            WaitUntil done = TRUE;
+            SocketSend client_socket \Str:=("Done" + "\0A");    !display done after movementV1 finished processing
+            done := FALSE;  !reset done flag
                       
         ENDWHILE
         !CloseConnection;        !if shutdown is pressed, close the connection

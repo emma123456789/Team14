@@ -23,6 +23,10 @@ function [x_coordinate,y_coordinate] = gameboardConversion(x,y)
 			y_coordinate = half_block_length*6;
 		case 'I'
 			y_coordinate = half_block_length*8;
+        case 'P'
+            y_coordinate = -half_block_length*10-50;
+        case 'Q'
+            y_coordinate = half_block_length*10+50;
 	end
 		
 

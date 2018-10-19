@@ -7,8 +7,8 @@ function SM_BP2Conveyor(X1, Y1, X2, Y2)
     slow = 'v50';
     table_height = 147;
     conveyor_height = 22;
-    block_height = 8;
-    move_height = table_height + block_height * 2.5;
+    block_height = 5;
+    move_height = table_height + block_height * 6;
     grip_height = table_height + block_height;
     conveyor_grip_height = conveyor_height + block_height;
     

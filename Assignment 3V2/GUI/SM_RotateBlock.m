@@ -6,8 +6,8 @@ function SM_RotateBlock(X1, Y1, rot)
     regular = 'v100';
     slow = 'v50';
     table_height = 147;
-    block_height = 8;
-    move_height = table_height + block_height * 2.5;
+    block_height = 5;
+    move_height = table_height + block_height * 6;
     grip_height = table_height + block_height;
     
     
@@ -37,6 +37,10 @@ function SM_RotateBlock(X1, Y1, rot)
     
     %rotate block by rot
     commandStr = sprintf('moveerb %.3f %.3f %.3f %.3f %.3f %.3f %s', X1,Y1,move_height,rot,180,0,fast);
+    queue.add(commandStr);
+    
+    %rotate block by rot
+    commandStr = sprintf('moveerb %.3f %.3f %.3f %.3f %.3f %.3f %s', X1,Y1,grip_height,rot,180,0,fast);
     queue.add(commandStr);
    
     %turn off solenoid
