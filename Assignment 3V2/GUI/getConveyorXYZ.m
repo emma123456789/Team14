@@ -4,7 +4,7 @@ function [eeX, eeY, eeZ] = getConveyorXYZ(hObject,eventdata,handles)
     if (get(hObject,'Value') == 1)
         %add in screenshot function
         [R, T] = extrinsics(convImagePoints.imagePoints, convWorldPoints.worldPoints, convParam.ConvCameraParams);
-        [x, y] = getpts(handles.axes2); %change to respective axes
+        [x, y] = getpts(handles.vid2); %change to respective axes
         x = round(x);
         y = round(y);
 

@@ -1,8 +1,15 @@
 function [eeX, eeY, eeZ] = getTableXYZ(hObject,eventdata,handles)
     global tableParam tableImagePoints tableWorldPoints
+    global vid
 
     if (get(hObject,'Value') == 1)
         %add in screenshot function 
+        im = getsnapshot(vid);
+        axes(handles.TableCamera);
+        figure(1);
+        imshow(im);
+        close(figure(1));
+        
         [R, T] = extrinsics(tableImagePoints.tImagePoints, tableWorldPoints.tWorldPoints, tableParam.tableCameraParams);
         [x, y] = getpts(handles.axes1); % need to change to respective axes
         x = round(x);
