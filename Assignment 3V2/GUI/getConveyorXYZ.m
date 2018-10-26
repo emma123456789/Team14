@@ -10,7 +10,11 @@ function [eeX, eeY, eeZ] = getConveyorXYZ(hObject,eventdata,handles)
         imshow(im);
         close(figure(1));
         [R, T] = extrinsics(convImagePoints.imagePoints, convWorldPoints.worldPoints, convParam.ConvCameraParams);
+<<<<<<< HEAD
         [x, y] = getpts(handles.ConveyorCamera); %change to respective axes
+=======
+        [x, y] = getpts(handles.vid2); %change to respective axes
+>>>>>>> 4a96d73ee6c92113686a1eaa9f7a409cf49c3754
         x = round(x);
         y = round(y);
 
