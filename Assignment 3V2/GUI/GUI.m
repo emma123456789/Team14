@@ -22,7 +22,7 @@ function varargout = GUI(varargin)
 %
     % See also: GUIDE, GUIDATA, GUIHANDLES
      % Edit the above text to modify the response to help GUI
-     % Last Modified by GUIDE v2.5 15-Oct-2018 14:58:25
+     % Last Modified by GUIDE v2.5 27-Oct-2018 23:58:03
      % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
     gui_State = struct('gui_Name',       mfilename, ...
@@ -78,6 +78,14 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     global MODE;% simulation or real? make sure anything that requires hardware to be connected checks if the mode is imulation first.
     MODE = 'r';
 
+    % Choose default command line output for tictactoe
+    handles.plr=1;
+    handles.box=[0 0 0;0 0 0;0 0 0];
+    set(handles.currentPlayer, 'String','Next: Player 1');
+    handles.counter=1;
+    global record;
+    record = cell.empty();
+    
      % Update handles structure
     guidata(hObject, handles);
     
@@ -4094,67 +4102,607 @@ function pushbutton108_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
 end
 
-% --- Executes on button press in button1.
-function button1_Callback(hObject, eventdata, handles)
-% hObject    handle to button1 (see GCBO)
+% --- Executes on button press in ttt1.
+function ttt1_Callback(hObject, eventdata, handles)
+% hObject    handle to ttt1 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+    % Initialisation
+    winner=0;
+    global tableBlockData;
+    global record;
+    %update currentplayer mark depending on whose turn
+    if handles.plr==1
+        plrmark='X';
+        number = (handles.counter+1)/2;
+        letter = 'P';
+    elseif handles.plr==2
+        plrmark='O';
+        number = handles.counter/2;
+        letter = 'Q';
+    end
+
+    %if not already marked
+    if handles.box(1,1)==0
+       set(hObject,'String',plrmark);
+       handles.box(1,1)=handles.plr;
+       [x1,y1] = gameboardConversion(number,letter);
+       [x2,y2] = gameboardConversion(4,'D');
+       
+       rec = sprintf('%.0f %.0f 4 D %.0f %.0f %.0f %c',x2,y2,x1,y1,number,letter);
+       record{handles.counter} = {rec};   
+        
+       SM_BP2BP(x1,y1,x2,y2);
+       findTableBlockIndex(letter,number);
+       BP2BP_updateBlocklist(4,'D', x2, y2);
+       
+       %update currentplayer value
+       winner=whowins(handles.plr,handles.box);
+       if handles.plr==1
+           set(handles.currentPlayer, 'String','Next: Player 2');
+           handles.plr=2;
+       else
+           set(handles.currentPlayer, 'String','Next: Player 1');
+           handles.plr=1;
+       end
+    end
+    %when nobody wins winner=0 other wise close program with results
+    if winner~=0
+        if winner==1
+            msgbox('Player 1 Wins');
+        elseif winner==2
+            msgbox('Player 2 Wins');
+        elseif winner==-1
+            msgbox('Its a Draw');
+        end
+        TicTacToeEndGame_Callback(hObject, eventdata, handles);
+    end
+    handles.counter = handles.counter+1;
+    
+    % updating info to all lists  
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    
+    guidata(hObject,handles);
 end
 
-% --- Executes on button press in button4.
-function button4_Callback(hObject, eventdata, handles)
-% hObject    handle to button4 (see GCBO)
+% --- Executes on button press in ttt4.
+function ttt4_Callback(hObject, eventdata, handles)
+% hObject    handle to ttt4 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+    % Initialisation
+    winner=0;
+    global tableBlockData;
+    global record;
+    %update currentplayer mark depending on whose turn
+    if handles.plr==1
+        plrmark='X';
+        number = (handles.counter+1)/2;
+        letter = 'P';
+    elseif handles.plr==2
+        plrmark='O';
+        number = handles.counter/2;
+        letter = 'Q';
+    end
+    
+    %if not already marked
+    if handles.box(2,1)==0
+       set(hObject,'String',plrmark);
+       handles.box(2,1)=handles.plr;
+       [x1,y1] = gameboardConversion(number,letter);
+       [x2,y2] = gameboardConversion(5,'D');
+        
+       rec = sprintf('%.0f %.0f 5 D %.0f %.0f %.0f %c',x2,y2,x1,y1,number,letter);
+       record{handles.counter} = {rec};
+        
+       SM_BP2BP(x1,y1,x2,y2);
+       findTableBlockIndex(letter,number);
+       BP2BP_updateBlocklist(5,'D', x2, y2);
+       
+       %update currentplayer value
+       winner=whowins(handles.plr,handles.box);
+       if handles.plr==1
+           set(handles.currentPlayer, 'String','Next: Player 2');
+           handles.plr=2;
+       else
+           set(handles.currentPlayer, 'String','Next: Player 1');
+           handles.plr=1;
+       end
+    end
+    %when nobody wins winner=0 other wise close program with results
+    if winner~=0
+        if winner==1
+            msgbox('Player 1 Wins');
+        elseif winner==2
+            msgbox('Player 2 Wins');
+        elseif winner==-1
+            msgbox('Its a Draw');
+        end
+        TicTacToeEndGame_Callback(hObject, eventdata, handles);
+    end
+    handles.counter = handles.counter+1;
+    
+    % updating info to all lists  
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    
+    guidata(hObject,handles);
 end
 
-% --- Executes on button press in button7.
-function button7_Callback(hObject, eventdata, handles)
-% hObject    handle to button7 (see GCBO)
+% --- Executes on button press in ttt7.
+function ttt7_Callback(hObject, eventdata, handles)
+% hObject    handle to ttt7 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+    % Initialisation
+    winner=0;
+    global tableBlockData;
+    global record;
+    %update currentplayer mark depending on whose turn
+    if handles.plr==1
+        plrmark='X';
+        number = (handles.counter+1)/2;
+        letter = 'P';
+    elseif handles.plr==2
+        plrmark='O';
+        number = handles.counter/2;
+        letter = 'Q';
+    end
+    
+    %if not already marked
+    if handles.box(3,1)==0
+       set(hObject,'String',plrmark)
+       handles.box(3,1)=handles.plr;
+       [x1,y1] = gameboardConversion(number,letter);
+       [x2,y2] = gameboardConversion(6,'D');
+      
+       rec = sprintf('%.0f %.0f 6 D %.0f %.0f %.0f %c',x2,y2,x1,y1,number,letter);
+       record{handles.counter} = {rec};      
+       
+       SM_BP2BP(x1,y1,x2,y2);
+       findTableBlockIndex(letter,number);
+       BP2BP_updateBlocklist(6,'D', x2, y2);
+       
+       %update currentplayer value
+       winner=whowins(handles.plr,handles.box);
+       if handles.plr==1
+           set(handles.currentPlayer, 'String','Next: Player 2');
+           handles.plr=2;
+       else
+           set(handles.currentPlayer, 'String','Next: Player 1');
+           handles.plr=1;
+       end
+    end
+    %when nobody wins winner=0 other wise close program with results
+    if winner~=0
+        if winner==1
+            msgbox('Player 1 Wins');
+        elseif winner==2
+            msgbox('Player 2 Wins');
+        elseif winner==-1
+            msgbox('Its a Draw');
+        end
+        TicTacToeEndGame_Callback(hObject, eventdata, handles);
+    end
+    handles.counter = handles.counter+1;
+    
+    % updating info to all lists  
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    
+    guidata(hObject,handles);
 end
 
-% --- Executes on button press in button8.
-function button8_Callback(hObject, eventdata, handles)
-% hObject    handle to button8 (see GCBO)
+% --- Executes on button press in ttt8.
+function ttt8_Callback(hObject, eventdata, handles)
+% hObject    handle to ttt8 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+    % Initialisation
+    winner=0;
+    global tableBlockData;
+    global record;
+    %update currentplayer mark depending on whose turn
+    if handles.plr==1
+        plrmark='X';
+        number = (handles.counter+1)/2;
+        letter = 'P';
+    elseif handles.plr==2
+        plrmark='O';
+        number = handles.counter/2;
+        letter = 'Q';
+    end
+    
+    %if not already marked
+    if handles.box(3,2)==0
+       set(hObject,'String',plrmark)
+       handles.box(3,2)=handles.plr;
+       [x1,y1] = gameboardConversion(number,letter);
+       [x2,y2] = gameboardConversion(6,'E');
+       
+       rec = sprintf('%.0f %.0f 6 E %.0f %.0f %.0f %c',x2,y2,x1,y1,number,letter);
+       record{handles.counter} = {rec};       
+       
+       SM_BP2BP(x1,y1,x2,y2);
+       findTableBlockIndex(letter,number);
+       BP2BP_updateBlocklist(6,'E', x2, y2);
+       
+       %update currentplayer value
+       winner=whowins(handles.plr,handles.box);
+       if handles.plr==1
+           set(handles.currentPlayer, 'String','Next: Player 2');
+           handles.plr=2;
+       else
+           set(handles.currentPlayer, 'String','Next: Player 1');
+           handles.plr=1;
+       end
+    end
+    %when nobody wins winner=0 other wise close program with results
+    if winner~=0
+        if winner==1
+            msgbox('Player 1 Wins');
+        elseif winner==2
+            msgbox('Player 2 Wins');
+        elseif winner==-1
+            msgbox('Its a Draw');
+        end
+        TicTacToeEndGame_Callback(hObject, eventdata, handles);
+    end
+    handles.counter = handles.counter+1;
+    
+    % updating info to all lists  
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    
+    guidata(hObject,handles);
 end
 
-% --- Executes on button press in button5.
-function button5_Callback(hObject, eventdata, handles)
-% hObject    handle to button5 (see GCBO)
+% --- Executes on button press in ttt5.
+function ttt5_Callback(hObject, eventdata, handles)
+% hObject    handle to ttt5 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+    % Initialisation
+    winner=0;
+    global tableBlockData;
+    global record;
+    %update currentplayer mark depending on whose turn
+    if handles.plr==1
+        plrmark='X';
+        number = (handles.counter+1)/2;
+        letter = 'P';
+    elseif handles.plr==2
+        plrmark='O';
+        number = handles.counter/2;
+        letter = 'Q';
+    end
+    
+    %if not already marked
+    if handles.box(2,2)==0
+       set(hObject,'String',plrmark)
+       handles.box(2,2)=handles.plr;
+       [x1,y1] = gameboardConversion(number,letter);
+       [x2,y2] = gameboardConversion(5,'E');
+       
+       rec = sprintf('%.0f %.0f 5 E %.0f %.0f %.0f %c',x2,y2,x1,y1,number,letter);
+       record{handles.counter} = {rec};      
+       
+       SM_BP2BP(x1,y1,x2,y2);
+       findTableBlockIndex(letter,number);
+       BP2BP_updateBlocklist(5,'E', x2, y2);
+       
+       %update currentplayer value
+       winner=whowins(handles.plr,handles.box);
+       if handles.plr==1
+           set(handles.currentPlayer, 'String','Next: Player 2');
+           handles.plr=2;
+       else
+           set(handles.currentPlayer, 'String','Next: Player 1');
+           handles.plr=1;
+       end
+    end
+    %when nobody wins winner=0 other wise close program with results
+    if winner~=0
+        if winner==1
+            msgbox('Player 1 Wins');
+        elseif winner==2
+            msgbox('Player 2 Wins');
+        elseif winner==-1
+            msgbox('Its a Draw');
+        end
+        TicTacToeEndGame_Callback(hObject, eventdata, handles);
+    end
+    handles.counter = handles.counter+1;
+    
+    % updating info to all lists  
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    
+    guidata(hObject,handles);
 end
 
-% --- Executes on button press in button2.
-function button2_Callback(hObject, eventdata, handles)
-% hObject    handle to button2 (see GCBO)
+% --- Executes on button press in ttt2.
+function ttt2_Callback(hObject, eventdata, handles)
+% hObject    handle to ttt2 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+    % Initialisation
+    winner=0;
+    global tableBlockData;
+    global record;
+    %update currentplayer mark depending on whose turn
+    if handles.plr==1
+        plrmark='X';
+        number = (handles.counter+1)/2;
+        letter = 'P';
+    elseif handles.plr==2
+        plrmark='O';
+        number = handles.counter/2;
+        letter = 'Q';
+    end
+    
+    %if not already marked
+    if handles.box(1,2)==0
+       set(hObject,'String',plrmark)
+       handles.box(1,2)=handles.plr;
+       [x1,y1] = gameboardConversion(number,letter);
+       [x2,y2] = gameboardConversion(4,'E');
+       
+       rec = sprintf('%.0f %.0f 4 E %.0f %.0f %.0f %c',x2,y2,x1,y1,number,letter);
+       record{handles.counter} = {rec};         
+       
+       SM_BP2BP(x1,y1,x2,y2);
+       findTableBlockIndex(letter,number);
+       BP2BP_updateBlocklist(4,'E', x2, y2);
+       
+       %update currentplayer value
+       winner=whowins(handles.plr,handles.box);
+       if handles.plr==1
+           set(handles.currentPlayer, 'String','Next: Player 2');
+           handles.plr=2;
+       else
+           set(handles.currentPlayer, 'String','Next: Player 1');
+           handles.plr=1;
+       end
+    end
+    %when nobody wins winner=0 other wise close program with results
+    if winner~=0
+        if winner==1
+            msgbox('Player 1 Wins');
+        elseif winner==2
+            msgbox('Player 2 Wins');
+        elseif winner==-1
+            msgbox('Its a Draw');
+        end
+        TicTacToeEndGame_Callback(hObject, eventdata, handles);
+    end
+    handles.counter = handles.counter+1;
+    
+    % updating info to all lists  
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    
+    guidata(hObject,handles);
 end
 
-% --- Executes on button press in button9.
-function button9_Callback(hObject, eventdata, handles)
-% hObject    handle to button9 (see GCBO)
+% --- Executes on button press in ttt9.
+function ttt9_Callback(hObject, eventdata, handles)
+% hObject    handle to ttt9 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+    % Initialisation
+    winner=0;
+    global tableBlockData;
+    global record;
+    %update currentplayer mark depending on whose turn
+    if handles.plr==1
+        plrmark='X';
+        number = (handles.counter+1)/2;
+        letter = 'P';
+    elseif handles.plr==2
+        plrmark='O';
+        number = handles.counter/2;
+        letter = 'Q';
+    end
+    
+    %if not already marked
+    if handles.box(3,3)==0
+       set(hObject,'String',plrmark)
+       handles.box(3,3)=handles.plr;
+       [x1,y1] = gameboardConversion(number,letter);
+       [x2,y2] = gameboardConversion(6,'F');
+       
+       rec = sprintf('%.0f %.0f 6 F %.0f %.0f %.0f %c',x2,y2,x1,y1,number,letter);
+       record{handles.counter} = {rec};       
+       
+       SM_BP2BP(x1,y1,x2,y2);
+       findTableBlockIndex(letter,number);
+       BP2BP_updateBlocklist(6,'F', x2, y2);
+       
+       %update currentplayer value
+       winner=whowins(handles.plr,handles.box);
+       if handles.plr==1
+           set(handles.currentPlayer, 'String','Next: Player 2');
+           handles.plr=2;
+       else
+           set(handles.currentPlayer, 'String','Next: Player 1');
+           handles.plr=1;
+       end
+    end
+    %when nobody wins winner=0 other wise close program with results
+    if winner~=0
+        if winner==1
+            msgbox('Player 1 Wins');
+        elseif winner==2
+            msgbox('Player 2 Wins');
+        elseif winner==-1
+            msgbox('Its a Draw');
+        end
+        TicTacToeEndGame_Callback(hObject, eventdata, handles);
+    end
+    handles.counter = handles.counter+1;
+    
+    % updating info to all lists  
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    
+    guidata(hObject,handles);
 end
 
-% --- Executes on button press in button6.
-function button6_Callback(hObject, eventdata, handles)
-% hObject    handle to button6 (see GCBO)
+% --- Executes on button press in ttt6.
+function ttt6_Callback(hObject, eventdata, handles)
+% hObject    handle to ttt6 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+    % Initialisation
+    winner=0;
+    global tableBlockData;
+    global record;
+    %update currentplayer mark depending on whose turn
+    if handles.plr==1
+        plrmark='X';
+        number = (handles.counter+1)/2;
+        letter = 'P';
+    elseif handles.plr==2
+        plrmark='O';
+        number = handles.counter/2;
+        letter = 'Q';
+    end
+    
+    %if not already marked
+    if handles.box(2,3)==0
+       set(hObject,'String',plrmark)
+       handles.box(2,3)=handles.plr;
+       [x1,y1] = gameboardConversion(number,letter);
+       [x2,y2] = gameboardConversion(5,'F');
+       
+       rec = sprintf('%.0f %.0f 5 F %.0f %.0f %.0f %c',x2,y2,x1,y1,number,letter);
+       record{handles.counter} = {rec};        
+       
+       SM_BP2BP(x1,y1,x2,y2);
+       findTableBlockIndex(letter,number);
+       BP2BP_updateBlocklist(5,'F', x2, y2);
+       
+       %update currentplayer value
+       winner=whowins(handles.plr,handles.box);
+       if handles.plr==1
+           set(handles.currentPlayer, 'String','Next: Player 2');
+           handles.plr=2;
+       else
+           set(handles.currentPlayer, 'String','Next: Player 1');
+           handles.plr=1;
+       end
+    end
+    %when nobody wins winner=0 other wise close program with results
+    if winner~=0
+        if winner==1
+            msgbox('Player 1 Wins');
+        elseif winner==2
+            msgbox('Player 2 Wins');
+        elseif winner==-1
+            msgbox('Its a Draw');
+        end
+        TicTacToeEndGame_Callback(hObject, eventdata, handles);
+    end
+    handles.counter = handles.counter+1;
+    
+    % updating info to all lists  
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    
+    guidata(hObject,handles);
 end
 
-% --- Executes on button press in button3.
-function button3_Callback(hObject, eventdata, handles)
-% hObject    handle to button3 (see GCBO)
+% --- Executes on button press in ttt3.
+function ttt3_Callback(hObject, eventdata, handles)
+% hObject    handle to ttt3 (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+
+    % Initialisation
+    winner=0;
+    global tableBlockData;
+    global record;
+    %update currentplayer mark depending on whose turn
+    if handles.plr==1
+        plrmark='X';
+        number = (handles.counter+1)/2;
+        letter = 'P';
+    elseif handles.plr==2
+        plrmark='O';
+        number = handles.counter/2;
+        letter = 'Q';
+    end
+    
+    %if not already marked
+    if handles.box(1,3)==0
+       set(hObject,'String',plrmark)
+       handles.box(1,3)=handles.plr;
+       [x1,y1] = gameboardConversion(number,letter);
+       [x2,y2] = gameboardConversion(4,'F');
+       
+       rec = sprintf('%.0f %.0f 4 F %.0f %.0f %.0f %c',x2,y2,x1,y1,number,letter);
+       record{handles.counter} = {rec};   
+       
+       SM_BP2BP(x1,y1,x2,y2);
+       findTableBlockIndex(letter,number);
+       BP2BP_updateBlocklist(4,'F', x2, y2);
+       
+       %update currentplayer value
+       winner=whowins(handles.plr,handles.box);
+       if handles.plr==1
+           set(handles.currentPlayer, 'String','Next: Player 2');
+           handles.plr=2;
+       else
+           set(handles.currentPlayer, 'String','Next: Player 1');
+           handles.plr=1;
+       end
+    end
+    %when nobody wins winner=0 other wise close program with results
+    if winner~=0
+        if winner==1
+            msgbox('Player 1 Wins');
+        elseif winner==2
+            msgbox('Player 2 Wins');
+        elseif winner==-1
+            msgbox('Its a Draw');
+        end
+        TicTacToeEndGame_Callback(hObject, eventdata, handles);
+    end
+    handles.counter = handles.counter+1;
+    
+    % updating info to all lists  
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    
+    guidata(hObject,handles);
 end
 
 % --- Executes on button press in TicTacToeEndGame.
@@ -4162,6 +4710,58 @@ function TicTacToeEndGame_Callback(hObject, eventdata, handles)
 % hObject    handle to TicTacToeEndGame (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    
+    % Global variable
+    global queue;
+    global record;
+    global tableBlockData;
+
+    % Cancel the movement
+    Cancel_Callback(hObject, eventdata, handles);
+    % Clear the queue
+    queue.clear();
+    
+    % Reset the game
+    handles.box=[0 0 0;0 0 0;0 0 0];
+    handles.plr=1;
+    
+    plrmark=' ';
+    set(handles.ttt1,'String',plrmark);
+    set(handles.ttt2,'String',plrmark);
+    set(handles.ttt3,'String',plrmark);
+    set(handles.ttt4,'String',plrmark);
+    set(handles.ttt5,'String',plrmark);
+    set(handles.ttt6,'String',plrmark);
+    set(handles.ttt7,'String',plrmark);
+    set(handles.ttt8,'String',plrmark);
+    set(handles.ttt9,'String',plrmark);
+    
+    % Move all the blocks back
+    for i = 1:length(record)
+        stringSplit = strsplit(record{1,i}{1,1});
+        x1 = str2double(stringSplit(1));
+        y1 = str2double(stringSplit(2));
+        number1 = str2double(stringSplit(3));
+        letter1 = char(stringSplit(4));
+        x2 = str2double(stringSplit(5));
+        y2 = str2double(stringSplit(6));
+        number2 = str2double(stringSplit(7));
+        letter2 = char(stringSplit(8));
+        
+        SM_BP2BP(x1,y1,x2,y2);
+        findTableBlockIndex(letter1,number1);
+        BP2BP_updateBlocklist(number2,letter2, x2, y2);
+        
+        % updating info to all lists  
+        set(handles.TableBlocksListbox, 'String', tableBlockData);
+        set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+        set(handles.BPtoBPBlockList, 'String', tableBlockData);
+        set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    end
+    
+    handles.counter = 1;
+    record = cell.empty();
+    guidata(hObject,handles);
 end
 
 % --- Executes on button press in TicTacToeResume.
@@ -4169,6 +4769,21 @@ function TicTacToeResume_Callback(hObject, eventdata, handles)
 % hObject    handle to TicTacToeResume (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    Resume_Callback(hObject, eventdata, handles);
+    
+    set(handles.nomove,'Visible','off');
+    
+    set(handles.tttdoNotMove,'BackgroundColor','white');
+    set(handles.tttdoNotMove,'Visible','on');
+    set(handles.ttt1,'Visible','on');
+    set(handles.ttt2,'Visible','on');
+    set(handles.ttt3,'Visible','on');
+    set(handles.ttt4,'Visible','on');
+    set(handles.ttt5,'Visible','on');
+    set(handles.ttt6,'Visible','on');
+    set(handles.ttt7,'Visible','on');
+    set(handles.ttt8,'Visible','on');
+    set(handles.ttt9,'Visible','on');
 end
 
 % --- Executes on button press in TicTacToePause.
@@ -4176,6 +4791,25 @@ function TicTacToePause_Callback(hObject, eventdata, handles)
 % hObject    handle to TicTacToePause (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    Pause_Callback(hObject, eventdata, handles);
+    
+    filename = 'i-will-not-move.jpg';
+    theImage = imread(filename);
+    axes(handles.nomove); % Use actual variable names from your program!
+    imshow(theImage);
+    
+    
+    set(handles.tttdoNotMove,'BackgroundColor','red');
+    set(handles.tttdoNotMove,'Visible','off');
+    set(handles.ttt1,'Visible','off');
+    set(handles.ttt2,'Visible','off');
+    set(handles.ttt3,'Visible','off');
+    set(handles.ttt4,'Visible','off');
+    set(handles.ttt5,'Visible','off');
+    set(handles.ttt6,'Visible','off');
+    set(handles.ttt7,'Visible','off');
+    set(handles.ttt8,'Visible','off');
+    set(handles.ttt9,'Visible','off');
 end
 
 % --- Executes on button press in Player2AIMove.
@@ -4338,12 +4972,18 @@ function ControlOrActivitiesPopup_Callback(hObject, eventdata, handles)
     contents = cellstr(get(hObject,'String'));
     PopupValue = contents{get(hObject,'Value')};
 
-    if (strcmp(PopupValue,'Control'))
-        set(handles.ControlPanel,'Visible','On');
-        set(handles.ActivitiesPanel,'Visible','Off');
-    elseif(strcmp(PopupValue,'Activites'))
-        set(handles.ControlPanel,'Visible','Off');
-        set(handles.ActivitiesPanel,'Visible','On');
+    if (strcmp(PopupValue,'Control Moves'))
+        set(handles.ControlMovesPanel,'Visible','On');
+        set(handles.TicTacToePanel,'Visible','Off');
+        set(handles.PathPlanningPanel,'Visible','Off');
+    elseif(strcmp(PopupValue,'Tic Tac Toe'))
+        set(handles.ControlMovesPanel,'Visible','Off');
+        set(handles.TicTacToePanel,'Visible','On');
+        set(handles.PathPlanningPanel,'Visible','Off');
+    elseif(strcmp(PopupValue,'Path Planning'))
+        set(handles.ControlMovesPanel,'Visible','Off');
+        set(handles.TicTacToePanel,'Visible','Off');
+        set(handles.PathPlanningPanel,'Visible','On');
     end
     
 end
