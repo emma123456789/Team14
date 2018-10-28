@@ -13,18 +13,20 @@ function CM_ClearTable()
     global boxY;
     boxX = 0;
     boxY = 409;
+    BP2Conveyor_index = 1;
 	
 	% Check each block in the table block list
 	len = length(tableBlockData);
 	for i = 1:len
-        BP2Conveyor_index = i;
-		stringSplit = strsplit(tableBlockData(i));
+		stringSplit = strsplit(tableBlockData(BP2Conveyor_index));
 		x1 = str2double(stringSplit(1));
         y1 = str2double(stringSplit(2));
         if (isReachable(x1, y1) == true)
             SM_BP2ConveyorModified(x1, y1, boxX, boxY)
             BP2Conveyor_updateBlocklist(boxX,boxY)
+            BP2Conveyor_index = BP2Conveyor_index-1;
         end
+        BP2Conveyor_index = BP2Conveyor_index+1;
         
     end
 
