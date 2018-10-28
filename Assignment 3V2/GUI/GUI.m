@@ -2830,6 +2830,17 @@ function clearTableButton_Callback(hObject, eventdata, handles)
 % hObject    handle to clearTableButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    global tableBlockData;
+    global conveyorBlockData;
+    CM_ClearTable();
+    
+    % updating info to all lists  
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
+    set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
 end
 
 % --- Executes on button press in fillTableButton.
