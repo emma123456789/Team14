@@ -76,7 +76,7 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     global vid;
     global vid2;
     global MODE;% simulation or real? make sure anything that requires hardware to be connected checks if the mode is imulation first.
-    MODE = 'r';
+    MODE = 's';
 
     % Choose default command line output for tictactoe
     handles.plr=1;
