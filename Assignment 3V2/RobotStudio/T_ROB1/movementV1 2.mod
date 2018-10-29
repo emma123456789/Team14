@@ -1,7 +1,7 @@
     MODULE ROB_MAIN
     
     VAR num effectorHeight:= 147;! The height of the table
-    PERS robtarget target := [[373, -230, 177],[4.37114E-08,0,-1,0],[0,0,0,0],[0,0,0,0,0,0]];! test target initialised to touch the table home
+    PERS robtarget target := [[337, -144, 177],[4.37114E-8,0,-1,0],[0,0,0,0],[0,0,0,0,0,0]];! test target initialised to touch the table home
     PERS robjoint joints:= [-90, 0, 0, 0, 0, 0]; !test pose initialised to calib position
    
     VAR num jog_inc:=30;                    !increment for linear jogging
@@ -9,7 +9,7 @@
     VAR num conveyerT:=10;
     PERS string current_state := "None";        !Current state for the main loop conditional statements, set in T_COM1
     PERS bool quit := FALSE;                 !quit flag
-    PERS bool done := FALSE;                !command finished flag
+    PERS bool done := TRUE;                !command finished flag
     PERS bool checkCom := FALSE;            !COM checked flag
     PERS bool errorHandling := FALSE;       !error flag
     PERS num errorNumber;                   !error number for range calculations
@@ -22,28 +22,67 @@
     PERS speeddata move_speed;              !speed data for poses
     PERS speeddata jog_speed;               !speed data for jogging
     PERS wobjdata wobjCurrent;              !current work object (can be used to calculate positions relative to different rotational frames)
-    
+    PERS bool initialized := TRUE;
    
     ! The Main procedure. When you select 'PP to Main' on the FlexPendant, it will go to this procedure.
     PROC Main()
-                
+        
+        IF initialized = FALSE THEN 
         ! Program Starts
-        MoveToCalibPos;                     !Start in calib position
-        current_state:="";                  !initialise current state
-        wobjCurrent:=wTable;                !initialise current frame to table reference
-        
-        SingArea \Wrist;                    !Allow wrist position to deviate to avoid singularities
-        confj  \On;                         !Aim for absolute position, if not possible stop execution
-    
+            MoveToCalibPos;                     !Start in calib position
+            current_state:="";                  !initialise current state
+            wobjCurrent:=wTable;                !initialise current frame to table reference
+            
+            SingArea \Wrist;                    !Allow wrist position to deviate to avoid singularities
+            confj  \On;                         !Aim for absolute position, if not possible stop execution
+            initialized := TRUE;
+        ENDIF 
 
-            !change in value of cancel will avtivate the cancel trigger
-    
-    WHILE quit = FALSE DO                       !robot action will run continuously when the shutdown button is not pressed
+            !change in value of cancel will avtivate the cancel trigger                    !robot action will run continuously when the shutdown button is not pressed
         
+        WHILE quit = FALSE DO   
+            
         deletePauseTrap;
         deleteCancelTrap;
         addPauseTrap;
         addCancelTrap;
+        
+        IF current_state = "paused" THEN
+            paused:=1;                       !the paused bool is set to TRUE to activate the paused trigger
+            !StopMove;                           !stopMove stops the robot's current path
+            !StorePath;                          !stores the robot's current path so that the robot can resume when needed
+            done:=TRUE;
+            current_state := "None";
+        ENDIF
+                                                !if asked to resume
+        IF current_state = "resume" THEN
+            paused:=0;                      !the paused bool is set to FALSE to activate the paused trigger again
+            !RestoPath;                          !RestoPath restores the path saved from StorePath
+            !StartMove;                          !robot starts moving again in the stored path
+            done:=TRUE;
+            current_state := "None";
+        ENDIF
+                                                !if asked to cancel
+        IF current_state = "cancel" THEN
+            cancelled:=1;                    !the cancelled bool iss et to TRUE to activate the cancel trigger
+            !ClearPath;                         
+            !StartMove;
+            done:=TRUE;
+            current_state := "None";
+        ENDIF
+                                                !if asked to shutdown
+        IF current_state = "shutdown" THEN
+            wobjCurrent:=wWorld;
+            MoveToPose [90, 0, 0, 0, 0, 0], v100;   !First lift to above conveyer to avoid collision with table
+            MoveToCalibPos;                         !Move to calib
+            vacPwrOff;                              !reset DIOs
+            vacSolOff;                          
+            conRunOff;
+            conDirRob;
+            quit:=TRUE;
+            done:=TRUE;
+            !current_state := "None";
+        ENDIF
         
         WaitUntil checkCom = TRUE; 
         
@@ -53,43 +92,7 @@
             !IPers paused, pauseTrigger;                 !change in value of paused will activate the pause trigger
             !CONNECT cancelTrigger WITH cancelRoutine;   !connect cancel trigger with cancel interrupt routine
             !IPers cancelled, cancelTrigger; 
-            IF current_state = "paused" THEN
-                paused:=1;                       !the paused bool is set to TRUE to activate the paused trigger
-                !StopMove;                           !stopMove stops the robot's current path
-                !StorePath;                          !stores the robot's current path so that the robot can resume when needed
-                done:=TRUE;
-                current_state := "None";
-            ENDIF
-                                                    !if asked to resume
-            IF current_state = "resume" THEN
-                paused:=0;                      !the paused bool is set to FALSE to activate the paused trigger again
-                RestoPath;                          !RestoPath restores the path saved from StorePath
-                !StartMove;                          !robot starts moving again in the stored path
-                done:=TRUE;
-                current_state := "None";
-            ENDIF
-                                                    !if asked to cancel
-            IF current_state = "cancel" THEN
-                cancelled:=1;                    !the cancelled bool iss et to TRUE to activate the cancel trigger
-                !ClearPath;                         
-                !StartMove;
-                done:=TRUE;
-                current_state := "None";
-            ENDIF
-                                                    !if asked to shutdown
-            IF current_state = "shutdown" THEN
-                wobjCurrent:=wWorld;
-                MoveToPose [90, 0, 0, 0, 0, 0], v100;   !First lift to above conveyer to avoid collision with table
-                MoveToCalibPos;                         !Move to calib
-                vacPwrOff;                              !reset DIOs
-                vacSolOff;                          
-                conRunOff;
-                conDirRob;
-                quit:=TRUE;
-                done:=TRUE;
-                !current_state := "None";
-            ENDIF
-			
+
 			IF current_state = "insert_box" THEN    
                 conDirRob;
                 conRunOn;
@@ -694,11 +697,11 @@
         
     TRAP pauseRoutine               !the pause interrupt is called for pausing
         IF paused =1 THEN            !if the robot is set to the paused state
-            !StopMove;                   !robot still first stop moving in the current path
+            StopMove;                   !robot still first stop moving in the current path
             StorePath;                  !the current path is stored for resuming later
         ELSE                        !the pause interrupt is called for resuming
             RestoPath;                  !robot restores the path stored earlier      
-            !StartMove;                  !robot will move along the restored path
+            StartMove;                  !robot will move along the restored path
         ENDIF
         current_state := "None";
         checkCom := FALSE;
@@ -706,36 +709,15 @@
    ! 
     TRAP cancelRoutine              !the cancel interrupt is called for cancelling
         IF cancelled = 1 THEN         !if the robot is set to cancelled state
-            !StopMove;                   !robot still stop moving in the current path
+            StopMove;                   !robot still stop moving in the current path
             ClearPath;                  !robot will delete the current path so that it cannot be restored
             StartMove;       
         ENDIF
         current_state := "None";
         checkCom := FALSE;
         ExitCycle;
-        !cancelled := 0;
+        cancelled := 0;
     ENDTRAP
     
-
-    !TRAP pauseRoutine               !the pause interrupt is called for pausing
-    !    IF paused =TRUE THEN            !if the robot is set to the paused state
-    !        StopMove;                   !robot still first stop moving in the current path
-    !        StorePath;                  !the current path is stored for resuming later
-    !    ELSE                        !the pause interrupt is called for resuming
-    !        RestoPath;                  !robot restores the path stored earlier      
-   !         StartMove;                  !robot will move along the restored path
-   !     ENDIF
-   !     current_state := "None";
-   !     checkCom := FALSE;
-   ! ENDTRAP
-   ! 
-    !TRAP cancelRoutine              !the cancel interrupt is called for cancelling
-    !    IF cancelled =TRUE THEN         !if the robot is set to cancelled state
-    !        StopMove;                   !robot still stop moving in the current path
-    !        ClearPath;                  !robot will delete the current path so that it cannot be restored
-    !    ENDIF
-    !    current_state := "None";
-    !    checkCom := FALSE;
-    !ENDTRAP
 
 ENDMODULE

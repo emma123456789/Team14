@@ -5,10 +5,10 @@
     ! The host and port that we will be listening for a connection on.
     PERS string current_state := "None";   !current state of the robot which is initialised as an empty string
     CONST num port := 1025;            !the port used for connection between RobotStudio and MATLAB
-    PERS string host := "192.168.125.1";
+    PERS string host := "127.0.0.1";
     PERS bool quit;                   !the quit flag                 
     PERS bool checkCom := FALSE;       !flag to jump to the movement file to decide its next move
-    PERS bool done := FALSE;           !flag that indicates action is done
+    PERS bool done := TRUE;           !flag that indicates action is done
     VAR num stringLength;              !number that returns the total length of the message received from MATLAB
     VAR num stringStart;               !number that stores the index of the first character
     VAR num numStart;                  !number that stores the index of the first digit
@@ -460,13 +460,14 @@
             !checkCom:=TRUE;
             !WaitUntil current_state = "None" and done = TRUE;   !wait until the current_state is reset and the done flag is set to the true from movementV1
             IF errorHandling = TRUE THEN       !if error is returned from movementV1 the error value is sent to MATLAB
-                SocketSend client_socket \Str:=("Error Number:" + ValtoStr(errorNumber) + "\0A");
+                SocketSend client_socket \Str:=("Movement Error:" + ValtoStr(errorNumber) + "\0A");
             ENDIF 
             errorHandling := FALSE;   !reset the errorHandling flag
             
-            WaitUntil done = TRUE;
-            SocketSend client_socket \Str:=("Done" + "\0A");    !display done after movementV1 finished processing
-            done := FALSE;  !reset done flag
+            IF done = TRUE THEN 
+                SocketSend client_socket \Str:=("Done" + "\0A");    !display done after movementV1 finished processing
+                done := FALSE;  !reset done flag
+            ENDIF 
                       
         ENDWHILE
         !CloseConnection;        !if shutdown is pressed, close the connection
