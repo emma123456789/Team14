@@ -1,5 +1,6 @@
   function [x,y]= getBox_XY(hObject)
     % box = imread('no_blocks.jpg');
+    global convParam convImagePoints convWorldPoints
     global vid2
 
     if (get(hObject,'Value') == 1)
@@ -39,5 +40,18 @@
     end
     x=bOrientation.Centroid(index,1);
     y=bOrientation.Centroid(index,2);
+    
+    x = round(x);
+    y = round(y);
+    
+    [R, T] = extrinsics(convImagePoints.imagePoints, convWorldPoints.worldPoints, convParam.ConvCameraParams);
+    worldPoints = pointsToWorld(convParam.ConvCameraParams, R, T, [x y]);
+    xTol=0; yTol=0;
+    X = worldPoints(end,1)+xTol;
+    Y = worldPoints(end,2)+yTol;
+    x = round(X); 
+    y = round(Y);
+   
+    
     end
     end
