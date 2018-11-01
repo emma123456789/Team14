@@ -19,12 +19,14 @@ function CM_fillDeck()
             stringSplit = strsplit(conveyorBlockData(i));
             xConveyor(i) = str2double(stringSplit(1)); %x-coordinate of blocks on conveyor
             yConveyor(i) = str2double(stringSplit(2)); %y-coordinate of blocks on conveyor
+            rotConveyor(i) = str2double(stringSplit(3));
             pattern = char(stringSplit(4));
             if strcmp(pattern,'1')
                 if(shapeCounter <= 6)%shape
                     shapeCounter = shapeCounter+1;
                     shapeBlocks(1,shapeCounter) = xConveyor(i); %first column is x
                     shapeBlocks(2,shapeCounter) = yConveyor(i); %second column is y
+                    shapeBlocks(3,shapeCounter) = rotConveyor(i); % third column is rotation
                 else
                     disp('shape matrix is full!')
                 end
@@ -33,6 +35,7 @@ function CM_fillDeck()
                     letterCounter = letterCounter+1;
                     letterBlocks(1,letterCounter) = xConveyor(i);
                     letterBlocks(2,letterCounter) = yConveyor(i);
+                    letterBlocks(3,letterCounter) = rotConveyor(i);
                 else
                     disp('letter matrix is full!')
                 end
@@ -44,8 +47,10 @@ function CM_fillDeck()
             for i2 = 1:length(shapeBlocks(1,:)) 
                 s1_x1(i2) = shapeBlocks(1,i2);
                 s1_y1(i2) = shapeBlocks(2,i2);
+                s1_rot(i2) = shapeBlocks(3,i2)
                 [s1_x2(i2),s1_y2(i2)] = gameboardConversion(i2,'Q');
-                SM_Conveyor2BP(s1_x1(i2), s1_y1(i2), s1_x2(i2), s1_y2(i2));
+%                 SM_RotateBlock(s1_x1(i2), s1_y1(i2), s1_rot(i2));
+                SM_FillDeckConveyor2BP(s1_x1(i2), s1_y1(i2), s1_x2(i2), s1_y2(i2), s1_rot(i2));
                 sprintf('Shape %d is moved onto Deck!',i2)
             end
         end
@@ -54,8 +59,10 @@ function CM_fillDeck()
            for i3 = 1:length(letterBlocks(1,:))
                 l1_x1(i3) = letterBlocks(1,i3);
                 l1_y1(i3) = letterBlocks(2,i3);
+                l1_rot(i3) = letterBlocks(3,i3);
                 [l1_x2(i3),l1_y2(i3)] = gameboardConversion(i3,'P');
-                SM_Conveyor2BP(l1_x1(i3), l1_y1(i3), l1_x2(i3), l1_y2(i3));
+%                 SM_RotateBlock(l1_x1(i3), l1_y1(i3), l1_rot(i3));
+                SM_FillDeckConveyor2BP(l1_x1(i3), l1_y1(i3), l1_x2(i3), l1_y2(i3), l1_rot(i3));
                 sprintf('Letter %d is moved onto Deck!',i3)
            end
        end

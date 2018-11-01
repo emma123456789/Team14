@@ -2807,7 +2807,7 @@ function fillDeckButton_Callback(hObject, eventdata, handles)
 % hObject    handle to fillDeckButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    CM_fillDeck();
+    CM_fillDeck;
 end
 
 % --- Executes on button press in clearDeckButton.
@@ -2815,6 +2815,7 @@ function clearDeckButton_Callback(hObject, eventdata, handles)
 % hObject    handle to clearDeckButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    CM_clearDeck;
 end
 
 % --- Executes on button press in sortDeckButton.
