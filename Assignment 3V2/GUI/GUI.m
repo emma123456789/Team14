@@ -22,7 +22,7 @@ function varargout = GUI(varargin)
 %
     % See also: GUIDE, GUIDATA, GUIHANDLES
      % Edit the above text to modify the response to help GUI
-     % Last Modified by GUIDE v2.5 27-Oct-2018 23:58:03
+     % Last Modified by GUIDE v2.5 04-Nov-2018 16:23:19
      % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
     gui_State = struct('gui_Name',       mfilename, ...
@@ -2802,17 +2802,17 @@ function errorContinue_Callback(hObject, eventdata, handles)
 end
 
 
-% --- Executes on button press in fillDeckButton.
-function fillDeckButton_Callback(hObject, eventdata, handles)
-% hObject    handle to fillDeckButton (see GCBO)
+% --- Executes on button press in fillDeck1Button.
+function fillDeck1Button_Callback(hObject, eventdata, handles)
+% hObject    handle to fillDeck1Button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     CM_fillDeck;
 end
 
-% --- Executes on button press in clearDeckButton.
-function clearDeckButton_Callback(hObject, eventdata, handles)
-% hObject    handle to clearDeckButton (see GCBO)
+% --- Executes on button press in clearDeck1Button.
+function clearDeck1Button_Callback(hObject, eventdata, handles)
+% hObject    handle to clearDeck1Button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     CM_clearDeck;
@@ -4984,18 +4984,36 @@ function ControlOrActivitiesPopup_Callback(hObject, eventdata, handles)
     contents = cellstr(get(hObject,'String'));
     PopupValue = contents{get(hObject,'Value')};
 
-    if (strcmp(PopupValue,'Control Moves'))
-        set(handles.ControlMovesPanel,'Visible','On');
+    if (strcmp(PopupValue,'Simple Moves and Conveyor Control'))
+        set(handles.SMandConveyorPanel,'Visible','On');
+        set(handles.ComplexMovePanel,'Visible','Off');
         set(handles.TicTacToePanel,'Visible','Off');
         set(handles.PathPlanningPanel,'Visible','Off');
+        set(handles.TestingPanel,'Visible','Off');        
+    elseif(strcmp(PopupValue,'Complex Moves'))
+        set(handles.SMandConveyorPanel,'Visible','Off');
+        set(handles.ComplexMovePanel,'Visible','On');
+        set(handles.TicTacToePanel,'Visible','Off');
+        set(handles.PathPlanningPanel,'Visible','Off');
+        set(handles.TestingPanel,'Visible','Off');  
     elseif(strcmp(PopupValue,'Tic Tac Toe'))
-        set(handles.ControlMovesPanel,'Visible','Off');
+        set(handles.SMandConveyorPanel,'Visible','Off');
+        set(handles.ComplexMovePanel,'Visible','Off');
         set(handles.TicTacToePanel,'Visible','On');
         set(handles.PathPlanningPanel,'Visible','Off');
+        set(handles.TestingPanel,'Visible','Off');  
     elseif(strcmp(PopupValue,'Path Planning'))
-        set(handles.ControlMovesPanel,'Visible','Off');
+        set(handles.SMandConveyorPanel,'Visible','Off');
+        set(handles.ComplexMovePanel,'Visible','Off');
         set(handles.TicTacToePanel,'Visible','Off');
         set(handles.PathPlanningPanel,'Visible','On');
+        set(handles.TestingPanel,'Visible','Off');  
+    elseif(strcmp(PopupValue,'Testing'))
+        set(handles.SMandConveyorPanel,'Visible','Off');
+        set(handles.ComplexMovePanel,'Visible','Off');
+        set(handles.TicTacToePanel,'Visible','Off');
+        set(handles.PathPlanningPanel,'Visible','Off');
+        set(handles.TestingPanel,'Visible','On');  
     end
     
 end
@@ -5045,4 +5063,47 @@ function TicOrPosePopup_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+end
+
+
+% --- Executes on button press in fillDeck2Button.
+function fillDeck2Button_Callback(hObject, eventdata, handles)
+% hObject    handle to fillDeck2Button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+% --- Executes on button press in clearDeck2Button.
+function clearDeck2Button_Callback(hObject, eventdata, handles)
+% hObject    handle to clearDeck2Button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+% --- Executes on button press in BP2BPTest.
+function BP2BPTest_Callback(hObject, eventdata, handles)
+% hObject    handle to BP2BPTest (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+% --- Executes on button press in BP2ConveyorTest.
+function BP2ConveyorTest_Callback(hObject, eventdata, handles)
+% hObject    handle to BP2ConveyorTest (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+% --- Executes on button press in Conveyor2BPTest.
+function Conveyor2BPTest_Callback(hObject, eventdata, handles)
+% hObject    handle to Conveyor2BPTest (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+% --- Executes on button press in RotateBlockTest.
+function RotateBlockTest_Callback(hObject, eventdata, handles)
+% hObject    handle to RotateBlockTest (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 end
