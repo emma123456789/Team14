@@ -4751,7 +4751,7 @@ function TicTacToeEndGame_Callback(hObject, eventdata, handles)
     % Move all the blocks back
     len = length(record);
     for i = 1:len
-        j = len - i; % to put everything back backwards
+        j = len - i + 1; % to put everything back backwards
         stringSplit = strsplit(record{1,j}{1,1});
         x1 = str2double(stringSplit(1));
         y1 = str2double(stringSplit(2));
