@@ -1,6 +1,13 @@
-function pathPlanning()
+function [path] = pathPlanning(start, goal)
     G = createNodes();
     Gnew = removeNodes(G);
-    shortestpath(Gnew);
     
+    start = char(start);
+    goal = char(goal);
+    path = shortestpath(Gnew, start, goal);
+    disp(path)
+end
+
+function main()
+    pathPlanning(A)
 end

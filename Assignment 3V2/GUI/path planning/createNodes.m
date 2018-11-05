@@ -38,6 +38,16 @@ function [G] = createNodes()
         'A1' 'B1' 'C1' 'D1' 'E1' 'F1' 'G1' 'H1' 'I1'}';
 
     G.Nodes.Name = BP;
-    plot(G,'XData',x,'YData',y)
+%     plot(G,'XData',x,'YData',y)
+    
+    %%testing
+%     bp = {'B1' 'C1' 'D1' 'B2' 'C2' 'D2'};
+%     Gnew = rmnode(G, bp);
+%     
+%     
+%     start = char('A1');
+%     goal = char('I1');
+%     p = shortestpath(Gnew, start, goal);
+%     disp(p)
 end
    
