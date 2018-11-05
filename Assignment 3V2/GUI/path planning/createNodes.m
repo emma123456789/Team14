@@ -1,4 +1,4 @@
-function createNodes()
+function [G] = createNodes()
     s = [];
     t = [];
     % G = graph([1,2], [2,1])

@@ -1,0 +1,47 @@
+function [G_out] = removeNodes(G_original,x, y)
+    G_out = G_original;
+    %node_number = x+(y-1)*9;
+    %G_out = rmnode(G_out, node_number);
+    % p = shortestpath(G_out, )
+    
+    global tableBlockData
+    data = tableBlockData;
+    
+    %get the bp of blocks acting as obstacles
+    %loop removes the respective node of the obstacle
+    nodeCount = length(data);
+    bpPosition = 5;
+    bpArray = [];
+    for row = 1:nodeCount
+        rowData = strsplit(data(row));
+		bp = char(rowData(bpPosition));
+        bpArray = [bpArray bp];
+        G_out = rmnode(G_out, bp);
+    end
+   
+end
+
+function [BPstring] = getObstacleBP()
+   % global tablebBlockData
+    
+    	% Check each block in the table block list
+	len = length(tableBlockData);
+	for i = 1:len
+		stringSplit = strsplit(tableBlockData(i));
+		BP = char(stringSplit(5));
+		% If the block is on player 1's deck
+		if strcmp(BP,'P1')||strcmp(BP,'P2')||strcmp(BP,'P3')||strcmp(BP,'P4')||strcmp(BP,'P5')||strcmp(BP,'P6')
+			pattern = char(stringSplit(4));
+			if strcmp(pattern,'2') % Letter: wrong shape, need to be moved
+				p1_moveInd(end+1) = i; % Store the index
+			end
+		% If the block is on player 2's deck
+		elseif strcmp(BP,'Q1')||strcmp(BP,'Q2')||strcmp(BP,'Q3')||strcmp(BP,'Q4')||strcmp(BP,'Q5')||strcmp(BP,'Q6')
+			pattern = char(stringSplit(4));
+			if strcmp(pattern,'1') % Shape: wrong shape, need to be moved
+				p2_moveInd(end+1) = i; % Store the index
+			end
+		end
+	end
+end
+

@@ -1,0 +1,6 @@
+function pathPlanning()
+    G = createNodes();
+    Gnew = removeNodes(G);
+    shortestpath(Gnew);
+    
+end
