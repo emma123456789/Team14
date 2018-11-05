@@ -5115,5 +5115,16 @@ end
 function TestingButton_Callback(hObject, eventdata, handles)
 % hObject    handle to TestingButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
-% handles    structure with handles and user data (see GUIDATA)
+% handles    structure with handles and user data (see GUIDATA) 
+
+    % GuiHandle allows us to change gui in external function
+    GuiHandle = ancestor(hObject, 'figure');
+    Testing_BP2BP(GuiHandle);
+    pause(5); % dont know how long to pause for
+    %Testing_BP2Conveyor(GuiHandle);
+%     pause(5); % dont know how long to pause for
+    %Testing_Conveyor2BP(GuiHandle);
+%     pause(5); % dont know how long to pause for
+    %Testing_RotateBlock(GuiHandle);
+%     pause(5); % dont know how long to pause for
 end
