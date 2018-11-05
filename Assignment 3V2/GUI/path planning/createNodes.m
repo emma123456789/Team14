@@ -19,7 +19,7 @@ function [G] = createNodes()
      end
 
     EdgeTable = table([s' t'], ...
-        'VariableNames',{'EndNodes'})
+        'VariableNames',{'EndNodes'});
     G = graph(EdgeTable);
 
     a = [1:9];

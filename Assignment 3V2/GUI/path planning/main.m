@@ -1,4 +1,4 @@
 function main()
-    p = pathPlanning('A1', 'I1');
-    disp(p);
+    course = pathPlanning('A9', 'I1');
+    disp(course);
 end

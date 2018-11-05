@@ -8,5 +8,15 @@ function [p] = pathPlanning(start, goal)
     start = char(start);
     goal = char(goal);
     p = shortestpath(Gnew, start, goal);
-    %disp(p)
+    s = size(p);
+    
+    if s == 0
+        fprintf('There is no available path for the robot to move from start to goal.\n')
+        % robot should not move at all
+    else
+        fprintf('Path available... Robot will move now!\n')
+        %robot should then move to start bp above the blocks
+        %before lowering itself to height = 5mm above table
+    end
+    
 end
