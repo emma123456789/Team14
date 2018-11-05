@@ -2,7 +2,7 @@
 % must have quotation marks
 
 function [p] = pathPlanning(start, goal)
-    G = createNodes();
+    [G, pPlot] = createNodes();
     Gnew = removeNodes(G);
     
     start = char(start);
@@ -17,6 +17,7 @@ function [p] = pathPlanning(start, goal)
         fprintf('Path available... Robot will move now!\n')
         %robot should then move to start bp above the blocks
         %before lowering itself to height = 5mm above table
+        highlight(pPlot,p,'EdgeColor','g')
     end
     
 end

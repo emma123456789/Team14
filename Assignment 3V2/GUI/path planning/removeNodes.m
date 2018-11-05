@@ -31,8 +31,6 @@ function [G_out] = removeNodes(G_original)
         'A2' 'C2' 'D2' 'E2' 'F2' 'G2' 'H2' 'I2'...
         'A1' 'B1' 'C1' 'D1' 'E1' 'F1' 'G1' 'H1' 'I1'};
     G_out = rmnode(G_out, bp);
-    
-   
-    
+ 
 end
 

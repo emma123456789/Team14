@@ -1,4 +1,4 @@
-function [G] = createNodes()
+function [G, pPlot] = createNodes()
     s = [];
     t = [];
     % G = graph([1,2], [2,1])
@@ -20,6 +20,7 @@ function [G] = createNodes()
 
     EdgeTable = table([s' t'], ...
         'VariableNames',{'EndNodes'});
+    
     G = graph(EdgeTable);
 
     a = [1:9];
@@ -38,7 +39,7 @@ function [G] = createNodes()
         'A1' 'B1' 'C1' 'D1' 'E1' 'F1' 'G1' 'H1' 'I1'}';
 
     G.Nodes.Name = BP;
-%     plot(G,'XData',x,'YData',y)
+    pPlot = plot(G,'XData',x,'YData',y);
     
     %%testing
 %     bp = {'B1' 'C1' 'D1' 'B2' 'C2' 'D2'};

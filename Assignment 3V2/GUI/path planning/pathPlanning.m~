@@ -12,12 +12,12 @@ function [p] = pathPlanning(start, goal)
     
     if s == 0
         fprintf('There is no available path for the robot to move from start to goal.\n')
-        br
         % robot should not move at all
     else
         fprintf('Path available... Robot will move now!\n')
         %robot should then move to start bp above the blocks
         %before lowering itself to height = 5mm above table
+        highlight(p,p,'EdgeColor','g')
     end
     
 end
