@@ -11,8 +11,8 @@ function BP2Conveyor_updateBlocklist(x2,y2)
     stringSplit = strsplit(tableBlockData(BP2Conveyor_index)); 
     
     % adding new BP: x y theta type BP
-    delimiters = [" "," "," "," ",""];
-    newBlockInfo = join([x2, y2, stringSplit(3), stringSplit(4), 0, 0], delimiters); % x y theta type BP
+    delimiters = [" "," "," "];
+    newBlockInfo = join([x2, y2, stringSplit(3), stringSplit(4)], delimiters); % x y theta type BP
     if isempty(conveyorBlockData)
         conveyorBlockData = newBlockInfo;
     else

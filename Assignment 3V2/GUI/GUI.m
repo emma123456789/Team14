@@ -2821,17 +2821,14 @@ function fillDeck1Button_Callback(hObject, eventdata, handles)
             l1_rot(i3) = letterBlocks(3,i3);
             [l1_x2(i3),l1_y2(i3)] = gameboardConversion(i3,'P');
             Conveyor2BP_index = letterIndex(i3)-(i3-1);
-    %                 SM_RotateBlock(l1_x1(i3), l1_y1(i3), l1_rot(i3));
-                SM_FillDeckConveyor2BP(l1_x1(i3), l1_y1(i3), l1_x2(i3), l1_y2(i3), l1_rot(i3));
-                Conveyor2BP_updateBlocklist(i3, 'P', l1_x2(i3), l1_y2(i3));
-        %         sprintf('Shape %d is moved onto Deck!',i2)1
-                set(handles.TableBlocksListbox, 'String', tableBlockData);
-                set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
-                set(handles.BPtoBPBlockList, 'String', tableBlockData);
-                set(handles.RotateBlockBlockList, 'String', tableBlockData);
-                set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
-                set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
-    %         sprintf('Letter %d is moved onto Deck!',i3)
+            SM_FillDeckConveyor2BP(l1_x1(i3), l1_y1(i3), l1_x2(i3), l1_y2(i3), l1_rot(i3));
+            Conveyor2BP_updateBlocklist(i3, 'P', l1_x2(i3), l1_y2(i3));
+            set(handles.TableBlocksListbox, 'String', tableBlockData);
+            set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+            set(handles.BPtoBPBlockList, 'String', tableBlockData);
+            set(handles.RotateBlockBlockList, 'String', tableBlockData);
+            set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
+            set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
         end
     end
 end
@@ -2841,7 +2838,15 @@ function clearDeck1Button_Callback(hObject, eventdata, handles)
 % hObject    handle to clearDeck1Button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    CM_clearDeck;
+    global tableBlockData;
+    global conveyorBlockData;
+    CM_clearDeck1; 
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
+    set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
 end
 
 % --- Executes on button press in sortDeckButton.
@@ -5113,10 +5118,8 @@ function fillDeck2Button_Callback(hObject, eventdata, handles)
             s1_rot(i2) = shapeBlocks(3,i2);
             [s1_x2(i2),s1_y2(i2)] = gameboardConversion(i2,'Q');
             Conveyor2BP_index = shapeIndex(i2)-(i2-1);
-    %                 SM_RotateBlock(s1_x1(i2), s1_y1(i2), s1_rot(i2));
             SM_FillDeckConveyor2BP(s1_x1(i2), s1_y1(i2), s1_x2(i2), s1_y2(i2), s1_rot(i2));
             Conveyor2BP_updateBlocklist(i2, 'Q', s1_x2(i2), s1_y2(i2));
-    %         sprintf('Shape %d is moved onto Deck!',i2)
             set(handles.TableBlocksListbox, 'String', tableBlockData);
             set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
             set(handles.BPtoBPBlockList, 'String', tableBlockData);
@@ -5132,6 +5135,15 @@ function clearDeck2Button_Callback(hObject, eventdata, handles)
 % hObject    handle to clearDeck2Button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    global tableBlockData;
+    global conveyorBlockData;
+    CM_clearDeck2; 
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
+    set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
 end
 
 % --- Executes on button press in BP2BPTest.
