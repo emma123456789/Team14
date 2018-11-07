@@ -22,7 +22,7 @@ function varargout = GUI(varargin)
 %
     % See also: GUIDE, GUIDATA, GUIHANDLES
      % Edit the above text to modify the response to help GUI
-     % Last Modified by GUIDE v2.5 05-Nov-2018 19:20:42
+     % Last Modified by GUIDE v2.5 07-Nov-2018 23:26:55
      % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
     gui_State = struct('gui_Name',       mfilename, ...
@@ -5191,4 +5191,59 @@ function TestingButton_Callback(hObject, eventdata, handles)
 %     pause(5); % dont know how long to pause for
     %Testing_RotateBlock(GuiHandle);
 %     pause(5); % dont know how long to pause for
+end
+
+
+
+function clearTableInput_Callback(hObject, eventdata, handles)
+% hObject    handle to clearTableInput (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of clearTableInput as text
+%        str2double(get(hObject,'String')) returns contents of clearTableInput as a double
+end
+
+% --- Executes during object creation, after setting all properties.
+function clearTableInput_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to clearTableInput (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+end 
+
+
+% --- Executes on selection change in ClearTableListbox.
+function ClearTableListbox_Callback(hObject, eventdata, handles)
+% hObject    handle to ClearTableListbox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns ClearTableListbox contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from ClearTableListbox
+end
+
+% --- Executes during object creation, after setting all properties.
+function ClearTableListbox_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to ClearTableListbox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+end
+
+% --- Executes on button press in deleteSelectedBP.
+function deleteSelectedBP_Callback(hObject, eventdata, handles)
+% hObject    handle to deleteSelectedBP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 end
