@@ -1,4 +1,4 @@
-function CM_fillDeck2()
+function CM_clearDeck2()
 
     global boxX;
     global boxY;
