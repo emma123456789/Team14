@@ -102,13 +102,13 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     global g_handles;
     global real_robot_IP_address;
     global sim_robot_IP_address;
-    global robot_port; 
+    global robot_port;
     global poseMode;
     global poseSpeed;
     global joggingSpeed;
     global eeX eeY eeZ eeROLL eePITCH eeYAW;
     global jaQ1 jaQ2 jaQ3 jaQ4 jaQ5 jaQ6;
-   
+    
     % Initialise the global variables
     poseMode = 1;
     poseSpeed = 'Slow'; joggingSpeed = 'Slow';
@@ -144,11 +144,9 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     % Define table and conveyor data of blocks
     global tableBlockData
     global conveyorBlockData
-    global fTableBlockData
     % initially create an empty string array
     tableBlockData = strings(0);
     conveyorBlockData = strings(0);
-    fTableBlockData = strings(0);
 end
  
  % --- Executes when send timer is called
@@ -5141,18 +5139,6 @@ function clearTableInput_Callback(hObject, eventdata, handles)
 % Hints: get(hObject,'String') returns contents of clearTableInput as text
 %        str2double(get(hObject,'String')) returns contents of clearTableInput as a double
     global fTableBlockData;
-    global ftBlockInfo;
-    
-    ftBlockInfo = get(hObject,'String');
-    
-    fTableList = string(ftBlockInfo);
-    if isempty(fTableBlockData)
-        fTableBlockData = fTableList;
-    else
-        fTableBlockData = [fTableBlockData; fTableList];
-    end
-    set(handles.ClearTableListbox, 'String', fTableBlockData);
-    
     
 end
 
@@ -5178,8 +5164,6 @@ function ClearTableListbox_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns ClearTableListbox contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from ClearTableListbox
-    global fTableIndexSelected;
-    fTableIndexSelected = get(hObject,'Value');
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -5200,9 +5184,4 @@ function deleteSelectedBP_Callback(hObject, eventdata, handles)
 % hObject    handle to deleteSelectedBP (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global fTableIndexSelected
-    global fTableBlockData
-    
-    fTableBlockData(fTableIndexSelected) = [];
-    set(handles.ClearTableListbox, 'String', fTableBlockData);
 end
