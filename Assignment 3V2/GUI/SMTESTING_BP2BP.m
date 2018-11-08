@@ -52,13 +52,18 @@ function SMTESTING_BP2BP(X1, Y1, X2, Y2, GuiHandle)
     
     % wait and then find the robot pose position
     pause(5); % dont know how long to pause for
-    % Find the robot pose position!!!!!!!!!!!!!!!!!!!!
-    
-    set(handles.RPXvalue,'string', '0');
-    set(handles.RPYvalue,'string', '0');
-    set(handles.RPZvalue,'string','0');
-    % cannot find angle using robot pose position
-    %set(handles.RPAnglevalue,'string', '0');
+    % Find the robot pose position
+    robot_pose_x = get(handles.XStatus,'String');
+	robot_pose_y = get(handles.YStatus,'String');
+	robot_pose_z = get(handles.ZStatus,'String');
+	% I'm not sure if this is the orientation! Or we might need to
+	% calculate it using the matrix and 6 joint angles?
+	robot_pose_rot = get(handles.Joint6Status,'String');
+	
+    set(handles.RPXvalue,'string', robot_pose_x);
+    set(handles.RPYvalue,'string', robot_pose_y);
+    set(handles.RPZvalue,'string', robot_pose_z);
+    set(handles.RPAnglevalue,'string', robot_pose_rot);	
     
     %move up to move height
     commandStr = sprintf('moveerb %.3f %.3f %.3f %.3f %.3f %.3f %s', X2,Y2,move_height,0,180,0,regular);

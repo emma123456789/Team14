@@ -17,7 +17,7 @@ function Testing_BP2BP(GuiHandle)
     stringSplit = strsplit(tableBlockData(1)); 
     X1 = stringSplit(1);
     Y1 = stringSplit(2);
-	
+	rot = stringSplit(3);
     BP2BP_index = 1;
 	
     % Update SM Function name and Location aims text
@@ -38,4 +38,21 @@ function Testing_BP2BP(GuiHandle)
     set(handles.BPtoBPBlockList, 'String', tableBlockData);
     set(handles.RotateBlockBlockList, 'String', tableBlockData);
     
+	% Analyse results
+	t = 5; % Tolerance
+	robot_pose_x = get(handles.RPXvalue,'String');
+	robot_pose_y = get(handles.RPYvalue,'String');
+	robot_pose_z = get(handles.RPZvalue,'String');
+	robot_pose_rot = get(handles.RPAnglevalue,'String');
+	
+	difference_RP_x = abs(str2double(robot_pose_x)-X2);
+	difference_RP_y = abs(str2double(robot_pose_y)-Y2);
+	difference_RP_z = abs(str2double(robot_pose_z)-147);
+	difference_RP_rot = abs(str2double(robot_pose_rot)-str2double(rot));
+	
+	if (difference_RP_x<t && difference_RP_y<t && difference_RP_z<t && difference_RP_rot<t)
+		set(handles.SuccessOrFailure, 'String', 'SUCCESS');
+	else
+		set(handles.SuccessOrFailure, 'String', 'FAILURE');
+	end
 end 

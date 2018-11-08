@@ -21,7 +21,7 @@ function Testing_RotateBlock(GuiHandle)
     set(handles.LAXvalue,'string', num2str(X1));
     set(handles.LAYvalue,'string', num2str(Y1));
     set(handles.LAZvalue,'string','147');
-    set(handles.LAAnglevalue,'string', rot);
+    set(handles.LAAnglevalue,'string', '0');
     
     % Move using SM BP2Conveyor modified so it will pause and move away
     SMTESTING_RotateBlock(X1, Y1, rot, GuiHandle);
@@ -32,6 +32,24 @@ function Testing_RotateBlock(GuiHandle)
     set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
     set(handles.BPtoBPBlockList, 'String', tableBlockData);
     set(handles.RotateBlockBlockList, 'String', tableBlockData);
+	
+	% Analyse results
+	t = 5; % Tolerance
+	robot_pose_x = get(handles.RPXvalue,'String');
+	robot_pose_y = get(handles.RPYvalue,'String');
+	robot_pose_z = get(handles.RPZvalue,'String');
+	robot_pose_rot = get(handles.RPAnglevalue,'String');
+	
+	difference_RP_x = abs(str2double(robot_pose_x)-X2);
+	difference_RP_y = abs(str2double(robot_pose_y)-Y2);
+	difference_RP_z = abs(str2double(robot_pose_z)-147);
+	difference_RP_rot = abs(str2double(robot_pose_rot)-0);
+	
+	if (difference_RP_x<t && difference_RP_y<t && difference_RP_z<t && difference_RP_rot<t)
+		set(handles.SuccessOrFailure, 'String', 'SUCCESS');
+	else
+		set(handles.SuccessOrFailure, 'String', 'FAILURE');
+	end
     
 end 
 
