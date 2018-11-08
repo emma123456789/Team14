@@ -4700,8 +4700,8 @@ function PPEndAlpha_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns PPEndAlpha contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from PPEndAlpha
-global ppGoalLetter
-ppGoalLetter = cellstr(get(hObject, 'String'));
+global goalLetter
+goalLetter = cellstr(get(hObject, 'String'));
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -4726,7 +4726,7 @@ function PPStartAlpha_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns PPStartAlpha contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from PPStartAlpha
 global ppStartLetter
-ppStartLetter = cellstr(get(hObject, 'String'));
+startLetter = cellstr(get(hObject, 'String'));
 
 end
 
@@ -4776,9 +4776,6 @@ function PPEndNumber_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns PPEndNumber contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from PPEndNumber
-global ppGoalNumber
-ppGoalNumber = cellstr(get(hObject, 'String'));
-
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -4799,15 +4796,6 @@ function StartMaze_Callback(hObject, eventdata, handles)
 % hObject    handle to StartMaze (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global ppStartLetter ppStartNumber 
-global ppGoalLetter ppGoalNumber
-global ppStart ppGoal
-
-%code to combine letter with number 
-
-
-pathPlanning(ppStart, ppGoal);
-
 end
 
 
