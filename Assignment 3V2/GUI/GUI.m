@@ -5192,6 +5192,8 @@ function fillTableInput_Callback(hObject, eventdata, handles)
             BP2BP_index = 1;
             BP2BP_updateBlocklist(gameboardNumber, gameboardLetter, gameboardX(i7), gameboardY(i7));
             set(handles.TableBlocksListbox, 'String', tableBlockData);
+            fTableBlockData(1) = [];
+            set(handles.fillTableListbox,'String',fTableBlockData);
         end
     end
     
