@@ -108,7 +108,6 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     global joggingSpeed;
     global eeX eeY eeZ eeROLL eePITCH eeYAW;
     global jaQ1 jaQ2 jaQ3 jaQ4 jaQ5 jaQ6;
-	global boxX boxY;
    
     % Initialise the global variables
     poseMode = 1;
@@ -117,7 +116,6 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     jaQ1 = 0; jaQ2 = 0; jaQ3 = 0; jaQ4 = 0; jaQ5 = 0; jaQ6 = 0;
     queue = LinkedList();
     status_queue = LinkedList();
-	boxX = 0; boxY = 409;
     
     % Initialise timers
     s_timer = timer;
@@ -2649,11 +2647,7 @@ function sortDeckButton_Callback(hObject, eventdata, handles)
 % hObject    handle to sortDeckButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-
-    % GuiHandle allows us to change gui in external function
-    GuiHandle = ancestor(hObject, 'figure');
-	
-	CM_SortDeck(GuiHandle);
+	CM_SortDeck();
 end
 
 % --- Executes on button press in clearTableButton.
@@ -4706,8 +4700,8 @@ function PPEndAlpha_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns PPEndAlpha contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from PPEndAlpha
-global ppGoalLetter
-ppGoalLetter = cellstr(get(hObject, 'String'));
+global goalLetter
+goalLetter = cellstr(get(hObject, 'String'));
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -4732,7 +4726,7 @@ function PPStartAlpha_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns PPStartAlpha contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from PPStartAlpha
 global ppStartLetter
-ppStartLetter = cellstr(get(hObject, 'String'));
+startLetter = cellstr(get(hObject, 'String'));
 
 end
 
@@ -4782,9 +4776,6 @@ function PPEndNumber_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns PPEndNumber contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from PPEndNumber
-global ppGoalNumber
-ppGoalNumber = cellstr(get(hObject, 'String'));
-
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -4805,15 +4796,6 @@ function StartMaze_Callback(hObject, eventdata, handles)
 % hObject    handle to StartMaze (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global ppStartLetter ppStartNumber 
-global ppGoalLetter ppGoalNumber
-global ppStart ppGoal
-
-%code to combine letter with number 
-
-
-pathPlanning(ppStart, ppGoal);
-
 end
 
 
@@ -5032,7 +5014,8 @@ function TestingButton_Callback(hObject, eventdata, handles)
     Testing_Conveyor2BP(GuiHandle);
     pause; % press enter to continue
 	
-    Testing_RotateBlock(GuiHandle);
+    %Testing_RotateBlock(GuiHandle);
+%     pause(5); % dont know how long to pause for
 end
 
 
