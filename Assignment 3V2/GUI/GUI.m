@@ -2405,83 +2405,75 @@ end
 % handles    structure with handles and user data (see GUIDATA)
  % Hint: get(hObject,'Value') returns toggle state of ConveyorCamSS
     global vid;
+    global tableParam tableImagePoints tableWorldPoints
+    global blockInfo 
+    global tableBlockData
+    
     if get(hObject,'Value') == 1
         %get one frame from table video feed and apply the edge,orientation,OCR and reachable detection of blocks
-        snapshot = getsnapshot(vid);
-        image = snapshot;
-        figure(1);
-        imshow(image); hold on;
-	%useBlocks is a function to get all imformation required 
-        [angles, position, letter, finalText] = useBlocks(image); 
-
-        %centroids, reachable
-        images = image;
-        imHSV = rgb2hsv(images);
-        imMask = imHSV(:,:,2)<0.25 & imHSV(:,:,3)>0.68;
-        imMask(1:250, :, :) = 1;
-        imMask(end-20:end, :, :) = 1;
-        imMask(:, end-20:end, :) = 1;
-        imMask(:, 1:20, :) = 1;
-	%get away noise 
-        SE1 = strel('line',3.3,0);
-        imMask = imclose(imMask,SE1);
-        SE2 = strel('line',3.3,90);
-        imMask = imclose(imMask,SE2);
-        SE3 = strel('disk',3);
-        imMask = imclose(imMask,SE3);
-	%regionprops applied to get centroids
-        bCentroid = regionprops('table',imMask,'Centroid');
-        centroids = bCentroid.Centroid(:,:);
-        N = length(centroids(:,1));
-        %reachable define
-        reachableTag = ones(1,N);
-        Cx =805;
-        Cy = 25.5943;
-        radius = 832.405697;
+          snapshot = getsnapshot(vid);
+          image = snapshot;
+%         image = imread('1.jpg');
+    
+    [angles, position, letter, finalText] = useBlocks(image);
+    figure(1);
+    imshow(image);
+    Blocksdata_table = zeros(length(angles),6);
+    % Constructing Final Array
+    for i=1:length(angles)
+        block = [position(i,1), position(i,2),... 
+            angles(i), letter(i),...
+            isReachable(position(i,1), position(i,2))];
         
-        for j=1:N
-            d = sqrt((centroids(j,1)-Cx)^2+(centroids(j,2)-Cy)^2);
-            if (d>radius)
-                reachableTag(1,j) = 0;
-            end
-        end
-     %edge finding with reachable
-        image(1:250,:,:)=0;  %resolution change here
-        greyBlocks = rgb2gray(image);
-        bwBlocks = imbinarize(greyBlocks);
-        seH = strel('line',3.9,0);
-        closeH = imclose(bwBlocks,seH);
-        seV = strel('line',3.9,90);
-        closeV = imclose(closeH,seV);
-        Blocks_final = medfilt2(closeV);
-        Blocks_final(1:250,:,:)=255;
-        Blocks_final = bwareaopen(Blocks_final,900);
-        Blocks_final = ~bwareaopen(~Blocks_final,100);
-        Blocks_final =~Blocks_final;
-        [B,L] = bwboundaries(Blocks_final,'noholes');
-	
-	%plot the edge of the blocks showing the reachable within red/blue color (red = unreachable)
-       for k = 1:length(B)
-           boundary = B{k};
-           if (reachableTag(1,k) ==1)
-               plot(boundary(:,2), boundary(:,1), 'b', 'LineWidth', 2)
-           else 
-               plot(boundary(:,2), boundary(:,1), 'r', 'LineWidth', 2)    
-           end
-       end
+        hold on 
 
-        % Constructing Final Array
-        for i=1:length(angles)
-            block = [position(i,1), position(i,2),... 
-                angles(i), letter(i),...
-                isReachable(position(i,1), position(i,2))];
-            % See if block is reachable or not
-            if (block(5)==1)
-                text(position(i,1)+30, position(i,2)+30, [finalText(i) ' , ' num2str(angles(i))], 'Color','blue');
+        % Show the central and orientation of the block
+        
+        plot(position(i,1),position(i,2),'*');
+        hold on
+         if (block(5)==1)
+             text(position(i,1)+30, position(i,2)+30, num2str(angles(i)*180/pi), 'Color','blue');
+         else
+             text(position(i,1)+30, position(i,2)+30, num2str(angles(i)*180/pi), 'Color','red');
+         end
+        
+        % write blocks information to a array
+        % [num2str(angles(i)*180/pi]//type of block: 1=letter/2=pattern
+        
+        x=round(block(1,1));
+        y=round(block(1,2));
+        Blocksdata_table(i,3) =block(1,3);
+        Blocksdata_table(i,4) =block(1,4); %check if it is a letter or not
+        Blocksdata_table(i,5) =1;  %call function coordinates to bp
+        Blocksdata_table(i,6) =block(1,5);
+  
+        
+        % change x y 
+        [R, T] = extrinsics(tableImagePoints.tImagePoints, tableWorldPoints.tWorldPoints, tableParam.tableCameraParams);
+        worldPoints = pointsToWorld(tableParam.tableCameraParams, R, T, [x y]);
+        xTol=0; yTol=0;
+        X = worldPoints(end,1)+xTol;
+        Y = worldPoints(end,2)+yTol;
+
+        [BPletter,BPnumber]= Coordinates2BP(X,Y);
+        X = round(X);
+        Y = round(Y);
+         BP=strcat(BPletter,BPnumber);
+         blockInfo = sprintf('%.0f %.0f %.0f %.0f %s %.0f',X,Y,round(block(1,3)),block(1,4),BP,block(1,5));
+         tableList = string(blockInfo);
+         if isempty(tableBlockData)
+                tableBlockData = tableList;
             else
-                text(position(i,1)+30, position(i,2)+30, [finalText(i) ' , ' num2str(angles(i))], 'Color','red');
-            end
-        end
+                tableBlockData = [tableBlockData; tableList];
+         end
+            set(handles.TableBlocksListbox, 'String', tableBlockData);
+            set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+            set(handles.BPtoBPBlockList, 'String', tableBlockData);
+            set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    
+         
+        
+    end
     end
  end
 
