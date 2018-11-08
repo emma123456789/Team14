@@ -75,7 +75,7 @@ function SMTESTING_BP2Conveyor(X1, Y1, X2, Y2, GuiHandle)
     commandStr = sprintf('vacuumPumpOff');
     queue.add(commandStr);
 	
-	%move robot away from table so computer vision position can be
+	%move robot away from conveyor so computer vision position can be
     %calculated (eg. move to table)
     commandStr = sprintf('moveerb %.3f %.3f %.3f %.3f %.3f %.3f %s', 300,0,move_height,0,180,0,fast);
     queue.add(commandStr);
