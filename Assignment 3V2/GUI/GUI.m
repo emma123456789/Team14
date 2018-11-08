@@ -5142,12 +5142,16 @@ function TestingButton_Callback(hObject, eventdata, handles)
 
     % GuiHandle allows us to change gui in external function
     GuiHandle = ancestor(hObject, 'figure');
+	
     Testing_BP2BP(GuiHandle);
-    pause(5); % dont know how long to pause for
-    %Testing_BP2Conveyor(GuiHandle);
-%     pause(5); % dont know how long to pause for
-    %Testing_Conveyor2BP(GuiHandle);
-%     pause(5); % dont know how long to pause for
+    pause; % press enter to continue
+	
+    Testing_BP2Conveyor(GuiHandle);
+    pause; % press enter to continue
+	
+    Testing_Conveyor2BP(GuiHandle);
+    pause; % press enter to continue
+	
     %Testing_RotateBlock(GuiHandle);
 %     pause(5); % dont know how long to pause for
 end
