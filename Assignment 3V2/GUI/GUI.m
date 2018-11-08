@@ -108,6 +108,7 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     global joggingSpeed;
     global eeX eeY eeZ eeROLL eePITCH eeYAW;
     global jaQ1 jaQ2 jaQ3 jaQ4 jaQ5 jaQ6;
+	global boxX boxY;
    
     % Initialise the global variables
     poseMode = 1;
@@ -116,6 +117,7 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     jaQ1 = 0; jaQ2 = 0; jaQ3 = 0; jaQ4 = 0; jaQ5 = 0; jaQ6 = 0;
     queue = LinkedList();
     status_queue = LinkedList();
+	boxX = 0; boxY = 409;
     
     % Initialise timers
     s_timer = timer;
@@ -5152,8 +5154,7 @@ function TestingButton_Callback(hObject, eventdata, handles)
     Testing_Conveyor2BP(GuiHandle);
     pause; % press enter to continue
 	
-    %Testing_RotateBlock(GuiHandle);
-%     pause(5); % dont know how long to pause for
+    Testing_RotateBlock(GuiHandle);
 end
 
 
