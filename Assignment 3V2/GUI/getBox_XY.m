@@ -1,7 +1,9 @@
-  function [x,y]= getBox_XY(hObject)
+    function [x,y]= getBox_XY(hObject)
     % box = imread('no_blocks.jpg');
     global convParam convImagePoints convWorldPoints
     global vid2
+    global Boxcentrod
+    
 
     if (get(hObject,'Value') == 1)
     snapshot = getsnapshot(vid2);
@@ -51,7 +53,9 @@
     Y = worldPoints(end,2)+yTol;
     x = round(X); 
     y = round(Y);
-   
+    
+    a = sprintf('%.0f %.0f',x,y);
+    Boxcentrod = a;
     
     end
     end
