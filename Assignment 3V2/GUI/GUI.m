@@ -5152,7 +5152,7 @@ function clearTableInput_Callback(hObject, eventdata, handles)
         fTableBlockData = [fTableBlockData; fTableList];
     end
     set(handles.ClearTableListbox, 'String', fTableBlockData);
-    
+    CM_fillTable;
     
 end
 
