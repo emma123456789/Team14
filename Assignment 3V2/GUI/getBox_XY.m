@@ -3,10 +3,13 @@
     global convParam convImagePoints convWorldPoints
     global vid2
 <<<<<<< HEAD
+<<<<<<< HEAD
      global BoxX;
     global BoxY;
    
 =======
+=======
+>>>>>>> d6eb43ac60170294966c0d41ce9286a8809c7f41
     global Boxcentrod
     
 
@@ -60,10 +63,16 @@
     x = round(X); 
     y = round(Y);
 <<<<<<< HEAD
+<<<<<<< HEAD
     BoxX=x;
     BoxY=y;
     disp(x);
     disp(y);
+=======
+    
+    a = sprintf('%.0f %.0f',x,y);
+    Boxcentrod = a;
+>>>>>>> d6eb43ac60170294966c0d41ce9286a8809c7f41
 =======
     
     a = sprintf('%.0f %.0f',x,y);
