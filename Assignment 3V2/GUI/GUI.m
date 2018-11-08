@@ -2391,26 +2391,11 @@ function getBox_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     global vid2;
+    global BoxX;
+    global BoxY;
     %check the if button is pressed
     if get(hObject,'Value') == 1
-       %get one frame from conveyor video feed and apply the edge and oritation detection of box
-       box = getsnapshot(vid2);
-       figure(1);
-       imshow(box); hold on;
-       box1 = box;
-       %only fucos on the conveyor part in th image
-       box1(:,1:580,:)=0;
-       box1(:,1180:1600,:)=0;
-       box1(710:1200,:,:)=0;
-       %detect the edge of box as white pattrn detect 
-       greybox1 = rgb2gray(box1);
-       bw = imbinarize(greybox1,0.5);
-       bw= ~bwareaopen(~bw,152200);
-       %apply regionprops to get orientation and centroid 
-       bOrientation = regionprops('table',bw,'Centroid','Image','Orientation');
-       %edge & orientation  plot
-       text(bOrientation.Centroid(1,1),bOrientation.Centroid(1,2),num2str(bOrientation.Orientation(1)),'Color','red','FontSize',20);
-       contour(bw,'r');
+      [BoxX,BoxY]= getBox_XY(hObject);
     end
 end
 
