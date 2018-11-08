@@ -22,7 +22,7 @@ function varargout = GUI(varargin)
 %
     % See also: GUIDE, GUIDATA, GUIHANDLES
      % Edit the above text to modify the response to help GUI
-     % Last Modified by GUIDE v2.5 27-Oct-2018 23:58:03
+     % Last Modified by GUIDE v2.5 08-Nov-2018 19:39:15
      % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
     gui_State = struct('gui_Name',       mfilename, ...
@@ -76,7 +76,7 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     global vid;
     global vid2;
     global MODE;% simulation or real? make sure anything that requires hardware to be connected checks if the mode is imulation first.
-    MODE = 's';
+    MODE = 'r';
 
     % Choose default command line output for tictactoe
     handles.plr=1;
@@ -102,13 +102,21 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     global g_handles;
     global real_robot_IP_address;
     global sim_robot_IP_address;
-    global robot_port;
+    global robot_port; 
     global poseMode;
     global poseSpeed;
     global joggingSpeed;
     global eeX eeY eeZ eeROLL eePITCH eeYAW;
     global jaQ1 jaQ2 jaQ3 jaQ4 jaQ5 jaQ6;
+<<<<<<< HEAD
+    global condition;
     
+    condition = 0;
+    
+=======
+	global boxX boxY;
+   
+>>>>>>> d6eb43ac60170294966c0d41ce9286a8809c7f41
     % Initialise the global variables
     poseMode = 1;
     poseSpeed = 'Slow'; joggingSpeed = 'Slow';
@@ -116,6 +124,7 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     jaQ1 = 0; jaQ2 = 0; jaQ3 = 0; jaQ4 = 0; jaQ5 = 0; jaQ6 = 0;
     queue = LinkedList();
     status_queue = LinkedList();
+	boxX = 0; boxY = 409;
     
     % Initialise timers
     s_timer = timer;
@@ -144,9 +153,11 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     % Define table and conveyor data of blocks
     global tableBlockData
     global conveyorBlockData
+    global fTableBlockData
     % initially create an empty string array
     tableBlockData = strings(0);
     conveyorBlockData = strings(0);
+    fTableBlockData = strings(0);
 end
  
  % --- Executes when send timer is called
@@ -2209,80 +2220,10 @@ function TableCamSS_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 % Hint: get(hObject,'Value') returns toggle state of TableCamSS
-
     global eeX eeY eeZ
     
     [eeX, eeY, eeZ] = getTableXYZ(hObject,eventdata,handles);
     disp(eeX); disp(eeY); disp(eeZ);
-
-%     global vid
-%     global tableParam
-%     global tableCameraR
-%     
-%     Rot = tableCameraR.R;
-%     Trans = [-114.9484  337.2691  831.0543]; %initial more accurate
-%     %Trans = [-362.2664002845348	-42.383249883396594	903.6546791412422]%later 
-%      if (get(hObject,'Value') == 1)
-%         %screenshot table cam
-%         im = getsnapshot(vid);
-%         axes(handles.TableCamera);
-%         figure(1);
-%         imshow(im);
-%         close(figure(1));
-%         [x1, y1]=getpts(handles.TableCamera);
-%         x1 = round(x1);
-%         y1 = round(y1);
-%         
-%         %checks of user clicked outside the camera frame from pixel number
-%         if x1 < 0 || x1 >1200
-%             flag = 0;
-%         else
-%             %converts the specified pixels into coordinates
-%             %with top left corner as origin
-%             worldPoints = pointsToWorld(tableParam.mainCameraParams, Rot, Trans, [x1 y1]);
-%             flag = 1;
-%         end
-%         
-%         switch flag
-%             case 0 %out of bounds of camera frame
-%                 disp('OUT OF BOUNDS: PLS TAKE PIC WITHIN TABLE CAMERA FRAME');
-%             case 1 %within bounds of camera frame
-%                 disp('PRINTING VALUES OF X Y Z');
-%                 xTol=-10; yTol=12; zTol=13; 
-%                 %zTol dependednt on item height on table
-%                 %initially set at 13 because block is 10 and additional
-%                 %tolerance of 3
-%                 eex = worldPoints(end,1)+xTol;
-%                 eey = worldPoints(end,2)+yTol;
-%                 eez = 147+zTol;
-%                 
-%                 %checks of the selected point is within reachable distance
-%                 %of the robot arm
-%                 reachable = isReachableWorld(eex, eey);
-%                 
-%                 if reachable == true
-%                     disp('IS REACHABLE BY ROBOT ARM ON TABLE')
-%                     if eex>175 
-%                         %checks that the point is atually on 
-%                         %the table and not in the middle of no where
-%                         fprintf('x = %d', eex)
-%                         fprintf('y = %d', eey)
-%                         fprintf('z = %d', eez)
-%                     else 
-%                         %user clicked on a point not on the table
-%                         %z coordinate not calculated
-%                         disp('IS NOT AN ACCEPTABLE POINT FOR ROBOT TO MOVE TO PLS DONT BE LAME')
-%                         fprintf('x = %d', eex)
-%                         fprintf('y = %d', eey)
-%                     end
-%                 else %not reachable and z coordinate is not even calculated
-%                     fprintf('x = %d', eex)
-%                     fprintf('y = %d', eey)
-%                     disp('IS NOT REACHABLE');
-%                     msgbox('IS NOT REACHABLE');
-%                 end
-%         end
-%      end
 end
 
  % --- Executes on button press in ConveyorCamSS.
@@ -2296,81 +2237,6 @@ function ConveyorCamSS_Callback(hObject, eventdata, handles)
     
     [eeX, eeY, eeZ] = getConveyorXYZ(hObject,eventdata,handles);
     disp(eeX); disp(eeY); disp(eeZ);
-
-%     global vid2
-%     global convParam 
-%     global convCameraR
-%     global convCameraT
-%     Rot = convCameraR.R;
-%     Trans = convCameraT.t;
-%     %Trans = [-114.9484  337.2691  831.0543] %initial more accurate
-%     %Trans = [-362.2664002845348	-42.383249883396594	903.6546791412422]%later 
-%     
-%      if (get(hObject,'Value') == 1)
-%         %screenshot table cam
-%         im = getsnapshot(vid2);
-%         axes(handles.ConveyorCamera);
-%         figure(1);
-%         imshow(im);
-%         close(figure(1));
-%         [x1, y1]=getpts(handles.ConveyorCamera);
-%         x1 = round(x1);
-%         y1 = round(y1);
-%         
-%         %checks of pixels is within the camera frame
-%         if x1 < 0 || x1 >1200
-%             flag = 0;
-%         else
-%             %converts the specified pixels into coordinates
-%             %with top left corner as origin
-%             worldPoints = pointsToWorld(convParam.ConvCameraParams, Rot, Trans, [x1 y1]);
-%             flag = 1;
-%         end
-%     
-%         switch flag
-%             case 0 %out of bounds of camera frame
-%                 disp('OUT OF BOUNDS: PLS TAKE PIC WITHIN CONVEYOR CAMERA FRAME');
-%             case 1 %within bounds of camera frame. Further checks can be done
-%                 disp('PRINTING VALUES OF X Y & MAYBE Z');
-%                 
-%                 %zTol dependednt on what item on table
-%                 xTol=-10; yTol=12; zTol=13; 
-%                 eex = worldPoints(end,1)+xTol;
-%                 eey = worldPoints(end,2)+yTol;
-%                 
-%                 %checks of the selected point is within reachable distance
-%                 %of the robot arm
-%                 reachable = isReachableWorld(eex, eey);
-%                 if reachable == true
-%                     %checks if the point is within the region of pick up in
-%                     %conveyor
-%                     if eey>184 && eey<634 && eex<0
-%                         disp('IS REACHABLE BY ROBOT ARM ON CONVEYOR') 
-%                         %height of conveyor in reference to base 
-%                         eez = 22+zTol;
-%                         disp(eex)
-%                         disp(eey)
-%                         disp(eez) 
-%                     elseif eex>175 %checks if the point is on the table
-%                         disp('IS REACHABLE BY ROBOT ARM ON TABLE')
-%                         %height of table in reference to base
-%                         eez = 147+zTol;
-%                         disp(eex)
-%                         disp(eey)
-%                         disp(eez)
-%                     else %user clicked on dodgy point thats nowhere
-%                         disp('IS NOT AN ACCEPTABLE POINT FOR ROBOT TO MOVE TO PLS DONT BE LAME')
-%                         disp(eex)
-%                         disp(eey)
-%                     end
-%                 else %point is not within reach of robot arm at all
-%                     disp(eex)
-%                     disp(eey)
-%                     disp('IS NOT REACHABLE');
-%                     msgbox('IS NOT REACHABLE');
-%                 end
-%         end
-%     end
 end
 
 % Hint: get(hObject,'Value') returns toggle state of ConveyorCamSS
@@ -2390,27 +2256,39 @@ function getBox_Callback(hObject, eventdata, handles)
 % hObject    handle to getBox (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+<<<<<<< HEAD
     global vid2;
+=======
+   
+>>>>>>> d6eb43ac60170294966c0d41ce9286a8809c7f41
+    global BoxX;
+    global BoxY;
     %check the if button is pressed
     if get(hObject,'Value') == 1
+<<<<<<< HEAD
+%        %get one frame from conveyor video feed and apply the edge and oritation detection of box
+%        box = getsnapshot(vid2);
+%        figure(1);
+%        imshow(box); hold on;
+%        box1 = box;
+%        %only fucos on the conveyor part in th image
+%        box1(:,1:580,:)=0;
+%        box1(:,1180:1600,:)=0;
+%        box1(710:1200,:,:)=0;
+%        %detect the edge of box as white pattrn detect 
+%        greybox1 = rgb2gray(box1);
+%        bw = imbinarize(greybox1,0.5);
+%        bw= ~bwareaopen(~bw,152200);
+%        %apply regionprops to get orientation and centroid 
+%        bOrientation = regionprops('table',bw,'Centroid','Image','Orientation');
+%        %edge & orientation  plot
+%        text(bOrientation.Centroid(1,1),bOrientation.Centroid(1,2),num2str(bOrientation.Orientation(1)),'Color','red','FontSize',20);
+%        contour(bw,'r');
+         [BoxX,BoxY]= getBox_XY(hObject);
+=======
        %get one frame from conveyor video feed and apply the edge and oritation detection of box
-       box = getsnapshot(vid2);
-       figure(1);
-       imshow(box); hold on;
-       box1 = box;
-       %only fucos on the conveyor part in th image
-       box1(:,1:580,:)=0;
-       box1(:,1180:1600,:)=0;
-       box1(710:1200,:,:)=0;
-       %detect the edge of box as white pattrn detect 
-       greybox1 = rgb2gray(box1);
-       bw = imbinarize(greybox1,0.5);
-       bw= ~bwareaopen(~bw,152200);
-       %apply regionprops to get orientation and centroid 
-       bOrientation = regionprops('table',bw,'Centroid','Image','Orientation');
-       %edge & orientation  plot
-       text(bOrientation.Centroid(1,1),bOrientation.Centroid(1,2),num2str(bOrientation.Orientation(1)),'Color','red','FontSize',20);
-       contour(bw,'r');
+       [BoxX ,BoxY] =  getBox_XY(hObject);
+>>>>>>> d6eb43ac60170294966c0d41ce9286a8809c7f41
     end
 end
 
@@ -2420,84 +2298,75 @@ end
 % handles    structure with handles and user data (see GUIDATA)
  % Hint: get(hObject,'Value') returns toggle state of ConveyorCamSS
     global vid;
+    global tableParam tableImagePoints tableWorldPoints
+    global blockInfo 
+    global tableBlockData
     if get(hObject,'Value') == 1
-        %get one frame from table video feed and apply the edge,orientation,OCR and reachable detection of blocks
-        snapshot = getsnapshot(vid);
-        image = snapshot;
-        figure(1);
-        imshow(image); hold on;
-	%useBlocks is a function to get all imformation required 
-        [angles, position, letter, finalText] = useBlocks(image); 
-
-        %centroids, reachable
-        images = image;
-        imHSV = rgb2hsv(images);
-        imMask = imHSV(:,:,2)<0.25 & imHSV(:,:,3)>0.68;
-        imMask(1:250, :, :) = 1;
-        imMask(end-20:end, :, :) = 1;
-        imMask(:, end-20:end, :) = 1;
-        imMask(:, 1:20, :) = 1;
-	%get away noise 
-        SE1 = strel('line',3.3,0);
-        imMask = imclose(imMask,SE1);
-        SE2 = strel('line',3.3,90);
-        imMask = imclose(imMask,SE2);
-        SE3 = strel('disk',3);
-        imMask = imclose(imMask,SE3);
-	%regionprops applied to get centroids
-        bCentroid = regionprops('table',imMask,'Centroid');
-        centroids = bCentroid.Centroid(:,:);
-        N = length(centroids(:,1));
-        %reachable define
-        reachableTag = ones(1,N);
-        Cx =805;
-        Cy = 25.5943;
-        radius = 832.405697;
+%         %get one frame from table video feed and apply the edge,orientation,OCR and reachable detection of blocks
+%          snapshot = getsnapshot(vid);
+%          image = snapshot;
+         image = imread('1.jpg');
+    
+    [angles, position, letter, finalText] = useBlocks(image);
+    figure(1);
+    imshow(image);
+    Blocksdata_table = zeros(length(angles),6);
+    % Constructing Final Array
+    for i=1:length(angles)
+        block = [position(i,1), position(i,2),... 
+            angles(i), letter(i),...
+            isReachable(position(i,1), position(i,2))];
         
-        for j=1:N
-            d = sqrt((centroids(j,1)-Cx)^2+(centroids(j,2)-Cy)^2);
-            if (d>radius)
-                reachableTag(1,j) = 0;
-            end
-        end
-     %edge finding with reachable
-        image(1:250,:,:)=0;  %resolution change here
-        greyBlocks = rgb2gray(image);
-        bwBlocks = imbinarize(greyBlocks);
-        seH = strel('line',3.9,0);
-        closeH = imclose(bwBlocks,seH);
-        seV = strel('line',3.9,90);
-        closeV = imclose(closeH,seV);
-        Blocks_final = medfilt2(closeV);
-        Blocks_final(1:250,:,:)=255;
-        Blocks_final = bwareaopen(Blocks_final,900);
-        Blocks_final = ~bwareaopen(~Blocks_final,100);
-        Blocks_final =~Blocks_final;
-        [B,L] = bwboundaries(Blocks_final,'noholes');
-	
-	%plot the edge of the blocks showing the reachable within red/blue color (red = unreachable)
-       for k = 1:length(B)
-           boundary = B{k};
-           if (reachableTag(1,k) ==1)
-               plot(boundary(:,2), boundary(:,1), 'b', 'LineWidth', 2)
-           else 
-               plot(boundary(:,2), boundary(:,1), 'r', 'LineWidth', 2)    
-           end
-       end
+        hold on 
 
-        % Constructing Final Array
-        for i=1:length(angles)
-            block = [position(i,1), position(i,2),... 
-                angles(i), letter(i),...
-                isReachable(position(i,1), position(i,2))];
-            % See if block is reachable or not
-            if (block(5)==1)
-                text(position(i,1)+30, position(i,2)+30, [finalText(i) ' , ' num2str(angles(i))], 'Color','blue');
+        % Show the central and orientation of the block
+        
+        plot(position(i,1),position(i,2),'*');
+        hold on
+         if (block(5)==1)
+             text(position(i,1)+30, position(i,2)+30, num2str(angles(i)*180/pi), 'Color','blue');
+         else
+             text(position(i,1)+30, position(i,2)+30, num2str(angles(i)*180/pi), 'Color','red');
+         end
+        
+        % write blocks information to a array
+        % [num2str(angles(i)*180/pi]//type of block: 1=letter/2=pattern
+        
+        x=round(block(1,1));
+        y=round(block(1,2));
+        Blocksdata_table(i,3) =block(1,3);
+        Blocksdata_table(i,4) =block(1,4); %check if it is a letter or not
+        Blocksdata_table(i,5) =1;  %call function coordinates to bp
+        Blocksdata_table(i,6) =block(1,5);
+  
+        
+        % change x y 
+        [R, T] = extrinsics(tableImagePoints.tImagePoints, tableWorldPoints.tWorldPoints, tableParam.tableCameraParams);
+        worldPoints = pointsToWorld(tableParam.tableCameraParams, R, T, [x y]);
+        xTol=0; yTol=0;
+        X = worldPoints(end,1)+xTol;
+        Y = worldPoints(end,2)+yTol;
+
+        [BPletter,BPnumber]= Coordinates2BP(X,Y);
+        X = round(X);
+        Y = round(Y);
+         BP=strcat(BPletter,BPnumber);
+         blockInfo = sprintf('%.0f %.0f %.0f %.0f %s %.0f',X,Y,round(block(1,3)),block(1,4),BP,block(1,5));
+         tableList = string(blockInfo);
+         if isempty(tableBlockData)
+                tableBlockData = tableList;
             else
-                text(position(i,1)+30, position(i,2)+30, [finalText(i) ' , ' num2str(angles(i))], 'Color','red');
-            end
-        end
+                tableBlockData = [tableBlockData; tableList];
+         end
+            set(handles.TableBlocksListbox, 'String', tableBlockData);
+            set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+            set(handles.BPtoBPBlockList, 'String', tableBlockData);
+            set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    
+         
+        
     end
+  end
  end
 
  %blocks detection function in pixel coordinates
@@ -2515,23 +2384,12 @@ function reachable = isReachable(x, y)
 end
 
 % blocks detection function in Robot Base Frame coordinates
-% Detects if position is Reachable
-function reachable = isReachableWorld(x, y)
-    zeroPosition = [0, 0];
-    radius = 548; 
-    
-    % Check if block is within reachable radius of robot
-    if(x-zeroPosition(1))^2+(y-zeroPosition(2))^2<radius^2
-        reachable = true;
-    else
-        reachable = false;
-    end
-end
+
 
  % Identifying Blocks
 function [trueAngles, centroids, letter, finalTextBefore] = useBlocks(image)
- %     images = imsharpen(image);
-    images = image;
+
+    images = imsharpen(image);
     imHSV = rgb2hsv(images);
     
     imMask = imHSV(:,:,2)<0.25 & imHSV(:,:,3)>0.68;
@@ -2539,51 +2397,47 @@ function [trueAngles, centroids, letter, finalTextBefore] = useBlocks(image)
     imMask(end-20:end, :, :) = 1;
     imMask(:, end-20:end, :) = 1;
     imMask(:, 1:20, :) = 1;
-     % Remove grid from image   
+
+    % Remove grid from image   
     for i=1:1200
         imMask(i,:) = ~bwareaopen(~imMask(i,:),4);
     end
     for i=1:1600
         imMask(:,i) = ~bwareaopen(~imMask(:,i),4);
     end
-%     SE1 = strel('line',3.3,0);
-%     imMask = imclose(imMask,SE1);
-%     SE2 = strel('line',3.3,90);
-%     imMask = imclose(imMask,SE2);
-%     SE3 = strel('disk',3);
-%     imMask = imclose(imMask,SE3);  
-     bCentroid = regionprops('table',imMask,'Centroid');
-     centroids = bCentroid.Centroid(2:end,:);
+    
     % Remove the letter inside block
     newMask = bwareaopen(imMask,800);
-     % Find characteristics of blocks using regionprops
-%      [centroids, area] = shapeCentroid(~newMask);
+%     imshow(newMask);
+    % Find characteristics of blocks using regionprops
+    [centroids, area] = shapeCentroid(~newMask);
     
     % Find how many blocks are in a centroid
-%     for i=1:length(area)
-%         true = 0;
-%         numberBlocks(i) = round(area(i)/2400);
-%         if (numberBlocks(i) > 1)
-%             imMask = imMask - bwareaopen(imMask, 3000);
-%             colourMask = bwperim(imMask);
-% %             Find characteristics of blocks using regionprops
-%             [centroids, area] = shapeCentroid(colourMask);
-%             true = 1;
-%         end
-%         if (true==1)
-%             break
-%         end
-%     end
+    for i=1:length(area)
+        true = 0;
+        numberBlocks(i) = round(area(i)/2400);
+        if (numberBlocks(i) > 1)
+            imMask = imMask - bwareaopen(imMask, 3000);
+            colourMask = bwperim(imMask);
+            % Find characteristics of blocks using regionprops
+            [centroids, area] = shapeCentroid(colourMask);
+            true = 1;
+        end
+        if (true==1)
+            break
+        end
+    end
     
     % Find Corner points using Douglas Peucker
      contour1 = contourc(double(newMask));
      res = DouglasPeucker(contour1,25);  % somewhere above 20
      co = removeZero(res); % Removes zero points 
-   
+  
     % this section calculates the angle of the block
-    for i=1:length(centroids(:,1))
+    for i=1:length(centroids)
         angles(i) = findAngle(co, centroids(i,:));
         [trueAngles(i), letter(i), finalTextBefore(i)] = findLetter(angles(i), centroids(i,:), imMask);
+%         imshow(~imMask);
     end    
     
     
@@ -2592,7 +2446,11 @@ end
  % Finds letter using OCR and change angle if letter is found
 function [angles, letter, finalTextBefore] = findLetter(angles, centroids, imMask)
     % Rotation through 4 angles to find letters for each centroid
-     % Split imMask into area
+
+ 
+    
+    
+    % Split imMask into area
     % form [xmin ymin width height].
     translatedAngles = rad2deg(angles);
     degrees = [translatedAngles; translatedAngles+90; translatedAngles-90; translatedAngles-180];
@@ -2604,7 +2462,7 @@ function [angles, letter, finalTextBefore] = findLetter(angles, centroids, imMas
     % CASE 1: Angle
     case1 = imrotate(I2,degrees(1));
     case1 = bwareaopen(case1, 100);
-%          imshow(case1)
+%           imshow(case1)
     results1 = ocr(case1, 'TextLayout', 'Word','CharacterSet','ABCDEFGHIJKLMNOPQRSTUVWXYZ');
     if (isempty(results1.Words) == 1)
         text = [0];
@@ -2612,59 +2470,28 @@ function [angles, letter, finalTextBefore] = findLetter(angles, centroids, imMas
     else
         text = [results1.Text(1)];
         results = [results1.WordConfidences(1)];
-    end
-    
-     % CASE 2: Angle + 90
-    case2 = imrotate(I2,degrees(2));
-    case2 = bwareaopen(case2, 100);
-    results2 = ocr(case2, 'TextLayout', 'Word','CharacterSet','ABCDEFGHIJKLMNOPQRSTUVWXYZ');
-%          imshow(case2)
-    if (isempty(results2.Words) == 1)
-        text = [text; 0];
-        results = [results; 0];
-    else
-        text = [text; results2.Text(1)];
-        results = [results; results2.WordConfidences(1)];
-    end
-    
-     % CASE 3: Angle - 90 
-    case3 = imrotate(I2,degrees(3));
-    case3 = bwareaopen(case3, 100);
-    results3 = ocr(case3, 'TextLayout', 'Word','CharacterSet','ABCDEFGHIJKLMNOPQRSTUVWXYZ');
-%          imshow(case3)
-    if (isempty(results3.Words) == 1)
-        text = [text ;0];
-        results = [results; 0];
-    else
-        text = [text; results3.Text(1)];
-        results = [results; results3.WordConfidences(1)];
-    end
-    
-     % CASE 4: Angle - 180  
-    case4 = imrotate(I2,degrees(4));
-    case4 = bwareaopen(case4, 100);
-    results4 = ocr(case4, 'TextLayout', 'Word','CharacterSet','ABCDEFGHIJKLMNOPQRSTUVWXYZ');
-%          imshow(case4)
-    if (isempty(results4.Words) == 1)
-        text = [text; 0];
-        results = [results; 0];
-    else
-        text = [text; results4.Text(1)];
-        results = [results; results4.WordConfidences(1)];
-    end
-    
-     % See which case has the highest confidence value
+    end 
+
+    % See which case has the highest confidence value
     max_num=max(results); 
     [max_num,max_idx] = max(results);
     rad = [0; (pi/2); (-pi/2); (-pi)];
-    
-     letter2number = @(c)1+lower(c)-'a'; % Convert letter to digit
+
+    letter2number = @(c)1+lower(c)-'a'; % Convert letter to digit
     finalTextBefore = text(max_idx);
     finalText = letter2number(finalTextBefore);
-    letter = finalText;
+    
+    if finalText<1
+    letter = 2;
+    else
+        letter = 1;
+    end
     angles = angles+rad(max_idx); % Find correct orientation of the block
-end 
- 
+
+    
+    
+    
+end  
  % Removes zero values from RDP
 function co = removeZero(res)
     j = 1;
@@ -2737,6 +2564,7 @@ function finalAngles = findAngle(co, centroids)
     else
         finalAngles = mean(associatedAngles);
     end
+
 end
  
  % Takes in a black and white mask of shapes and gets the stats on each
@@ -2802,20 +2630,51 @@ function errorContinue_Callback(hObject, eventdata, handles)
 end
 
 
-% --- Executes on button press in fillDeckButton.
-function fillDeckButton_Callback(hObject, eventdata, handles)
-% hObject    handle to fillDeckButton (see GCBO)
+% --- Executes on button press in fillDeck1Button.
+function fillDeck1Button_Callback(hObject, eventdata, handles)
+% hObject    handle to fillDeck1Button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    CM_fillDeck;
+    global letterBlocks;
+    global tableBlockData;
+    global conveyorBlockData;
+    global Conveyor2BP_index;
+    global letterIndex;
+    
+    CM_fillDeck1;
+    if(~isempty(letterBlocks))
+        for i3 = 1:length(letterBlocks(1,:))
+            l1_x1(i3) = letterBlocks(1,i3);
+            l1_y1(i3) = letterBlocks(2,i3);
+            l1_rot(i3) = letterBlocks(3,i3);
+            [l1_x2(i3),l1_y2(i3)] = gameboardConversion(i3,'P');
+            Conveyor2BP_index = letterIndex(i3)-(i3-1);
+            SM_FillDeckConveyor2BP(l1_x1(i3), l1_y1(i3), l1_x2(i3), l1_y2(i3), l1_rot(i3));
+            Conveyor2BP_updateBlocklist(i3, 'P', l1_x2(i3), l1_y2(i3));
+            set(handles.TableBlocksListbox, 'String', tableBlockData);
+            set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+            set(handles.BPtoBPBlockList, 'String', tableBlockData);
+            set(handles.RotateBlockBlockList, 'String', tableBlockData);
+            set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
+            set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
+        end
+    end
 end
 
-% --- Executes on button press in clearDeckButton.
-function clearDeckButton_Callback(hObject, eventdata, handles)
-% hObject    handle to clearDeckButton (see GCBO)
+% --- Executes on button press in clearDeck1Button.
+function clearDeck1Button_Callback(hObject, eventdata, handles)
+% hObject    handle to clearDeck1Button (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    CM_clearDeck;
+    global tableBlockData;
+    global conveyorBlockData;
+    CM_clearDeck1; 
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
+    set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
 end
 
 % --- Executes on button press in sortDeckButton.
@@ -2823,7 +2682,11 @@ function sortDeckButton_Callback(hObject, eventdata, handles)
 % hObject    handle to sortDeckButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-	CM_SortDeck();
+
+    % GuiHandle allows us to change gui in external function
+    GuiHandle = ancestor(hObject, 'figure');
+	
+	CM_SortDeck(GuiHandle);
 end
 
 % --- Executes on button press in clearTableButton.
@@ -2849,7 +2712,28 @@ function fillTableButton_Callback(hObject, eventdata, handles)
 % hObject    handle to fillTableButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+%     global tableBlockData;
+%     global fillTableX;
+%     global fillTableY;
+%     global gameboardX;
+%     global gameboardY;
+%     global deckNum;
+%     global gbNum;
+%     global gameboardNumber;
+%     global gameboardLetter;
+%     global BP2BP_index;
+%     
+%     CM_fillTable;
+%     if(~isempty(deckNum)&&~isempty(gbNum))
+%         for i7 = 1:min(deckNum,gbNum)
+%             SM_BP2BP(fillTableX(i7),fillTableY(i7),gameboardX(i7),gameboardY(i7));
+%             BP2BP_index = 1;
+%             BP2BP_updateBlocklist(gameboardNumber, gameboardLetter, gameboardX(i7), gameboardY(i7));
+%             set(handles.TableBlocksListbox, 'String', tableBlockData);
+%         end
+%     end
 end
+
 
 % --- Executes on button press in reloadBoxButton.
 function reloadBoxButton_Callback(hObject, eventdata, handles)
@@ -4124,6 +4008,7 @@ function ttt1_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
+    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4168,6 +4053,7 @@ function ttt1_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4191,6 +4077,7 @@ function ttt4_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
+    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4235,6 +4122,7 @@ function ttt4_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4258,6 +4146,7 @@ function ttt7_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
+    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4302,6 +4191,7 @@ function ttt7_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4325,6 +4215,7 @@ function ttt8_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
+    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4369,6 +4260,7 @@ function ttt8_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4392,6 +4284,7 @@ function ttt5_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
+    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4436,6 +4329,7 @@ function ttt5_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4459,6 +4353,7 @@ function ttt2_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
+    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4503,6 +4398,7 @@ function ttt2_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4526,6 +4422,7 @@ function ttt9_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
+    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4570,6 +4467,7 @@ function ttt9_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4593,6 +4491,7 @@ function ttt6_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
+    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4637,6 +4536,7 @@ function ttt6_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4660,6 +4560,7 @@ function ttt3_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
+    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4704,6 +4605,7 @@ function ttt3_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4727,11 +4629,18 @@ function TicTacToeEndGame_Callback(hObject, eventdata, handles)
     global queue;
     global record;
     global tableBlockData;
-
-    % Cancel the movement
-    Cancel_Callback(hObject, eventdata, handles);
+    global condition;
+    
+    if (condition ~= 1)
+        % Cancel the movement
+        Cancel_Callback(hObject, eventdata, handles);
+%         Resume_Callback(hObject, eventdata, handles);
     % Clear the queue
     queue.clear();
+        condition = 0;
+    end
+    
+
     
     % Reset the game
     handles.box=[0 0 0;0 0 0;0 0 0];
@@ -4749,8 +4658,15 @@ function TicTacToeEndGame_Callback(hObject, eventdata, handles)
     set(handles.ttt9,'String',plrmark);
     
     % Move all the blocks back
-    for i = 1:length(record)
+<<<<<<< HEAD
+    for i = length(record):1
         stringSplit = strsplit(record{1,i}{1,1});
+=======
+    len = length(record);
+    for i = 1:len
+        j = len - i + 1; % to put everything back backwards
+        stringSplit = strsplit(record{1,j}{1,1});
+>>>>>>> d6eb43ac60170294966c0d41ce9286a8809c7f41
         x1 = str2double(stringSplit(1));
         y1 = str2double(stringSplit(2));
         number1 = str2double(stringSplit(3));
@@ -4853,6 +4769,8 @@ function PPEndAlpha_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns PPEndAlpha contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from PPEndAlpha
+global ppGoalLetter
+ppGoalLetter = cellstr(get(hObject, 'String'));
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -4876,6 +4794,9 @@ function PPStartAlpha_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns PPStartAlpha contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from PPStartAlpha
+global ppStartLetter
+ppStartLetter = cellstr(get(hObject, 'String'));
+
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -4899,6 +4820,8 @@ function PPStartNumber_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns PPStartNumber contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from PPStartNumber
+global ppStartNumber
+ppStartNumber = cellstr(get(hObject, 'String'));
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -4922,6 +4845,9 @@ function PPEndNumber_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns PPEndNumber contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from PPEndNumber
+global ppGoalNumber
+ppGoalNumber = cellstr(get(hObject, 'String'));
+
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -4942,6 +4868,15 @@ function StartMaze_Callback(hObject, eventdata, handles)
 % hObject    handle to StartMaze (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+global ppStartLetter ppStartNumber 
+global ppGoalLetter ppGoalNumber
+global ppStart ppGoal
+
+%code to combine letter with number 
+
+
+pathPlanning(ppStart, ppGoal);
+
 end
 
 
@@ -4984,18 +4919,36 @@ function ControlOrActivitiesPopup_Callback(hObject, eventdata, handles)
     contents = cellstr(get(hObject,'String'));
     PopupValue = contents{get(hObject,'Value')};
 
-    if (strcmp(PopupValue,'Control Moves'))
-        set(handles.ControlMovesPanel,'Visible','On');
+    if (strcmp(PopupValue,'Simple Moves and Conveyor Control'))
+        set(handles.SMandConveyorPanel,'Visible','On');
+        set(handles.ComplexMovePanel,'Visible','Off');
         set(handles.TicTacToePanel,'Visible','Off');
         set(handles.PathPlanningPanel,'Visible','Off');
+        set(handles.TestingPanel,'Visible','Off');        
+    elseif(strcmp(PopupValue,'Complex Moves'))
+        set(handles.SMandConveyorPanel,'Visible','Off');
+        set(handles.ComplexMovePanel,'Visible','On');
+        set(handles.TicTacToePanel,'Visible','Off');
+        set(handles.PathPlanningPanel,'Visible','Off');
+        set(handles.TestingPanel,'Visible','Off');  
     elseif(strcmp(PopupValue,'Tic Tac Toe'))
-        set(handles.ControlMovesPanel,'Visible','Off');
+        set(handles.SMandConveyorPanel,'Visible','Off');
+        set(handles.ComplexMovePanel,'Visible','Off');
         set(handles.TicTacToePanel,'Visible','On');
         set(handles.PathPlanningPanel,'Visible','Off');
+        set(handles.TestingPanel,'Visible','Off');  
     elseif(strcmp(PopupValue,'Path Planning'))
-        set(handles.ControlMovesPanel,'Visible','Off');
+        set(handles.SMandConveyorPanel,'Visible','Off');
+        set(handles.ComplexMovePanel,'Visible','Off');
         set(handles.TicTacToePanel,'Visible','Off');
         set(handles.PathPlanningPanel,'Visible','On');
+        set(handles.TestingPanel,'Visible','Off');  
+    elseif(strcmp(PopupValue,'Testing'))
+        set(handles.SMandConveyorPanel,'Visible','Off');
+        set(handles.ComplexMovePanel,'Visible','Off');
+        set(handles.TicTacToePanel,'Visible','Off');
+        set(handles.PathPlanningPanel,'Visible','Off');
+        set(handles.TestingPanel,'Visible','On');  
     end
     
 end
@@ -5045,4 +4998,202 @@ function TicOrPosePopup_CreateFcn(hObject, eventdata, handles)
 if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
     set(hObject,'BackgroundColor','white');
 end
+end
+
+
+% --- Executes on button press in fillDeck2Button.
+function fillDeck2Button_Callback(hObject, eventdata, handles)
+% hObject    handle to fillDeck2Button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+    global shapeBlocks;
+    global tableBlockData;
+    global conveyorBlockData;
+    global Conveyor2BP_index;
+    global shapeIndex;
+    
+    CM_fillDeck2;
+    if(~isempty(shapeBlocks))
+        for i2 = 1:length(shapeBlocks(1,:)) 
+            s1_x1(i2) = shapeBlocks(1,i2);
+            s1_y1(i2) = shapeBlocks(2,i2);
+            s1_rot(i2) = shapeBlocks(3,i2);
+            [s1_x2(i2),s1_y2(i2)] = gameboardConversion(i2,'Q');
+            Conveyor2BP_index = shapeIndex(i2)-(i2-1);
+            SM_FillDeckConveyor2BP(s1_x1(i2), s1_y1(i2), s1_x2(i2), s1_y2(i2), s1_rot(i2));
+            Conveyor2BP_updateBlocklist(i2, 'Q', s1_x2(i2), s1_y2(i2));
+            set(handles.TableBlocksListbox, 'String', tableBlockData);
+            set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+            set(handles.BPtoBPBlockList, 'String', tableBlockData);
+            set(handles.RotateBlockBlockList, 'String', tableBlockData);
+            set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
+            set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
+        end
+    end
+end
+
+% --- Executes on button press in clearDeck2Button.
+function clearDeck2Button_Callback(hObject, eventdata, handles)
+% hObject    handle to clearDeck2Button (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+    global tableBlockData;
+    global conveyorBlockData;
+    CM_clearDeck2; 
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
+    set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
+end
+
+% --- Executes on button press in BP2BPTest.
+function BP2BPTest_Callback(hObject, eventdata, handles)
+% hObject    handle to BP2BPTest (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+% --- Executes on button press in BP2ConveyorTest.
+function BP2ConveyorTest_Callback(hObject, eventdata, handles)
+% hObject    handle to BP2ConveyorTest (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+% --- Executes on button press in Conveyor2BPTest.
+function Conveyor2BPTest_Callback(hObject, eventdata, handles)
+% hObject    handle to Conveyor2BPTest (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+% --- Executes on button press in RotateBlockTest.
+function RotateBlockTest_Callback(hObject, eventdata, handles)
+% hObject    handle to RotateBlockTest (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+end
+
+
+% --- Executes on button press in TestingButton.
+function TestingButton_Callback(hObject, eventdata, handles)
+% hObject    handle to TestingButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA) 
+
+    % GuiHandle allows us to change gui in external function
+    GuiHandle = ancestor(hObject, 'figure');
+	
+    Testing_BP2BP(GuiHandle);
+    pause; % press enter to continue
+	
+    Testing_BP2Conveyor(GuiHandle);
+    pause; % press enter to continue
+	
+    Testing_Conveyor2BP(GuiHandle);
+    pause; % press enter to continue
+	
+    Testing_RotateBlock(GuiHandle);
+end
+
+
+
+function fillTableInput_Callback(hObject, eventdata, handles)
+% hObject    handle to fillTableInput (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: get(hObject,'String') returns contents of fillTableInput as text
+%        str2double(get(hObject,'String')) returns contents of fillTableInput as a double
+    global tableBlockData;
+    global fillTableX;
+    global fillTableY;
+    global gameboardX;
+    global gameboardY;
+    global deckNum;
+    global gbNum;
+    global gameboardNumber;
+    global gameboardLetter;
+    global BP2BP_index;
+    global ftBlockInfo;
+    global fTableBlockData;
+    
+        
+    ftBlockInfo = get(hObject,'String');
+    
+    fTableList = string(ftBlockInfo);
+    if isempty(fTableBlockData)
+        fTableBlockData = fTableList;
+    else
+        fTableBlockData = [fTableBlockData; fTableList];
+    end
+    set(handles.fillTableListbox, 'String', fTableBlockData);
+    CM_fillTable;
+
+    if(deckNum ~= 0)
+        for i7 = 1:min(deckNum,gbNum)
+            SM_BP2BP(fillTableX(i7),fillTableY(i7),gameboardX(i7),gameboardY(i7));
+            BP2BP_index = 1;
+            BP2BP_updateBlocklist(gameboardNumber, gameboardLetter, gameboardX(i7), gameboardY(i7));
+            set(handles.TableBlocksListbox, 'String', tableBlockData);
+            fTableBlockData(1) = [];
+            set(handles.fillTableListbox,'String',fTableBlockData);
+        end
+    else
+        disp('No more blocks on both decks!');
+    end
+    
+end
+
+% --- Executes during object creation, after setting all properties.
+function fillTableInput_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fillTableInput (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: edit controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+end 
+
+
+% --- Executes on selection change in fillTableListbox.
+function fillTableListbox_Callback(hObject, eventdata, handles)
+% hObject    handle to fillTableListbox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+
+% Hints: contents = cellstr(get(hObject,'String')) returns fillTableListbox contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from fillTableListbox
+    global fTableIndexSelected;
+    fTableIndexSelected = get(hObject,'Value');
+end
+
+% --- Executes during object creation, after setting all properties.
+function fillTableListbox_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fillTableListbox (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    empty - handles not created until after all CreateFcns called
+
+% Hint: listbox controls usually have a white background on Windows.
+%       See ISPC and COMPUTER.
+if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+    set(hObject,'BackgroundColor','white');
+end
+end
+
+% --- Executes on button press in deleteSelectedBP.
+function deleteSelectedBP_Callback(hObject, eventdata, handles)
+% hObject    handle to deleteSelectedBP (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+    global fTableIndexSelected
+    global fTableBlockData
+    
+    fTableBlockData(fTableIndexSelected) = [];
+    set(handles.fillTableListbox, 'String', fTableBlockData);
 end

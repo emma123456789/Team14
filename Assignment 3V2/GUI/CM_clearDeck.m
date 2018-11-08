@@ -1,4 +1,6 @@
 function CM_fillDeck()
+    global BoxX;
+    global BoxY;
 %     global conveyorBlockData;
 %     shapeCounter = 0;
 %     letterCounter = 0;
@@ -49,9 +51,9 @@ function CM_fillDeck()
             for columnCounter = 1:4
                 s1_x1(blockCounter) = blockMatrixX(columnCounter+(rowCounter-1)*4);
                 s1_y1(blockCounter) = blockMatrixY(columnCounter+(rowCounter-1)*4);
-                s1_x2(blockCounter) = -18+(rowCounter-1)*-60;
-                s1_y2(blockCounter) = 521+(columnCounter-1)*-60;
-                SM_Conveyor2BP(s1_x1(blockCounter), s1_y1(blockCounter), s1_x2(blockCounter), s1_y2(blockCounter));
+                s1_x2(blockCounter) = BoxX;
+                s1_y2(blockCounter) = BoxY;
+                SM_BP2ConveyorModified(s1_x1(blockCounter), s1_y1(blockCounter), s1_x2(blockCounter), s1_y2(blockCounter));
                 sprintf('Block %d is moved onto Conveyor!',blockCounter)
                 blockCounter = blockCounter+1;
             end

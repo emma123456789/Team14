@@ -1,17 +1,17 @@
     MODULE ROB_MAIN
     
     VAR num effectorHeight:= 147;! The height of the table
-    PERS robtarget target := [[337, -144, 177],[4.37114E-8,0,-1,0],[0,0,0,0],[0,0,0,0,0,0]];! test target initialised to touch the table home
+    PERS robtarget target := [[265, -230, 177],[4.37114E-08,0,-1,0],[0,0,0,0],[0,0,0,0,0,0]];! test target initialised to touch the table home
     PERS robjoint joints:= [-90, 0, 0, 0, 0, 0]; !test pose initialised to calib position
    
     VAR num jog_inc:=30;                    !increment for linear jogging
     VAR num jog_inc_deg:= 5;                !increment for axis jogging
     VAR num conveyerT:=10;
-    PERS string current_state := "None";        !Current state for the main loop conditional statements, set in T_COM1
-    PERS bool quit := FALSE;                 !quit flag
-    PERS bool done := TRUE;                !command finished flag
-    PERS bool checkCom := FALSE;            !COM checked flag
-    PERS bool errorHandling := FALSE;       !error flag
+    PERS string current_state := "";        !Current state for the main loop conditional statements, set in T_COM1
+    PERS bool quit;                 !quit flag
+    PERS bool done;                !command finished flag
+    PERS bool checkCom;            !COM checked flag
+    PERS bool errorHandling;       !error flag
     PERS num errorNumber;                   !error number for range calculations
     VAR intnum pauseTrigger;                !trigger for pausing robot path
     VAR intnum cancelTrigger;               !trigger for cancelling robot path
@@ -26,6 +26,12 @@
    
     ! The Main procedure. When you select 'PP to Main' on the FlexPendant, it will go to this procedure.
     PROC Main()
+        
+        quit := FALSE;
+        done := FALSE;
+        checkCom := FALSE;
+        errorHandling := FALSE;
+        !initialized := FALSE;
         
         IF initialized = FALSE THEN 
         ! Program Starts
