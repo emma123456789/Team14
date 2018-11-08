@@ -2794,7 +2794,11 @@ function sortDeckButton_Callback(hObject, eventdata, handles)
 % hObject    handle to sortDeckButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-	CM_SortDeck();
+
+    % GuiHandle allows us to change gui in external function
+    GuiHandle = ancestor(hObject, 'figure');
+	
+	CM_SortDeck(GuiHandle);
 end
 
 % --- Executes on button press in clearTableButton.
