@@ -2818,27 +2818,26 @@ function fillTableButton_Callback(hObject, eventdata, handles)
 % hObject    handle to fillTableButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global tableBlockData;
-    global fillTableX;
-    global fillTableY;
-    global gameboardX;
-    global gameboardY;
-    global deckNum;
-    global gbNum;
-    global gameboardNumber;
-    global gameboardLetter;
-    global BP2BP_index;
-    
-    CM_fillTable;
-    if(~isempty(deckNum)&&~isempty(gbNum))
-        for i7 = 1:min(deckNum,gbNum)
-            SM_BP2BP(fillTableX(i7),fillTableY(i7),gameboardX(i7),gameboardY(i7));
-            BP2BP_index = 1;
-            BP2BP_updateBlocklist(gameboardNumber, gameboardLetter, gameboardX(i7), gameboardY(i7));
-            set(handles.TableBlocksListbox, 'String', tableBlockData);
-        end
-    end
-    
+%     global tableBlockData;
+%     global fillTableX;
+%     global fillTableY;
+%     global gameboardX;
+%     global gameboardY;
+%     global deckNum;
+%     global gbNum;
+%     global gameboardNumber;
+%     global gameboardLetter;
+%     global BP2BP_index;
+%     
+%     CM_fillTable;
+%     if(~isempty(deckNum)&&~isempty(gbNum))
+%         for i7 = 1:min(deckNum,gbNum)
+%             SM_BP2BP(fillTableX(i7),fillTableY(i7),gameboardX(i7),gameboardY(i7));
+%             BP2BP_index = 1;
+%             BP2BP_updateBlocklist(gameboardNumber, gameboardLetter, gameboardX(i7), gameboardY(i7));
+%             set(handles.TableBlocksListbox, 'String', tableBlockData);
+%         end
+%     end
 end
 
 
@@ -5172,7 +5171,9 @@ function fillTableInput_Callback(hObject, eventdata, handles)
     global gameboardNumber;
     global gameboardLetter;
     global BP2BP_index;
-    global ftBloc
+    global ftBlockInfo;
+    global fTableBlockData;
+    
         
     ftBlockInfo = get(hObject,'String');
     
@@ -5191,7 +5192,10 @@ function fillTableInput_Callback(hObject, eventdata, handles)
             BP2BP_index = 1;
             BP2BP_updateBlocklist(gameboardNumber, gameboardLetter, gameboardX(i7), gameboardY(i7));
             set(handles.TableBlocksListbox, 'String', tableBlockData);
+            fTableBlockData(1) = [];
+            set(handles.fillTableListbox,'String',fTableBlockData);
         end
+        
     end
     
 end

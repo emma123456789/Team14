@@ -5186,7 +5186,7 @@ function fillTableInput_Callback(hObject, eventdata, handles)
     set(handles.fillTableListbox, 'String', fTableBlockData);
     CM_fillTable;
 
-    if(~isempty(deckNum)&&~isempty(gbNum))
+    if(deckNum ~= 0)
         for i7 = 1:min(deckNum,gbNum)
             SM_BP2BP(fillTableX(i7),fillTableY(i7),gameboardX(i7),gameboardY(i7));
             BP2BP_index = 1;
@@ -5195,6 +5195,8 @@ function fillTableInput_Callback(hObject, eventdata, handles)
             fTableBlockData(1) = [];
             set(handles.fillTableListbox,'String',fTableBlockData);
         end
+    else
+        disp('No more blocks on both decks!');
     end
     
 end

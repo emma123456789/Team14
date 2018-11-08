@@ -11,8 +11,10 @@ function CM_fillTable()
     global gbNum;
     global gameboardLetter;
     global gameboardNumber;
-    
+    fillTableX = [];
+    fillTableY = [];
     len = length(tableBlockData);
+    
     for i5 = 1:len
         stringSplit = strsplit(tableBlockData(i5));
 		BP = char(stringSplit(5));
