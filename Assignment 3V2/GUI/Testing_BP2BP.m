@@ -2,6 +2,7 @@
 
 function Testing_BP2BP(GuiHandle) 
     global tableBlockData;
+	global BP2BP_index;
     %tableBlockData = '120 80 9 2 B2';
     
     % This allows us to change gui in external function
@@ -16,7 +17,9 @@ function Testing_BP2BP(GuiHandle)
     stringSplit = strsplit(tableBlockData(1)); 
     X1 = stringSplit(1);
     Y1 = stringSplit(2);
-    
+	
+    BP2BP_index = 1;
+	
     % Update SM Function name and Location aims text
     set(handles.CurrentSM,'string','BP to BP Simple Move');
     set(handles.LAXvalue,'string', num2str(X2));
@@ -26,7 +29,7 @@ function Testing_BP2BP(GuiHandle)
     
     % Move using SM BP2BP modified so it will pause and move away
     SMTESTING_BP2BP(X1, Y1, X2, Y2, GuiHandle);
-    findTableBlockIndex(letter, number);
+%     findTableBlockIndex(letter, number);
     BP2BP_updateBlocklist(number, letter, X2, Y2);
     
     % updating info to all lists  
