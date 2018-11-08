@@ -108,20 +108,12 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     global joggingSpeed;
     global eeX eeY eeZ eeROLL eePITCH eeYAW;
     global jaQ1 jaQ2 jaQ3 jaQ4 jaQ5 jaQ6;
-<<<<<<< HEAD
-<<<<<<< HEAD
     global condition;
     
     condition = 0;
-    
-=======
-	global boxX boxY;
+	global BoxX BoxY;
+	global BoxX BoxY;
    
->>>>>>> d6eb43ac60170294966c0d41ce9286a8809c7f41
-=======
-	global boxX boxY;
-   
->>>>>>> d6eb43ac60170294966c0d41ce9286a8809c7f41
     % Initialise the global variables
     poseMode = 1;
     poseSpeed = 'Slow'; joggingSpeed = 'Slow';
@@ -2261,20 +2253,11 @@ function getBox_Callback(hObject, eventdata, handles)
 % hObject    handle to getBox (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-<<<<<<< HEAD
-<<<<<<< HEAD
     global vid2;
-=======
-   
->>>>>>> d6eb43ac60170294966c0d41ce9286a8809c7f41
-=======
-   
->>>>>>> d6eb43ac60170294966c0d41ce9286a8809c7f41
     global BoxX;
     global BoxY;
     %check the if button is pressed
     if get(hObject,'Value') == 1
-<<<<<<< HEAD
 %        %get one frame from conveyor video feed and apply the edge and oritation detection of box
 %        box = getsnapshot(vid2);
 %        figure(1);
@@ -2294,13 +2277,8 @@ function getBox_Callback(hObject, eventdata, handles)
 %        text(bOrientation.Centroid(1,1),bOrientation.Centroid(1,2),num2str(bOrientation.Orientation(1)),'Color','red','FontSize',20);
 %        contour(bw,'r');
          [BoxX,BoxY]= getBox_XY(hObject);
-=======
        %get one frame from conveyor video feed and apply the edge and oritation detection of box
        [BoxX ,BoxY] =  getBox_XY(hObject);
-<<<<<<< HEAD
->>>>>>> d6eb43ac60170294966c0d41ce9286a8809c7f41
-=======
->>>>>>> d6eb43ac60170294966c0d41ce9286a8809c7f41
     end
 end
 
@@ -4670,44 +4648,35 @@ function TicTacToeEndGame_Callback(hObject, eventdata, handles)
     set(handles.ttt9,'String',plrmark);
     
     % Move all the blocks back
-<<<<<<< HEAD
-<<<<<<< HEAD
     for i = length(record):1
         stringSplit = strsplit(record{1,i}{1,1});
-=======
-=======
->>>>>>> d6eb43ac60170294966c0d41ce9286a8809c7f41
-    len = length(record);
-    for i = 1:len
-        j = len - i + 1; % to put everything back backwards
-        stringSplit = strsplit(record{1,j}{1,1});
-<<<<<<< HEAD
->>>>>>> d6eb43ac60170294966c0d41ce9286a8809c7f41
-=======
->>>>>>> d6eb43ac60170294966c0d41ce9286a8809c7f41
-        x1 = str2double(stringSplit(1));
-        y1 = str2double(stringSplit(2));
-        number1 = str2double(stringSplit(3));
-        letter1 = char(stringSplit(4));
-        x2 = str2double(stringSplit(5));
-        y2 = str2double(stringSplit(6));
-        number2 = str2double(stringSplit(7));
-        letter2 = char(stringSplit(8));
-        
-        SM_BP2BP(x1,y1,x2,y2);
-        findTableBlockIndex(letter1,number1);
-        BP2BP_updateBlocklist(number2,letter2, x2, y2);
-        
-        % updating info to all lists  
-        set(handles.TableBlocksListbox, 'String', tableBlockData);
-        set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
-        set(handles.BPtoBPBlockList, 'String', tableBlockData);
-        set(handles.RotateBlockBlockList, 'String', tableBlockData);
-    end
-    
+        len = length(record);
+        for i = 1:len
+            j = len - i + 1; % to put everything back backwards
+            stringSplit = strsplit(record{1,j}{1,1});
+            x1 = str2double(stringSplit(1));
+            y1 = str2double(stringSplit(2));
+            number1 = str2double(stringSplit(3));
+            letter1 = char(stringSplit(4));
+            x2 = str2double(stringSplit(5));
+            y2 = str2double(stringSplit(6));
+            number2 = str2double(stringSplit(7));
+            letter2 = char(stringSplit(8));
+
+            SM_BP2BP(x1,y1,x2,y2);
+            findTableBlockIndex(letter1,number1);
+            BP2BP_updateBlocklist(number2,letter2, x2, y2);
+
+            % updating info to all lists  
+            set(handles.TableBlocksListbox, 'String', tableBlockData);
+            set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+            set(handles.BPtoBPBlockList, 'String', tableBlockData);
+            set(handles.RotateBlockBlockList, 'String', tableBlockData);
+        end
     handles.counter = 1;
     record = cell.empty();
     guidata(hObject,handles);
+    end
 end
 
 % --- Executes on button press in TicTacToeResume.
@@ -4940,7 +4909,6 @@ function ControlOrActivitiesPopup_Callback(hObject, eventdata, handles)
     if (strcmp(PopupValue,'Simple Moves and Conveyor Control'))
         set(handles.SMandConveyorPanel,'Visible','On');
         set(handles.ComplexMovePanel,'Visible','Off');
-<<<<<<< HEAD
         set(handles.TicTacToePanel,'Visible','Off');
         set(handles.PathPlanningPanel,'Visible','Off');
         set(handles.TestingPanel,'Visible','Off');        
@@ -4949,7 +4917,6 @@ function ControlOrActivitiesPopup_Callback(hObject, eventdata, handles)
         set(handles.ComplexMovePanel,'Visible','On');
         set(handles.TicTacToePanel,'Visible','Off');
         set(handles.PathPlanningPanel,'Visible','Off');
-=======
         set(handles.TicTacToePanel,'Visible','Off');
         set(handles.PathPlanningPanel,'Visible','Off');
         set(handles.TestingPanel,'Visible','Off');        
@@ -4958,7 +4925,6 @@ function ControlOrActivitiesPopup_Callback(hObject, eventdata, handles)
         set(handles.ComplexMovePanel,'Visible','On');
         set(handles.TicTacToePanel,'Visible','Off');
         set(handles.PathPlanningPanel,'Visible','Off');
->>>>>>> d6eb43ac60170294966c0d41ce9286a8809c7f41
         set(handles.TestingPanel,'Visible','Off');  
     elseif(strcmp(PopupValue,'Tic Tac Toe'))
         set(handles.SMandConveyorPanel,'Visible','Off');
