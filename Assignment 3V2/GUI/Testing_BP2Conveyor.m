@@ -2,6 +2,7 @@
 
 function Testing_BP2Conveyor(GuiHandle) 
     global tableBlockData;
+	global conveyorBlockData;
 	global boxX;
     global boxY;
 	global BP2Conveyor_index;
@@ -38,6 +39,9 @@ function Testing_BP2Conveyor(GuiHandle)
     set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
     set(handles.BPtoBPBlockList, 'String', tableBlockData);
     set(handles.RotateBlockBlockList, 'String', tableBlockData);
+	
+	set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
+	set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
     
 end 
 
