@@ -1,8 +1,8 @@
-% x= 195;
-% y=0;
-% [letter,number]= Coordinates2BP(x,y);
+%   x= 195;
+%   y=0;
+%   [letter,number]= Coordinates2BP(x,y);
 
-function [letter,number] = CoordinatestoBP(x,y)
+function [letter,number] = Coordinates2BP(x,y)
     
     
     %blocks 32*32
@@ -16,9 +16,9 @@ function [letter,number] = CoordinatestoBP(x,y)
 	number = x;
     letter = y;
 	if (rem(number,1)<=error_x)
-        number = floor(number);
+        number = num2str(floor(number));
     elseif (rem(number,1)>=(1-error_x))
-        number = ceil(number);
+        number = num2str(ceil(number));
     else 
         disp('Not in any BP'); 
         number = 'Num';
