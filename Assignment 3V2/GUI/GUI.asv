@@ -22,7 +22,7 @@ function varargout = GUI(varargin)
 %
     % See also: GUIDE, GUIDATA, GUIHANDLES
      % Edit the above text to modify the response to help GUI
-     % Last Modified by GUIDE v2.5 08-Nov-2018 16:04:04
+     % Last Modified by GUIDE v2.5 08-Nov-2018 19:39:15
      % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
     gui_State = struct('gui_Name',       mfilename, ...
@@ -102,13 +102,13 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     global g_handles;
     global real_robot_IP_address;
     global sim_robot_IP_address;
-    global robot_port;
+    global robot_port; 
     global poseMode;
     global poseSpeed;
     global joggingSpeed;
     global eeX eeY eeZ eeROLL eePITCH eeYAW;
     global jaQ1 jaQ2 jaQ3 jaQ4 jaQ5 jaQ6;
-    
+   
     % Initialise the global variables
     poseMode = 1;
     poseSpeed = 'Slow'; joggingSpeed = 'Slow';
@@ -144,9 +144,11 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     % Define table and conveyor data of blocks
     global tableBlockData
     global conveyorBlockData
+    global fTableBlockData
     % initially create an empty string array
     tableBlockData = strings(0);
     conveyorBlockData = strings(0);
+    fTableBlockData = strings(0);
 end
  
  % --- Executes when send timer is called
@@ -2816,7 +2818,29 @@ function fillTableButton_Callback(hObject, eventdata, handles)
 % hObject    handle to fillTableButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    global tableBlockData;
+    global fillTableX;
+    global fillTableY;
+    global gameboardX;
+    global gameboardY;
+    global deckNum;
+    global gbNum;
+    global gameboardNumber;
+    global gameboardLetter;
+    global BP2BP_index;
+    
+    CM_fillTable;
+    if(~isempty(deckNum)&&~isempty(gbNum))
+        for i7 = 1:min(deckNum,gbNum)
+            SM_BP2BP(fillTableX(i7),fillTableY(i7),gameboardX(i7),gameboardY(i7));
+            BP2BP_index = 1;
+            BP2BP_updateBlocklist(gameboardNumber, gameboardLetter, gameboardX(i7), gameboardY(i7));
+            set(handles.TableBlocksListbox, 'String', tableBlockData);
+        end
+    end
+    
 end
+
 
 % --- Executes on button press in reloadBoxButton.
 function reloadBoxButton_Callback(hObject, eventdata, handles)
@@ -5131,20 +5155,50 @@ end
 
 
 
-function clearTableInput_Callback(hObject, eventdata, handles)
-% hObject    handle to clearTableInput (see GCBO)
+function fillTableInput_Callback(hObject, eventdata, handles)
+% hObject    handle to fillTableInput (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of clearTableInput as text
-%        str2double(get(hObject,'String')) returns contents of clearTableInput as a double
-    global fTableBlockData;
+% Hints: get(hObject,'String') returns contents of fillTableInput as text
+%        str2double(get(hObject,'String')) returns contents of fillTableInput as a double
+    global tableBlockData;
+    global fillTableX;
+    global fillTableY;
+    global gameboardX;
+    global gameboardY;
+    global deckNum;
+    global gbNum;
+    global gameboardNumber;
+    global gameboardLetter;
+    global BP2BP_index;
+    global ftBloc
+        
+    ftBlockInfo = get(hObject,'String');
+    
+    fTableList = string(ftBlockInfo);
+    if isempty(fTableBlockData)
+        fTableBlockData = fTableList;
+    else
+        fTableBlockData = [fTableBlockData; fTableList];
+    end
+    set(handles.fillTableListbox, 'String', fTableBlockData);
+    CM_fillTable;
+
+    if(~isempty(deckNum)&&~isempty(gbNum))
+        for i7 = 1:min(deckNum,gbNum)
+            SM_BP2BP(fillTableX(i7),fillTableY(i7),gameboardX(i7),gameboardY(i7));
+            BP2BP_index = 1;
+            BP2BP_updateBlocklist(gameboardNumber, gameboardLetter, gameboardX(i7), gameboardY(i7));
+            set(handles.TableBlocksListbox, 'String', tableBlockData);
+        end
+    end
     
 end
 
 % --- Executes during object creation, after setting all properties.
-function clearTableInput_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to clearTableInput (see GCBO)
+function fillTableInput_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fillTableInput (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -5156,19 +5210,21 @@ end
 end 
 
 
-% --- Executes on selection change in ClearTableListbox.
-function ClearTableListbox_Callback(hObject, eventdata, handles)
-% hObject    handle to ClearTableListbox (see GCBO)
+% --- Executes on selection change in fillTableListbox.
+function fillTableListbox_Callback(hObject, eventdata, handles)
+% hObject    handle to fillTableListbox (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: contents = cellstr(get(hObject,'String')) returns ClearTableListbox contents as cell array
-%        contents{get(hObject,'Value')} returns selected item from ClearTableListbox
+% Hints: contents = cellstr(get(hObject,'String')) returns fillTableListbox contents as cell array
+%        contents{get(hObject,'Value')} returns selected item from fillTableListbox
+    global fTableIndexSelected;
+    fTableIndexSelected = get(hObject,'Value');
 end
 
 % --- Executes during object creation, after setting all properties.
-function ClearTableListbox_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to ClearTableListbox (see GCBO)
+function fillTableListbox_CreateFcn(hObject, eventdata, handles)
+% hObject    handle to fillTableListbox (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -5184,4 +5240,9 @@ function deleteSelectedBP_Callback(hObject, eventdata, handles)
 % hObject    handle to deleteSelectedBP (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    global fTableIndexSelected
+    global fTableBlockData
+    
+    fTableBlockData(fTableIndexSelected) = [];
+    set(handles.fillTableListbox, 'String', fTableBlockData);
 end

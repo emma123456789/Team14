@@ -3,6 +3,15 @@
 function CM_fillTable()
     global fTableBlockData;
     global tableBlockData;
+    global fillTableX;
+    global fillTableY;
+    global gameboardX;
+    global gameboardY;
+    global deckNum;
+    global gbNum;
+    global gameboardLetter;
+    global gameboardNumber;
+    
     len = length(tableBlockData);
     for i5 = 1:len
         stringSplit = strsplit(tableBlockData(i5));
@@ -15,7 +24,7 @@ function CM_fillTable()
             fillTableY(end+1) = str2double(stringSplit(2));
         end
     end
-    deckNum = length(fillTableIndex);
+    deckNum = length(fillTableX);
     gbNum = length(fTableBlockData);
     for i6 = 1:gbNum
         fString = string(fTableBlockData(i6));
@@ -23,10 +32,6 @@ function CM_fillTable()
         gameboardNumber = str2double(fString{1}(2));
         [gameboardX(i6),gameboardY(i6)] = gameboardConversion(gameboardNumber,gameboardLetter);
     end
-    if(~isempty(deckNum)&&~isempty(gbNum))
-        for i7 = 1:min(deckNum,gbNum)
-            SM_BP2BP(fillTableX(i7),fillTableY(i7),gameboardX(i7),gameboardY(i7));
-        end
-    end
+
     
 end
