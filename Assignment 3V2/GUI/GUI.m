@@ -109,6 +109,7 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     global eeX eeY eeZ eeROLL eePITCH eeYAW;
     global jaQ1 jaQ2 jaQ3 jaQ4 jaQ5 jaQ6;
 	global boxX boxY;
+	global condition;
    
     % Initialise the global variables
     poseMode = 1;
@@ -118,6 +119,7 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     queue = LinkedList();
     status_queue = LinkedList();
 	boxX = 0; boxY = 409;
+	condition = 0;
     
     % Initialise timers
     s_timer = timer;
@@ -4131,6 +4133,7 @@ function ttt1_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
+    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4175,6 +4178,7 @@ function ttt1_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4198,6 +4202,7 @@ function ttt4_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
+    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4242,6 +4247,7 @@ function ttt4_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4265,6 +4271,7 @@ function ttt7_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
+    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4309,6 +4316,7 @@ function ttt7_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4332,6 +4340,7 @@ function ttt8_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
+    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4376,6 +4385,7 @@ function ttt8_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4399,6 +4409,7 @@ function ttt5_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
+    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4443,6 +4454,7 @@ function ttt5_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4466,6 +4478,7 @@ function ttt2_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
+    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4510,6 +4523,7 @@ function ttt2_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4533,6 +4547,7 @@ function ttt9_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
+    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4577,6 +4592,7 @@ function ttt9_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4600,6 +4616,7 @@ function ttt6_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
+    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4644,6 +4661,7 @@ function ttt6_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4667,6 +4685,7 @@ function ttt3_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
+    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4711,6 +4730,7 @@ function ttt3_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4734,11 +4754,15 @@ function TicTacToeEndGame_Callback(hObject, eventdata, handles)
     global queue;
     global record;
     global tableBlockData;
+	global condition;
 
-    % Cancel the movement
-    Cancel_Callback(hObject, eventdata, handles);
-    % Clear the queue
-    queue.clear();
+	if (condition ~= 1)
+		% Cancel the movement
+		Cancel_Callback(hObject, eventdata, handles);
+		% Clear the queue
+		queue.clear();
+		condition = 0;
+	end
     
     % Reset the game
     handles.box=[0 0 0;0 0 0;0 0 0];
