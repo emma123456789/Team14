@@ -1,11 +1,10 @@
-%   x= 195;
-%   y=0;
-%   [letter,number]= Coordinates2BP(x,y);
+%    x= 195;
+%    y=228;
+%    [letter,number]= CoordinatesBP(x,y);
 
 function [letter,number] = Coordinates2BP(x,y)
-    
-    
     %blocks 32*32
+    Deskcheck=y;
     flag=1;
 	half_block_length = 36/2;  %37
 	base = 175;
@@ -26,7 +25,25 @@ function [letter,number] = Coordinates2BP(x,y)
         flag = 0;
     end
     
-    if y>=0 && flag==1 
+    if (Deskcheck>225)||(Deskcheck<-225)
+          if (Deskcheck>=228)&&(Deskcheck<=232)
+              letter = 'P';
+          
+          end
+          if (Deskcheck>225)&&(Deskcheck<228)
+              letter = 'Num';
+              number = 'Num';
+          end
+          if (Deskcheck>=-232)&&(Deskcheck<=-228)
+              letter = 'Q';
+          end
+          if (Deskcheck>-228)&&(Deskcheck<-225)
+              letter = 'Num';
+              number = 'Num';
+          end
+    else
+        
+    if (y>=0) && (flag==1) 
         if (rem(letter,1)<=error_y)
             letter=floor(letter);
         elseif(rem(letter,1)>=(1-error_y))
@@ -51,29 +68,31 @@ function [letter,number] = Coordinates2BP(x,y)
         end
         
     end
-
+    
+    end
         y=letter;
         if (flag==1)
-            switch y
-                case -8
-                    letter = 'A';
-                case -6
-                    letter = 'B';
-                case -4
-                    letter = 'C';
-                case -2
-                    letter = 'D';
-                case 0
-                    letter = 'E';
-                case 2
-                    letter = 'F';
-                case 4
-                    letter = 'G';
-                case 6
-                    letter = 'H';
-                case 8
-                    letter = 'I';
-               
-            end
+    	switch y
+		case -8
+			letter = 'A';
+		case -6
+			letter = 'B';
+		case -4
+			letter = 'C';
+		case -2
+			letter = 'D';
+		case 0
+			letter = 'E';
+		case 2
+			letter = 'F';
+		case 4
+			letter = 'G';
+		case 6
+			letter = 'H';
+		case 8
+			letter = 'I';     
         end
+        end
+        
+        
 end
