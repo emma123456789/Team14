@@ -9,8 +9,10 @@ function CM_ClearTable()
 	% Read the block list
     global tableBlockData;
     global BP2Conveyor_index;
-    global BoxX;
-    global BoxY;
+    global boxX;
+    global boxY;
+    boxX = 0;
+    boxY = 409;
     BP2Conveyor_index = 1;
 	
 	% Check each block in the table block list
@@ -20,8 +22,8 @@ function CM_ClearTable()
 		x1 = str2double(stringSplit(1));
         y1 = str2double(stringSplit(2));
         if (isReachable(x1, y1) == true)
-            SM_BP2ConveyorModified(x1, y1, BoxX, BoxY)
-            BP2Conveyor_updateBlocklist(BoxX,BoxY)
+            SM_BP2ConveyorModified(x1, y1, boxX, boxY)
+            BP2Conveyor_updateBlocklist(boxX,boxY)
             BP2Conveyor_index = BP2Conveyor_index-1;
         end
         BP2Conveyor_index = BP2Conveyor_index+1;

@@ -1,7 +1,7 @@
     MODULE ROB_MAIN
     
     VAR num effectorHeight:= 147;! The height of the table
-    PERS robtarget target := [[265, -230, 177],[4.37114E-08,0,-1,0],[0,0,0,0],[0,0,0,0,0,0]];! test target initialised to touch the table home
+    PERS robtarget target := [[193, -144, 177],[4.37114E-08,0,-1,0],[0,0,0,0],[0,0,0,0,0,0]];! test target initialised to touch the table home
     PERS robjoint joints:= [-90, 0, 0, 0, 0, 0]; !test pose initialised to calib position
    
     VAR num jog_inc:=30;                    !increment for linear jogging

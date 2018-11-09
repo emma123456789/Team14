@@ -2,9 +2,6 @@
     % box = imread('no_blocks.jpg');
     global convParam convImagePoints convWorldPoints
     global vid2
-    global BoxX;
-    global BoxY;
-   
     global Boxcentrod
     
 
@@ -56,20 +53,9 @@
     Y = worldPoints(end,2)+yTol;
     x = round(X); 
     y = round(Y);
-    BoxX=x;
-    BoxY=y;
-    disp(x);
-    disp(y);
-
     
     a = sprintf('%.0f %.0f',x,y);
     Boxcentrod = a;
-
-    
-    a = sprintf('%.0f %.0f',x,y);
-    Boxcentrod = a;
-
     
     end
-end
-   
+    end

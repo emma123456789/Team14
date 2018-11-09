@@ -2,6 +2,7 @@
 %from one BP to another
 function SMTESTING_BP2BP(X1, Y1, X2, Y2, GuiHandle)
     global queue;
+    global tableBlockData;
     fast = 'v500';
     regular = 'v100';
     slow = 'v50';
@@ -82,9 +83,12 @@ function SMTESTING_BP2BP(X1, Y1, X2, Y2, GuiHandle)
     pause(5); % dont know how long to pause for
     % Find the computer vision position!!!!!!!!!!!!!!!!!!!
     
-    set(handles.CVXvalue,'string', '0');
-    set(handles.CVYvalue,'string', '0');
-    set(handles.CVZvalue,'string','0');
-    set(handles.CVAnglevalue,'string', '0');
+    getBlocks_Callback(hObject, eventdata, handles)
+    testingBlocks = strsplit(tableBlockData(1));
+    
+    set(handles.CVXvalue,'string', testingBlocks(1));
+    set(handles.CVYvalue,'string', testingBlocks(2));
+    set(handles.CVZvalue,'string','147');
+    set(handles.CVAnglevalue,'string', testingBlocks(3));
     
 end

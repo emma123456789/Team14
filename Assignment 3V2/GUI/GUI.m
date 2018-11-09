@@ -22,7 +22,7 @@ function varargout = GUI(varargin)
 %
     % See also: GUIDE, GUIDATA, GUIHANDLES
      % Edit the above text to modify the response to help GUI
-     % Last Modified by GUIDE v2.5 08-Nov-2018 19:39:15
+     % Last Modified by GUIDE v2.5 09-Nov-2018 08:36:28
      % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
     gui_State = struct('gui_Name',       mfilename, ...
@@ -108,11 +108,7 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     global joggingSpeed;
     global eeX eeY eeZ eeROLL eePITCH eeYAW;
     global jaQ1 jaQ2 jaQ3 jaQ4 jaQ5 jaQ6;
-    global condition;
-    
-    condition = 0;
-	global BoxX BoxY;
-	global BoxX BoxY;
+	global boxX boxY;
    
     % Initialise the global variables
     poseMode = 1;
@@ -412,9 +408,9 @@ end
     global g_handles;
     global MODE;
     if  MODE == 's'
-        IP = sim_robot_IP_address
+        IP = sim_robot_IP_address;
     else
-        IP = real_robot_IP_address
+        IP = real_robot_IP_address;
     end
     
  	% Connect to the robot 	
@@ -2253,32 +2249,131 @@ function getBox_Callback(hObject, eventdata, handles)
 % hObject    handle to getBox (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-    global vid2;
+    global convParam convImagePoints convWorldPoints
+    global vid2
+    global Boxcentrod 
+    global blockInfo 
+    global conveyorBlockData
     global BoxX;
     global BoxY;
     %check the if button is pressed
     if get(hObject,'Value') == 1
-%        %get one frame from conveyor video feed and apply the edge and oritation detection of box
-%        box = getsnapshot(vid2);
-%        figure(1);
-%        imshow(box); hold on;
-%        box1 = box;
-%        %only fucos on the conveyor part in th image
-%        box1(:,1:580,:)=0;
-%        box1(:,1180:1600,:)=0;
-%        box1(710:1200,:,:)=0;
-%        %detect the edge of box as white pattrn detect 
-%        greybox1 = rgb2gray(box1);
-%        bw = imbinarize(greybox1,0.5);
-%        bw= ~bwareaopen(~bw,152200);
-%        %apply regionprops to get orientation and centroid 
-%        bOrientation = regionprops('table',bw,'Centroid','Image','Orientation');
-%        %edge & orientation  plot
-%        text(bOrientation.Centroid(1,1),bOrientation.Centroid(1,2),num2str(bOrientation.Orientation(1)),'Color','red','FontSize',20);
-%        contour(bw,'r');
-         [BoxX,BoxY]= getBox_XY(hObject);
        %get one frame from conveyor video feed and apply the edge and oritation detection of box
-       [BoxX ,BoxY] =  getBox_XY(hObject);
+          snapshot = getsnapshot(vid2);
+          box = snapshot;
+%box = imread('4.jpg');
+    figure(2);
+ imshow(box); hold on;
+    box1 = box;
+    box1(:,1:600,:)=0;     %1:580
+    box1(:,1180:1600,:)=0;  %1180:1600
+    box1(710:1200,:,:)=0;   %710:1200
+       
+    greybox1 = rgb2gray(box1);
+    bw = imbinarize(greybox1,0.4);   %0.5
+  
+    bw1 = ~bwareaopen(~bw,1000); 
+    bw2 = ~bwareaopen(~bw,152000);
+    bw3 = medfilt2(bw2,[10 10]);
+    blackIndex = find(bw3==0);
+    box2=rgb2gray(box);
+    
+    box2(blackIndex) =255;
+    bw4 = imbinarize(box2,0.4); 
+    bw4 =~bwareaopen(~bw4,1000); 
+    
+    bw5 = bwareaopen(bw4,800);
+  
+    
+    Size1 = length(find(bw1));
+    Size2 = length(find(bw2));
+    
+    if (Size1 <Size2)
+        disp('Blocks detected');
+    % detection of box
+    bOrientation = regionprops('table',bw2,'Centroid','Image','Orientation');
+    N= length(bOrientation.Orientation);
+     for i= 1:N 
+      if   (length(bOrientation.Image{i})>200)
+     index=i;
+      end
+     end
+    plot(bOrientation.Centroid(index,1),bOrientation.Centroid(index,2),'*');
+    text(bOrientation.Centroid(index,1),bOrientation.Centroid(index,2),num2str(bOrientation.Orientation(index)),'Color','red','FontSize',20);
+    contour(bw2,'r');
+    
+    %get centroid for box
+    x=bOrientation.Centroid(index,1);
+    y=bOrientation.Centroid(index,2);
+    
+    x = round(x);
+    y = round(y);
+    
+    [R, T] = extrinsics(convImagePoints.imagePoints, convWorldPoints.worldPoints, convParam.ConvCameraParams);
+    worldPoints = pointsToWorld(convParam.ConvCameraParams, R, T, [x y]);
+    xTol=0; yTol=0;
+    X = worldPoints(end,1)+xTol;
+    Y = worldPoints(end,2)+yTol;
+    x = round(X); 
+    y = round(Y);
+    BoxX = x;
+    BoxY = y;
+    a = sprintf('%.0f %.0f',x,y);
+    Boxcentrod = a;
+    
+    %detect blocks in box
+     
+     [angles, position, letter, finalText] = useBlocks_conveyor(bw4,bw5);  
+     
+      % Constructing Final Array
+    for i=1:length(angles)
+        block = [position(i,1), position(i,2),... 
+            angles(i), letter(i),...
+            1];
+        
+        hold on 
+
+        % Show the central and orientation of the block
+        plot(position(i,1),position(i,2),'*');
+        hold on
+         if (block(5)==1)
+             text(position(i,1)+30, position(i,2)+30, num2str(angles(i)*180/pi), 'Color','blue');
+         else
+             text(position(i,1)+30, position(i,2)+30, num2str(angles(i)*180/pi), 'Color','red');
+         end   
+        % change x y 
+        x=position(i,1);
+        y=position(i,2);
+        [R, T] = extrinsics(convImagePoints.imagePoints, convWorldPoints.worldPoints, convParam.ConvCameraParams);
+        worldPoints = pointsToWorld(convParam.ConvCameraParams, R, T, [x y]);
+        xTol=0; yTol=0;
+        X = worldPoints(end,1)+xTol;
+        Y = worldPoints(end,2)+yTol;
+
+      
+        X = round(X);
+        Y = round(Y);
+     
+         blockInfo = sprintf('%.0f %.0f %.0f %.0f',X,Y,round(block(1,3)),block(1,4));
+         tableList = string(blockInfo);
+         
+         if isempty(conveyorBlockData)
+                conveyorBlockData = tableList;
+            else
+                conveyorBlockData = [conveyorBlockData; tableList];
+            end 
+            set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
+            set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
+    
+         
+        
+    end
+    
+    else
+        disp('No Blocks');
+    end
+      
+       
     end
 end
 
@@ -2293,9 +2388,9 @@ end
     global tableBlockData
     if get(hObject,'Value') == 1
 %         %get one frame from table video feed and apply the edge,orientation,OCR and reachable detection of blocks
-%          snapshot = getsnapshot(vid);
-%          image = snapshot;
-         image = imread('1.jpg');
+         snapshot = getsnapshot(vid);
+         image = snapshot;
+%          image = imread('1.jpg');
     
     [angles, position, letter, finalText] = useBlocks(image);
     figure(1);
@@ -2374,7 +2469,45 @@ function reachable = isReachable(x, y)
 end
 
 % blocks detection function in Robot Base Frame coordinates
+function [trueAngles, centroids, letter, finalTextBefore] = useBlocks_conveyor(image1,image2)
 
+    
+    % Remove the letter inside block
+    imMask=image1;
+    newMask = image2;
+    % Find characteristics of blocks using regionprops
+    [centroids, area] = shapeCentroid(~newMask);
+    
+    % Find how many blocks are in a centroid
+    for i=1:length(area)
+        true = 0;
+        numberBlocks(i) = round(area(i)/2400);
+        if (numberBlocks(i) > 1)
+            imMask = imMask - bwareaopen(imMask, 3000);
+            colourMask = bwperim(imMask);
+            % Find characteristics of blocks using regionprops
+            [centroids, area] = shapeCentroid(colourMask);
+            true = 1;
+        end
+        if (true==1)
+            break
+        end
+    end
+    
+    % Find Corner points using Douglas Peucker
+     contour1 = contourc(double(newMask));
+     res = DouglasPeucker(contour1,25);  % somewhere above 20
+     co = removeZero(res); % Removes zero points 
+ 
+    % this section calculates the angle of the block
+    for i=1:length(centroids(:,1))
+        angles(i) = findAngle(co, centroids(i,:));
+        [trueAngles(i), letter(i), finalTextBefore(i)] = findLetter(angles(i), centroids(i,:), imMask);
+%         imshow(~imMask);
+    end    
+    
+    
+end
 
  % Identifying Blocks
 function [trueAngles, centroids, letter, finalTextBefore] = useBlocks(image)
@@ -2631,7 +2764,7 @@ function fillDeck1Button_Callback(hObject, eventdata, handles)
     global Conveyor2BP_index;
     global letterIndex;
     
-    CM_fillDeck1;
+    CM_fillDeck1();
     if(~isempty(letterBlocks))
         for i3 = 1:length(letterBlocks(1,:))
             l1_x1(i3) = letterBlocks(1,i3);
@@ -3998,7 +4131,6 @@ function ttt1_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
-    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4043,7 +4175,6 @@ function ttt1_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
-        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4067,7 +4198,6 @@ function ttt4_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
-    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4112,7 +4242,6 @@ function ttt4_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
-        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4136,7 +4265,6 @@ function ttt7_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
-    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4181,7 +4309,6 @@ function ttt7_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
-        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4205,7 +4332,6 @@ function ttt8_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
-    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4250,7 +4376,6 @@ function ttt8_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
-        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4274,7 +4399,6 @@ function ttt5_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
-    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4319,7 +4443,6 @@ function ttt5_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
-        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4343,7 +4466,6 @@ function ttt2_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
-    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4388,7 +4510,6 @@ function ttt2_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
-        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4412,7 +4533,6 @@ function ttt9_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
-    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4457,7 +4577,6 @@ function ttt9_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
-        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4481,7 +4600,6 @@ function ttt6_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
-    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4526,7 +4644,6 @@ function ttt6_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
-        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4550,7 +4667,6 @@ function ttt3_Callback(hObject, eventdata, handles)
     winner=0;
     global tableBlockData;
     global record;
-    global condition;
     %update currentplayer mark depending on whose turn
     if handles.plr==1
         plrmark='X';
@@ -4595,7 +4711,6 @@ function ttt3_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
-        condition = 1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4619,18 +4734,11 @@ function TicTacToeEndGame_Callback(hObject, eventdata, handles)
     global queue;
     global record;
     global tableBlockData;
-    global condition;
-    
-    if (condition ~= 1)
-        % Cancel the movement
-        Cancel_Callback(hObject, eventdata, handles);
-%         Resume_Callback(hObject, eventdata, handles);
+
+    % Cancel the movement
+    Cancel_Callback(hObject, eventdata, handles);
     % Clear the queue
     queue.clear();
-        condition = 0;
-    end
-    
-
     
     % Reset the game
     handles.box=[0 0 0;0 0 0;0 0 0];
@@ -4648,35 +4756,33 @@ function TicTacToeEndGame_Callback(hObject, eventdata, handles)
     set(handles.ttt9,'String',plrmark);
     
     % Move all the blocks back
-    for i = length(record):1
-        stringSplit = strsplit(record{1,i}{1,1});
-        len = length(record);
-        for i = 1:len
-            j = len - i + 1; % to put everything back backwards
-            stringSplit = strsplit(record{1,j}{1,1});
-            x1 = str2double(stringSplit(1));
-            y1 = str2double(stringSplit(2));
-            number1 = str2double(stringSplit(3));
-            letter1 = char(stringSplit(4));
-            x2 = str2double(stringSplit(5));
-            y2 = str2double(stringSplit(6));
-            number2 = str2double(stringSplit(7));
-            letter2 = char(stringSplit(8));
-
-            SM_BP2BP(x1,y1,x2,y2);
-            findTableBlockIndex(letter1,number1);
-            BP2BP_updateBlocklist(number2,letter2, x2, y2);
-
-            % updating info to all lists  
-            set(handles.TableBlocksListbox, 'String', tableBlockData);
-            set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
-            set(handles.BPtoBPBlockList, 'String', tableBlockData);
-            set(handles.RotateBlockBlockList, 'String', tableBlockData);
-        end
+    len = length(record);
+    for i = 1:len
+        j = len - i + 1; % to put everything back backwards
+        stringSplit = strsplit(record{1,j}{1,1});
+        x1 = str2double(stringSplit(1));
+        y1 = str2double(stringSplit(2));
+        number1 = str2double(stringSplit(3));
+        letter1 = char(stringSplit(4));
+        x2 = str2double(stringSplit(5));
+        y2 = str2double(stringSplit(6));
+        number2 = str2double(stringSplit(7));
+        letter2 = char(stringSplit(8));
+        
+        SM_BP2BP(x1,y1,x2,y2);
+        findTableBlockIndex(letter1,number1);
+        BP2BP_updateBlocklist(number2,letter2, x2, y2);
+        
+        % updating info to all lists  
+        set(handles.TableBlocksListbox, 'String', tableBlockData);
+        set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+        set(handles.BPtoBPBlockList, 'String', tableBlockData);
+        set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    end
+    
     handles.counter = 1;
     record = cell.empty();
     guidata(hObject,handles);
-    end
 end
 
 % --- Executes on button press in TicTacToeResume.
@@ -4727,11 +4833,94 @@ function TicTacToePause_Callback(hObject, eventdata, handles)
     set(handles.ttt9,'Visible','off');
 end
 
-% --- Executes on button press in Player2AIMove.
-function Player2AIMove_Callback(hObject, eventdata, handles)
-% hObject    handle to Player2AIMove (see GCBO)
+% --- Executes on button press in Player1AIMove.
+function Player1AIMove_Callback(hObject, eventdata, handles)
+% hObject    handle to Player1AIMove (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+    % Initialisation
+    winner=0;
+    global tableBlockData;
+    global record;
+    GuiHandle = ancestor(hObject, 'figure');
+    if handles.plr==1
+        %do AI
+        board = handles.box;
+        turn = handles.plr;
+        agent_turn = 1;
+        [ board, value] = searchTreeTemp(board, turn, agent_turn);
+        
+        plrmark='X';
+
+        for i = 1:3
+            for j=1:3
+                if (handles.box(i,j)~=board(i,j))
+                   setString(plrmark, i, j, GuiHandle);
+                   number = (handles.counter+1)/2;
+                   letter = 'P';
+                   
+                   [x1,y1] = gameboardConversion(number,letter);
+                   if(i==1)
+                       number2 = 4;
+                   elseif(i==2)
+                       number2 = 5;
+                   elseif(i==3)
+                       number2 = 6;
+                   end
+                   
+                   if(j==1)
+                       letter2 = 'D';
+                   elseif(j==2)
+                       letter2 = 'E';
+                   elseif(j==3)
+                       letter2 = 'F';
+                   end
+                   
+                   [x2,y2] = gameboardConversion(number2,letter2);
+
+                   rec = sprintf('%.0f %.0f %.0f %c %.0f %.0f %.0f %c',x2,y2,number2,letter2,x1,y1,number,letter);
+                   record{handles.counter} = {rec};   
+
+                   SM_BP2BP(x1,y1,x2,y2);
+                   findTableBlockIndex(letter,number);
+                   BP2BP_updateBlocklist(number2,letter2, x2, y2);
+                   break;
+                end
+
+            end
+        end
+        handles.box = board;
+        
+       %update currentplayer value
+       winner=whowins(handles.plr,handles.box);
+       if handles.plr==1
+           set(handles.currentPlayer, 'String','Next: Player 2');
+           handles.plr=2;
+       else
+           set(handles.currentPlayer, 'String','Next: Player 1');
+           handles.plr=1;
+       end
+    end
+    %when nobody wins winner=0 other wise close program with results
+    if winner~=0
+        if winner==1
+            msgbox('Player 1 Wins');
+        elseif winner==2
+            msgbox('Player 2 Wins');
+        elseif winner==-1
+            msgbox('Its a Draw');
+        end
+        TicTacToeEndGame_Callback(hObject, eventdata, handles);
+    end
+    handles.counter = handles.counter+1;
+    
+    % updating info to all lists  
+    set(handles.TableBlocksListbox, 'String', tableBlockData);
+    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+    set(handles.BPtoBPBlockList, 'String', tableBlockData);
+    set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    
+    guidata(hObject,handles);
 end
 
 % --- Executes on button press in Player2Move.
@@ -4757,7 +4946,9 @@ function PPEndAlpha_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns PPEndAlpha contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from PPEndAlpha
 global ppGoalLetter
-ppGoalLetter = cellstr(get(hObject, 'String'));
+ 
+contents = cellstr(get(hObject, 'String'));
+ppGoalLetter = contents{get(hObject, 'Value')};
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -4782,7 +4973,8 @@ function PPStartAlpha_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns PPStartAlpha contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from PPStartAlpha
 global ppStartLetter
-ppStartLetter = cellstr(get(hObject, 'String'));
+contents = cellstr(get(hObject, 'String'));
+ppStartLetter = contents{get(hObject, 'Value')};
 
 end
 
@@ -4808,7 +5000,8 @@ function PPStartNumber_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns PPStartNumber contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from PPStartNumber
 global ppStartNumber
-ppStartNumber = cellstr(get(hObject, 'String'));
+contents = cellstr(get(hObject, 'String'));
+ppStartNumber = contents{get(hObject, 'Value')};
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -4833,7 +5026,8 @@ function PPEndNumber_Callback(hObject, eventdata, handles)
 % Hints: contents = cellstr(get(hObject,'String')) returns PPEndNumber contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from PPEndNumber
 global ppGoalNumber
-ppGoalNumber = cellstr(get(hObject, 'String'));
+contents = cellstr(get(hObject, 'String'));
+ppGoalNumber = contents{get(hObject, 'Value')};
 
 end
 
@@ -4855,15 +5049,33 @@ function StartMaze_Callback(hObject, eventdata, handles)
 % hObject    handle to StartMaze (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-global ppStartLetter ppStartNumber 
-global ppGoalLetter ppGoalNumber
-global ppStart ppGoal
+    global ppStartLetter ppStartNumber 
+    global ppGoalLetter ppGoalNumber
 
-%code to combine letter with number 
+    %code to combine letter with number 
+    ppStart = strcat(ppStartLetter, ppStartNumber);
+    ppGoal = strcat(ppGoalLetter,ppGoalNumber);
 
+    %display the start and end BPs
+    disp(ppStart);
+    disp(ppGoal);
 
-pathPlanning(ppStart, ppGoal);
+    %does path planning with start and goal gui inputs
+    ppBpPath = pathPlanning(ppStart, ppGoal);
 
+    noPath = 'Path not available!';
+    yesPath = 'Path available - moving now!';
+
+    %checks if there is a path available or not
+    if isempty(ppBpPath)
+        %prints on gui there is no path
+        set(handles.PathPlanningText, 'String', noPath);
+    else
+        %prints on gui there is a path available
+        set(handles.PathPlanningText, 'String', yesPath);
+        %moves robot along path
+        movePathPlanning(ppBpPath);
+    end
 end
 
 
@@ -4909,14 +5121,6 @@ function ControlOrActivitiesPopup_Callback(hObject, eventdata, handles)
     if (strcmp(PopupValue,'Simple Moves and Conveyor Control'))
         set(handles.SMandConveyorPanel,'Visible','On');
         set(handles.ComplexMovePanel,'Visible','Off');
-        set(handles.TicTacToePanel,'Visible','Off');
-        set(handles.PathPlanningPanel,'Visible','Off');
-        set(handles.TestingPanel,'Visible','Off');        
-    elseif(strcmp(PopupValue,'Complex Moves'))
-        set(handles.SMandConveyorPanel,'Visible','Off');
-        set(handles.ComplexMovePanel,'Visible','On');
-        set(handles.TicTacToePanel,'Visible','Off');
-        set(handles.PathPlanningPanel,'Visible','Off');
         set(handles.TicTacToePanel,'Visible','Off');
         set(handles.PathPlanningPanel,'Visible','Off');
         set(handles.TestingPanel,'Visible','Off');        

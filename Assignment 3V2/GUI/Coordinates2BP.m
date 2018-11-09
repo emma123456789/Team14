@@ -54,25 +54,26 @@ function [letter,number] = Coordinates2BP(x,y)
 
         y=letter;
         if (flag==1)
-    	switch y
-		case -8
-			letter = 'A';
-		case -6
-			letter = 'B';
-		case -4
-			letter = 'C';
-		case -2
-			letter = 'D';
-		case 0
-			letter = 'E';
-		case 2
-			letter = 'F';
-		case 4
-			letter = 'G';
-		case 6
-			letter = 'H';
-		case 8
-			letter = 'I';     
-        end
+            switch y
+                case -8
+                    letter = 'A';
+                case -6
+                    letter = 'B';
+                case -4
+                    letter = 'C';
+                case -2
+                    letter = 'D';
+                case 0
+                    letter = 'E';
+                case 2
+                    letter = 'F';
+                case 4
+                    letter = 'G';
+                case 6
+                    letter = 'H';
+                case 8
+                    letter = 'I';
+               
+            end
         end
 end

@@ -3,7 +3,7 @@
     ! The socket connected to the client.
     VAR socketdev client_socket;
     ! The host and port that we will be listening for a connection on.
-    PERS string current_state := "None";   !current state of the robot which is initialised as an empty string
+    PERS string current_state := "";   !current state of the robot which is initialised as an empty string
     CONST num port := 1025;            !the port used for connection between RobotStudio and MATLAB
     PERS string host := "192.168.125.1";
     PERS bool quit;                   !the quit flag                 
