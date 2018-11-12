@@ -9,7 +9,7 @@
 %  BP = 'Q1';
 %  [OGflag] = CheckOG1(BP);
 
- function [OGflg] = CheckOG(BP)
+ function [OGflg,row,column] = CheckOG(BP)
      global OG;
     
     row =double(BP(2))-48;
