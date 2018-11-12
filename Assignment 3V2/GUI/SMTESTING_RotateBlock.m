@@ -2,6 +2,7 @@
 %from one BP to another
 function SMTESTING_RotateBlock(X1, Y1, rot, GuiHandle)
     global queue;
+    global tableBlockData;
     fast = 'v500';
     regular = 'v100';
     slow = 'v50';
@@ -50,7 +51,7 @@ function SMTESTING_RotateBlock(X1, Y1, rot, GuiHandle)
     queue.add(commandStr);
 	
 	% wait and then find the robot pose position
-    pause(5); % dont know how long to pause for
+    pause; % press enter to continue
     % Find the robot pose position
     robot_pose_x = get(handles.XStatus,'String');
 	robot_pose_y = get(handles.YStatus,'String');
@@ -78,12 +79,14 @@ function SMTESTING_RotateBlock(X1, Y1, rot, GuiHandle)
     queue.add(commandStr);
     
     % wait and then find the computer vision position
-    pause(5); % dont know how long to pause for
+    pause; % press enter to continue
     % Find the computer vision position!!!!!!!!!!!!!!!!!!!
+    getBlocks_Callback(hObject, eventdata, handles)
+    testingBlocks = strsplit(tableBlockData(1));
     
-    set(handles.CVXvalue,'string', '0');
-    set(handles.CVYvalue,'string', '0');
-    set(handles.CVZvalue,'string','0');
-    set(handles.CVAnglevalue,'string', '0');
+    set(handles.CVXvalue,'string', testingBlocks(1));
+    set(handles.CVYvalue,'string', testingBlocks(2));
+    set(handles.CVZvalue,'string','147');
+    set(handles.CVAnglevalue,'string', testingBlocks(3));
     
 end

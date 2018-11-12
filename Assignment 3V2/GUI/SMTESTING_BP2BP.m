@@ -52,7 +52,7 @@ function SMTESTING_BP2BP(X1, Y1, X2, Y2, GuiHandle)
     queue.add(commandStr);
     
     % wait and then find the robot pose position
-    pause(5); % dont know how long to pause for
+    pause; % press enter to continue
     % Find the robot pose position
     robot_pose_x = get(handles.XStatus,'String');
 	robot_pose_y = get(handles.YStatus,'String');
@@ -80,7 +80,7 @@ function SMTESTING_BP2BP(X1, Y1, X2, Y2, GuiHandle)
     queue.add(commandStr);
     
     % wait and then find the computer vision position
-    pause(5); % dont know how long to pause for
+    pause; % press enter to continue
     % Find the computer vision position!!!!!!!!!!!!!!!!!!!
     
     getBlocks_Callback(hObject, eventdata, handles)
