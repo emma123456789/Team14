@@ -34,5 +34,5 @@ global OG;
         OG(row,column)=1;
         newOG=OG;
     end
-
+ newOG=OG;
 end

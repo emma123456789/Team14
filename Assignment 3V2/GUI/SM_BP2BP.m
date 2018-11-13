@@ -2,6 +2,7 @@
 %from one BP to another
 function SM_BP2BP(X1, Y1, X2, Y2)
     global queue;
+    global OG;
     fast = 'v500';
     regular = 'v100';
     slow = 'v50';
@@ -15,6 +16,12 @@ function SM_BP2BP(X1, Y1, X2, Y2)
     %WIP
     %WIP
     
+    %strcat
+    [letter,number] = Coordinates2BP(X2,Y2);
+    BP = strcat(letter,number);
+%     [OGflg,row,column] = CheckOG(BP);
+    
+%     if OGflg ==0
     %move to block position
     commandStr = sprintf('moveerb %.3f %.3f %.3f %.3f %.3f %.3f %s', X1,Y1,move_height,0,180,0,fast);
     queue.add(commandStr);
@@ -55,4 +62,8 @@ function SM_BP2BP(X1, Y1, X2, Y2)
     commandStr = sprintf('vacuumPumpOff');
     queue.add(commandStr);
     
+%     [newOG] = UpdateOG(BP);
+%     else
+%         disp('BP is already in use');
+%     end
 end

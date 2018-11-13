@@ -18,8 +18,8 @@ function Testing_RotateBlock(GuiHandle)
     
     % Update SM Function name and Location aims text
     set(handles.CurrentSM,'string','Rotate Block Simple Move');
-    set(handles.LAXvalue,'string', num2str(X1));
-    set(handles.LAYvalue,'string', num2str(Y1));
+    set(handles.LAXvalue,'string', X1);
+    set(handles.LAYvalue,'string', Y1);
     set(handles.LAZvalue,'string','147');
     set(handles.LAAnglevalue,'string', '0');
     

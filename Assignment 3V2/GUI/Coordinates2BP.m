@@ -8,12 +8,13 @@ function [letter,number] = Coordinates2BP(x,y)
     flag=1;
 	half_block_length = 36/2;  %37
 	base = 175;
-     error_x = (2/18+1)/2-0.5;
-     error_y = 2/half_block_length;
+     error_x = (2/18+1)/2-0.5+0.1;
+     error_y = 2/half_block_length+0.1;
 	x = (((x-base)/half_block_length)+1)/2;
     y = y/half_block_length;   
 	number = x;
     letter = y;
+    
 	if (rem(number,1)<=error_x)
         number = num2str(floor(number));
     elseif (rem(number,1)>=(1-error_x))
@@ -25,19 +26,21 @@ function [letter,number] = Coordinates2BP(x,y)
         flag = 0;
     end
     
-    if (Deskcheck>225)||(Deskcheck<-225)
-          if (Deskcheck>=228)&&(Deskcheck<=232)
-              letter = 'P';
+    if (Deskcheck>210)||(Deskcheck<-210)
+          if (Deskcheck>=220)&&(Deskcheck<=240)
+              letter = 'Q';
           
           end
-          if (Deskcheck>225)&&(Deskcheck<228)
+          
+          if (Deskcheck>240)&&(Deskcheck<220)
               letter = 'Num';
               number = 'Num';
           end
-          if (Deskcheck>=-232)&&(Deskcheck<=-228)
-              letter = 'Q';
+          
+          if (Deskcheck>=-240)&&(Deskcheck<=-220)
+              letter = 'P';
           end
-          if (Deskcheck>-228)&&(Deskcheck<-225)
+          if (Deskcheck>-220)&&(Deskcheck<-240)
               letter = 'Num';
               number = 'Num';
           end

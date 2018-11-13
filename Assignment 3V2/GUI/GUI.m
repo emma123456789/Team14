@@ -75,9 +75,11 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
 
     global vid;
     global vid2;
+    global OG;
     global MODE;% simulation or real? make sure anything that requires hardware to be connected checks if the mode is imulation first.
     MODE = 'r';
 
+     OG = zeros(9,11);
     % Choose default command line output for tictactoe
     handles.plr=1;
     handles.box=[0 0 0;0 0 0;0 0 0];
@@ -153,6 +155,25 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     tableBlockData = strings(0);
     conveyorBlockData = strings(0);
     fTableBlockData = strings(0);
+    
+    
+    
+%         axes(g_handles.TableCamera);
+%         axes(g_handles.ConveyorCamera);
+%         vid = videoinput('winvideo',1, 'MJPG_1600x1200'); 
+%         video_resolution1 = vid.VideoResolution;
+%         nbands1 = vid.NumberOfBands;
+%         vid2 = videoinput('winvideo',2,'MJPG_1600x1200'); 
+%         video_resolution2 = vid2.VideoResolution;
+%         nbands2 = vid2.NumberOfBands;
+% 
+%         % sguideet image handle
+%         hImage=image(zeros([video_resolution1(2), video_resolution1(1), nbands1]),'Parent',g_handles.TableCamera);
+%         hImage2=image(zeros([video_resolution2(2), video_resolution2(1), nbands2]),'Parent',g_handles.ConveyorCamera);
+%         preview(vid,hImage);
+% 
+%         preview(vid2,hImage2);
+    
 end
  
  % --- Executes when send timer is called
@@ -449,6 +470,9 @@ end
         hImage=image(zeros([video_resolution1(2), video_resolution1(1), nbands1]),'Parent',g_handles.TableCamera);
         hImage2=image(zeros([video_resolution2(2), video_resolution2(1), nbands2]),'Parent',g_handles.ConveyorCamera);
         preview(vid,hImage);
+        src1 = getselectedsource(vid);
+        src1.ExposureMode = 'manual';
+        src1.Exposure = -4;
         preview(vid2,hImage2);
      end
      
@@ -2356,7 +2380,7 @@ function getBox_Callback(hObject, eventdata, handles)
         X = round(X);
         Y = round(Y);
      
-         blockInfo = sprintf('%.0f %.0f %.0f %.0f',X,Y,round(block(1,3)),block(1,4));
+         blockInfo = sprintf('%.0f %.0f %.0f %.0f',X,Y,(block(1,3)*180/pi),block(1,4));
          tableList = string(blockInfo);
          
          if isempty(conveyorBlockData)
@@ -2388,6 +2412,7 @@ end
     global tableParam tableImagePoints tableWorldPoints
     global blockInfo 
     global tableBlockData
+    global OG
     if get(hObject,'Value') == 1
 %         %get one frame from table video feed and apply the edge,orientation,OCR and reachable detection of blocks
          snapshot = getsnapshot(vid);
@@ -2438,6 +2463,7 @@ end
         X = round(X);
         Y = round(Y);
          BP=strcat(BPletter,BPnumber);
+%         [newOG] = UpdateOG(BP);
          blockInfo = sprintf('%.0f %.0f %.0f %.0f %s %.0f',X,Y,round(block(1,3)),block(1,4),BP,block(1,5));
          tableList = string(blockInfo);
          if isempty(tableBlockData)
@@ -2525,10 +2551,10 @@ function [trueAngles, centroids, letter, finalTextBefore] = useBlocks(image)
 
     % Remove grid from image   
     for i=1:1200
-        imMask(i,:) = ~bwareaopen(~imMask(i,:),4);
+        imMask(i,:) = ~bwareaopen(~imMask(i,:),6);
     end
     for i=1:1600
-        imMask(:,i) = ~bwareaopen(~imMask(:,i),4);
+        imMask(:,i) = ~bwareaopen(~imMask(:,i),6);
     end
     
     % Remove the letter inside block

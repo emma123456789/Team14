@@ -57,6 +57,8 @@ function SMTESTING_BP2BP(X1, Y1, X2, Y2, GuiHandle)
     robot_pose_x = get(handles.XStatus,'String');
 	robot_pose_y = get(handles.YStatus,'String');
 	robot_pose_z = get(handles.ZStatus,'String');
+    robot_pose_z = str2double(robot_pose_z)-5;
+    robot_pose_z = num2str(robot_pose_z);
 	% I'm not sure if this is the orientation! Or we might need to
 	% calculate it using the matrix and 6 joint angles?
 	robot_pose_rot = get(handles.Joint6Status,'String');
@@ -80,15 +82,15 @@ function SMTESTING_BP2BP(X1, Y1, X2, Y2, GuiHandle)
     queue.add(commandStr);
     
     % wait and then find the computer vision position
-    pause; % press enter to continue
-    % Find the computer vision position!!!!!!!!!!!!!!!!!!!
-    
-    getBlocks_Callback(hObject, eventdata, handles)
-    testingBlocks = strsplit(tableBlockData(1));
-    
-    set(handles.CVXvalue,'string', testingBlocks(1));
-    set(handles.CVYvalue,'string', testingBlocks(2));
-    set(handles.CVZvalue,'string','147');
-    set(handles.CVAnglevalue,'string', testingBlocks(3));
+%     pause; % press enter to continue
+%     % Find the computer vision position!!!!!!!!!!!!!!!!!!!
+%     
+%     getBlocks_Callback(hObject, eventdata, handles)
+%     testingBlocks = strsplit(tableBlockData(1));
+%     
+%     set(handles.CVXvalue,'string', testingBlocks(1));
+%     set(handles.CVYvalue,'string', testingBlocks(2));
+%     set(handles.CVZvalue,'string','147');
+%     set(handles.CVAnglevalue,'string', testingBlocks(3));
     
 end
