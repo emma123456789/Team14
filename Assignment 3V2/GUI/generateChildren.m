@@ -1,12 +1,12 @@
-function children  = generateChildren( board, turn )
-    [ rows cols ] = find(board == 0);
-    [ row col ] = size(board);
+function children  = generateChildren( board, plr )
+    [ rows columns ] = find(board == 0);
+    [ row column ] = size(board);
     [ spaces_ spaces ] = size(rows);
-    children = zeros(row, col, spaces_);
+    children = zeros(row, column, spaces_);
     
     for i=1:spaces_
         child = board;
-        child( rows(i, 1), cols(i, 1) ) = turn;
+        child( rows(i, 1), columns(i, 1) ) = plr;
         children(:, :, i) = child;
     end
 end

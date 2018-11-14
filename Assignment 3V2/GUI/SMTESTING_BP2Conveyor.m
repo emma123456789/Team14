@@ -2,7 +2,6 @@
 %from BP to conveyor
 function SMTESTING_BP2Conveyor(X1, Y1, X2, Y2, GuiHandle)
     global queue;
-    global conveyorBlockData;
     fast = 'v500';
     regular = 'v100';
     slow = 'v50';
@@ -15,11 +14,6 @@ function SMTESTING_BP2Conveyor(X1, Y1, X2, Y2, GuiHandle)
     
 	% This allows us to change gui in external function
     handles = guidata(GuiHandle);
-	
-    
-    %first avoid collision with table
-    %WIP
-    %WIP
     
     %move to block position
     commandStr = sprintf('moveerb %.3f %.3f %.3f %.3f %.3f %.3f %s', X1,Y1,move_height,0,180,0,fast);
@@ -61,8 +55,6 @@ function SMTESTING_BP2Conveyor(X1, Y1, X2, Y2, GuiHandle)
 	robot_pose_z = get(handles.ZStatus,'String');
     robot_pose_z = str2double(robot_pose_z)-5;
     robot_pose_z = num2str(robot_pose_z);
-	% I'm not sure if this is the orientation! Or we might need to
-	% calculate it using the matrix and 6 joint angles?
 	robot_pose_rot = get(handles.Joint6Status,'String');
 	
     set(handles.RPXvalue,'string', robot_pose_x);
@@ -80,8 +72,8 @@ function SMTESTING_BP2Conveyor(X1, Y1, X2, Y2, GuiHandle)
 	
 	%move robot away from conveyor so computer vision position can be
     %calculated (eg. move to table)
-    commandStr = sprintf('moveerb %.3f %.3f %.3f %.3f %.3f %.3f %s', 300,0,move_height,0,180,0,fast);
-    queue.add(commandStr);
+%     commandStr = sprintf('moveerb %.3f %.3f %.3f %.3f %.3f %.3f %s', 300,0,move_height,0,180,0,fast);
+%     queue.add(commandStr);
     
     % wait and then find the computer vision position
 %     pause; % press enter to continue

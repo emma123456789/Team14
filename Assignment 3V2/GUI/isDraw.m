@@ -7,7 +7,6 @@ function [ draw ] = isDraw( board, row, col)
             end
         end
     end
-    
     draw = true;
 end
 

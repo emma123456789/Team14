@@ -6,35 +6,48 @@
 % see assumption 6.
 
 function CM_ClearTable()
-	% Read the block list
+	% global array of the table block information
     global tableBlockData;
+    % accessing the index of the block that is being moved
     global BP2Conveyor_index;
+    % access the box's center coordinates
     global boxX;
     global boxY;
-    boxX = 0;
-    boxY = 409;
+%     boxX = 0;
+%     boxY = 409;
+
+    % Make BP2Conveyor index to 1
     BP2Conveyor_index = 1;
 	
 	% Check each block in the table block list
 	len = length(tableBlockData);
+    % loop through the entire table block data list
 	for i = 1:len
+        % splitting up the string of block information
 		stringSplit = strsplit(tableBlockData(BP2Conveyor_index));
 		x1 = str2double(stringSplit(1));
         y1 = str2double(stringSplit(2));
+        % if the block is reachable, then move it to conveyor
         if (isReachable(x1, y1) == true)
+            % modified BP2Conveyor drops it at a height to allow blocks to
+            % be placed in same position
             SM_BP2ConveyorModified(x1, y1, boxX, boxY)
             BP2Conveyor_updateBlocklist(boxX,boxY)
+            % the index needs to stay the same if the prior block is 
+            % removed from the blocklist
             BP2Conveyor_index = BP2Conveyor_index-1;
         end
+        % move the index to the next block
         BP2Conveyor_index = BP2Conveyor_index+1;
         
     end
 
 end
 
+% This reachable function is used within the function CM_ClearTable and
+% finds which blocks are reachable or are not
  function reachable = isReachable(x, y)
-    %zeroPosition = [805, 25.5943];
-    %radius = 832.405697; 
+    % radius of the robot's reachability
     radius = 548.6;
     
     % Check if block is within reachable radius of robot

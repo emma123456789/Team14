@@ -1,3 +1,5 @@
+% This function looks through the box matrix and calculates if there is a
+% winner or not and if so who
 function [winner] = whowins (plr, box)
     winner=0;
     % logic for winner
