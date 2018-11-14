@@ -5132,7 +5132,7 @@ function StartMaze_Callback(hObject, eventdata, handles)
     disp(ppStart);
     disp(ppGoal);
 
-    %gets path & flag for gui input start and goal
+    %gets path with start and goal gui inputs
     [ppBpPath, ppFlag]= pathPlanning(ppStart, ppGoal);
     
     %moveFlag: 0=no path, 1=yes path, 2=start/goal on obstacle, no path 
