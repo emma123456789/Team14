@@ -4205,6 +4205,8 @@ function ttt1_Callback(hObject, eventdata, handles)
             msgbox('Its a Draw');
         end
         condition = 1;
+        handles.box=[0 0 0;0 0 0;0 0 0];
+        handles.plr=1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4274,6 +4276,8 @@ function ttt4_Callback(hObject, eventdata, handles)
             msgbox('Its a Draw');
         end
         condition = 1;
+        handles.box=[0 0 0;0 0 0;0 0 0];
+        handles.plr=1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4343,6 +4347,8 @@ function ttt7_Callback(hObject, eventdata, handles)
             msgbox('Its a Draw');
         end
         condition = 1;
+        handles.box=[0 0 0;0 0 0;0 0 0];
+        handles.plr=1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4412,6 +4418,8 @@ function ttt8_Callback(hObject, eventdata, handles)
             msgbox('Its a Draw');
         end
         condition = 1;
+        handles.box=[0 0 0;0 0 0;0 0 0];
+        handles.plr=1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4481,6 +4489,8 @@ function ttt5_Callback(hObject, eventdata, handles)
             msgbox('Its a Draw');
         end
         condition = 1;
+        handles.box=[0 0 0;0 0 0;0 0 0];
+        handles.plr=1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4550,6 +4560,8 @@ function ttt2_Callback(hObject, eventdata, handles)
             msgbox('Its a Draw');
         end
         condition = 1;
+        handles.box=[0 0 0;0 0 0;0 0 0];
+        handles.plr=1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4619,6 +4631,8 @@ function ttt9_Callback(hObject, eventdata, handles)
             msgbox('Its a Draw');
         end
         condition = 1;
+        handles.box=[0 0 0;0 0 0;0 0 0];
+        handles.plr=1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4688,6 +4702,8 @@ function ttt6_Callback(hObject, eventdata, handles)
             msgbox('Its a Draw');
         end
         condition = 1;
+        handles.box=[0 0 0;0 0 0;0 0 0];
+        handles.plr=1;        
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4757,6 +4773,8 @@ function ttt3_Callback(hObject, eventdata, handles)
             msgbox('Its a Draw');
         end
         condition = 1;
+        handles.box=[0 0 0;0 0 0;0 0 0];
+        handles.plr=1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
@@ -4809,25 +4827,27 @@ function TicTacToeEndGame_Callback(hObject, eventdata, handles)
     len = length(record);
     for i = 1:len
         j = len - i + 1; % to put everything back backwards
-        stringSplit = strsplit(record{1,j}{1,1});
-        x1 = str2double(stringSplit(1));
-        y1 = str2double(stringSplit(2));
-        number1 = str2double(stringSplit(3));
-        letter1 = char(stringSplit(4));
-        x2 = str2double(stringSplit(5));
-        y2 = str2double(stringSplit(6));
-        number2 = str2double(stringSplit(7));
-        letter2 = char(stringSplit(8));
-        
-        SM_BP2BP(x1,y1,x2,y2);
-        findTableBlockIndex(letter1,number1);
-        BP2BP_updateBlocklist(number2,letter2, x2, y2);
-        
-        % updating info to all lists  
-        set(handles.TableBlocksListbox, 'String', tableBlockData);
-        set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
-        set(handles.BPtoBPBlockList, 'String', tableBlockData);
-        set(handles.RotateBlockBlockList, 'String', tableBlockData);
+        if(~isempty(record{1,j}))
+            stringSplit = strsplit(record{1,j}{1,1});
+            x1 = str2double(stringSplit(1));
+            y1 = str2double(stringSplit(2));
+            number1 = str2double(stringSplit(3));
+            letter1 = char(stringSplit(4));
+            x2 = str2double(stringSplit(5));
+            y2 = str2double(stringSplit(6));
+            number2 = str2double(stringSplit(7));
+            letter2 = char(stringSplit(8));
+
+            SM_BP2BP(x1,y1,x2,y2);
+            findTableBlockIndex(letter1,number1);
+            BP2BP_updateBlocklist(number2,letter2, x2, y2);
+
+            % updating info to all lists  
+            set(handles.TableBlocksListbox, 'String', tableBlockData);
+            set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+            set(handles.BPtoBPBlockList, 'String', tableBlockData);
+            set(handles.RotateBlockBlockList, 'String', tableBlockData);
+        end
     end
     
     handles.counter = 1;
@@ -4960,6 +4980,8 @@ function Player1AIMove_Callback(hObject, eventdata, handles)
         elseif winner==-1
             msgbox('Its a Draw');
         end
+        handles.box=[0 0 0;0 0 0;0 0 0];
+        handles.plr=1;
         TicTacToeEndGame_Callback(hObject, eventdata, handles);
     end
     handles.counter = handles.counter+1;
