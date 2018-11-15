@@ -1,21 +1,22 @@
-%    x= 195;
-%    y=228;
-%    [letter,number]= CoordinatesBP(x,y);
-
 function [letter,number] = Coordinates2BP(x,y)
+% Coordinates2BP  change the Coordinates to BP
+% [letter,number] = Coordinates2BP(x,y) change the x,y position to BP
+    
     %blocks 32*32
+    % change the x,y respect to relative axes
     Deskcheck=y;
     flag=1;
-	half_block_length = 36/2;  %37
-	base = 175;
-     error_x = (2/18+1)/2-0.5+0.1;
-     error_y = 2/half_block_length+0.1;
-	x = (((x-base)/half_block_length)+1)/2;
+    half_block_length = 36/2;  %37
+    base = 175;
+    error_x = (2/18+1)/2-0.5+0.1;
+    error_y = 2/half_block_length+0.1;
+    x = (((x-base)/half_block_length)+1)/2;
     y = y/half_block_length;   
-	number = x;
+    number = x;
     letter = y;
     
-	if (rem(number,1)<=error_x)
+    %convert x to number information
+    if (rem(number,1)<=error_x)
         number = num2str(floor(number));
     elseif (rem(number,1)>=(1-error_x))
         number = num2str(ceil(number));
@@ -25,7 +26,7 @@ function [letter,number] = Coordinates2BP(x,y)
         letter = 'Num';
         flag = 0;
     end
-    
+       %convert y to letter information
     if (Deskcheck>210)||(Deskcheck<-210)
           if (Deskcheck>=220)&&(Deskcheck<=240)
               letter = 'Q';
@@ -74,6 +75,7 @@ function [letter,number] = Coordinates2BP(x,y)
     
     end
         y=letter;
+	 %give the BP depending on the calculation above
         if (flag==1)
     	switch y
 		case -8
