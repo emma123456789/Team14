@@ -22,7 +22,7 @@ function varargout = GUI(varargin)
 %
     % See also: GUIDE, GUIDATA, GUIHANDLES
      % Edit the above text to modify the response to help GUI
-     % Last Modified by GUIDE v2.5 12-Nov-2018 17:57:26
+     % Last Modified by GUIDE v2.5 15-Nov-2018 21:11:57
      % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
     gui_State = struct('gui_Name',       mfilename, ...
@@ -5568,4 +5568,12 @@ function MoveToHomeButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
     Move2Home();
+end
+
+
+% --- Executes on button press in cameraFeedButton.
+function cameraFeedButton_Callback(hObject, eventdata, handles)
+% hObject    handle to cameraFeedButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
 end
