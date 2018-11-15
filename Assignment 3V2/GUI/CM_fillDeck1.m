@@ -15,7 +15,7 @@ function CM_fillDeck1()
             rotConveyor(i) = str2double(stringSplit(3));
             pattern = char(stringSplit(4));
 
-            if strcmp(pattern,'2')
+%             if strcmp(pattern,'2')
                 if(letterCounter <= 6) %letter
                     letterCounter = letterCounter+1;
                     letterIndex(letterCounter) = i;
@@ -25,7 +25,7 @@ function CM_fillDeck1()
                 else
                     disp('Player1 deck is full!')
                 end
-            end
+%             end
         end
 
 end

@@ -14,7 +14,7 @@ function CM_fillDeck2()
             yConveyor(i) = str2double(stringSplit(2)); %y-coordinate of blocks on conveyor
             rotConveyor(i) = str2double(stringSplit(3));
             pattern = char(stringSplit(4));
-            if strcmp(pattern,'1')
+%             if strcmp(pattern,'1')
                 if(shapeCounter <= 6)%shape
                     shapeCounter = shapeCounter+1;
                     shapeIndex(shapeCounter) = i;
@@ -24,6 +24,6 @@ function CM_fillDeck2()
                 else
                     disp('Player2 deck is full!')
                 end
-            end
+%             end
         end
 end
