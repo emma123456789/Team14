@@ -3,8 +3,6 @@ function CM_clearDeck1()
     global boxX;
     global boxY;
     global BP2Conveyor_index;
-    boxX = 0;
-    boxY = 409;
     BP2Conveyor_index = 1;
 
     blockMatrixX1 = [];

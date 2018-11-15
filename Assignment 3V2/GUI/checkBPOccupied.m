@@ -1,4 +1,4 @@
-% Table Block Index will compare bp with table list to find index of the
+% checkBPOccupied will compare bp with table list to find index of the
 % matching BP
 function occupied = checkBPOccupied(letter, number)
     % global array of the table block information

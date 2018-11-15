@@ -13,8 +13,6 @@ function CM_ClearTable()
     % access the box's center coordinates
     global boxX;
     global boxY;
-%     boxX = 0;
-%     boxY = 409;
 
     % Make BP2Conveyor index to 1
     BP2Conveyor_index = 1;

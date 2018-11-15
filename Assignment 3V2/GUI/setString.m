@@ -1,3 +1,4 @@
+% setString will update the gui tic tac toe grid
 function setString(plrmark, i, j, GuiHandle)
     handles = guidata(GuiHandle);
     if (i == 1)

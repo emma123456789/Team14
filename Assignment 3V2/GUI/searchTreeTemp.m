@@ -1,3 +1,6 @@
+% This function will find the optimal place the AI should be placed through
+% looking at the next gamestates and seeing which place will return the
+% highest value
 function [nextBoard, value] = searchTreeTemp(board, turn, agentTurn)
     
     [ gameState ] = isAgentWin(board, 3, 3, agentTurn);

@@ -12,11 +12,6 @@ function SM_Conveyor2BP(X1, Y1, X2, Y2)
     grip_height = table_height + block_height;
     conveyor_grip_height = conveyor_height + block_height;
     
-    
-    %first avoid collision with table
-    %WIP
-    %WIP
-    
     %move to conveyor position
     commandStr = sprintf('moveerb %.3f %.3f %.3f %.3f %.3f %.3f %s', X1,Y1,move_height,0,180,0,fast);
     queue.add(commandStr);

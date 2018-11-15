@@ -2674,6 +2674,7 @@ function [angles, letter, finalTextBefore] = findLetter(angles, centroids, imMas
     
     
 end  
+
  % Removes zero values from RDP
 function co = removeZero(res)
     j = 1;
@@ -3017,12 +3018,12 @@ function BPtoConveyorButton1_Callback(hObject, eventdata, handles)
 	x1 = BP2Conveyor_blocklist(1);
     y1 = BP2Conveyor_blocklist(2);
 	% Need to know conveyor coordinates
-    x2 = 0;
-    y2 = 409;
-	SM_BP2Conveyor(x1,y1,x2,y2);
-    BP2Conveyor_updateBlocklist(x2, y2);
+    global boxX;
+    global boxY;
+	SM_BP2Conveyor(x1,y1,boxX,boxY);
+    BP2Conveyor_updateBlocklist(boxX, boxY);
     
-        % updating info to all lists  
+    % updating info to all lists  
     set(handles.TableBlocksListbox, 'String', tableBlockData);
     set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
     set(handles.BPtoBPBlockList, 'String', tableBlockData);
@@ -3042,6 +3043,7 @@ function RotateBlockBlockList_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from RotateBlockBlockList
 	global Rotate_blocklist;
     global Rotate_index;
+    % This will choose out of a list of the block list data
     contents = cellstr(get(hObject,'String'));
 	block_list = contents{get(hObject, 'Value')};
     Rotate_index = get(hObject, 'Value');
@@ -3060,9 +3062,9 @@ function RotateBlockBlockList_CreateFcn(hObject, eventdata, handles)
 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
 
 
@@ -3076,6 +3078,7 @@ function BPtoBPBlockList_Callback(hObject, eventdata, handles)
 %        contents{get(hObject,'Value')} returns selected item from BPtoBPBlockList
 	global BP2BP_blocklist;
     global BP2BP_index;
+    % This will choose out of a list of the block list data
     contents = cellstr(get(hObject,'String'));
 	block_list = contents{get(hObject, 'Value')};
     BP2BP_index = get(hObject, 'Value');
@@ -3094,9 +3097,9 @@ function BPtoBPBlockList_CreateFcn(hObject, eventdata, handles)
 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
 
 % --- Executes on selection change in ConveyortoBPBlockList.
@@ -3126,9 +3129,9 @@ function ConveyortoBPBlockList_CreateFcn(hObject, eventdata, handles)
 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
 
 
@@ -3154,9 +3157,9 @@ function BPtoBPAlphabet_CreateFcn(hObject, eventdata, handles)
 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
 
 
@@ -3182,9 +3185,9 @@ function BPtoBPNumber_CreateFcn(hObject, eventdata, handles)
 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
 
 
@@ -3218,9 +3221,9 @@ function BPtoConveyorBlockList_CreateFcn(hObject, eventdata, handles)
 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
 
 % --- Executes on selection change in ConveyortoBPAlphabet.
@@ -3244,9 +3247,9 @@ function ConveyortoBPAlphabet_CreateFcn(hObject, eventdata, handles)
 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
 
 
@@ -3272,9 +3275,9 @@ function ConveyortoBPNumber_CreateFcn(hObject, eventdata, handles)
 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
 
 
@@ -3298,9 +3301,9 @@ function ConveyorBlocksListbox_CreateFcn(hObject, eventdata, handles)
 
 % Hint: listbox controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
 
 
@@ -3324,9 +3327,9 @@ function TableBlocksListbox_CreateFcn(hObject, eventdata, handles)
 
 % Hint: listbox controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
 
 
@@ -3353,9 +3356,9 @@ function CameraPopupmenu_CreateFcn(hObject, eventdata, handles)
 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 
     global cameraType
     cameraType = 'Table';
@@ -3380,9 +3383,9 @@ function BlockListPopupmenu_CreateFcn(hObject, eventdata, handles)
 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
 
 
@@ -3407,9 +3410,9 @@ function CorrectBlockStatusHereEdit_CreateFcn(hObject, eventdata, handles)
 
 % Hint: edit controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
 
 
@@ -3426,13 +3429,9 @@ function CorrectButton_Callback(hObject, eventdata, handles)
     global cameraType
     
     tableList = string(blockInfo);
-    %tableList = {1, 2, 3;
-          %'text', rand(5,10,2), {11; 22; 33}};
-          
-    %data = get(handles.listbox1,'String');
-    %data = [data ; cellstr('blue')];
-  %hi = isempty(tableBlockData)
     
+    % The correct button will check which block data the user wants to add
+    % to and then adds whatever they inputed on the gui
     switch cameraType
 		case 'Table'
             if isempty(tableBlockData)
@@ -3468,6 +3467,8 @@ function DeleteSelectedTableBlock_Callback(hObject, eventdata, handles)
     global tableIndexSelected
     global tableBlockData
     
+    % this will find which block data has been selected on the list and
+    % will delete it
     tableBlockData(tableIndexSelected) = [];
     set(handles.TableBlocksListbox, 'String', tableBlockData);
     set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
@@ -3483,7 +3484,9 @@ function DeleteSelectedConveyorBlock_Callback(hObject, eventdata, handles)
 % handles    structure with handles and user data (see GUIDATA)
     global conveyorIndexSelected
     global conveyorBlockData
-
+    
+    % this will find which block data has been selected on the list and
+    % will delete it
     conveyorBlockData(conveyorIndexSelected) = [];
     set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
     set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
@@ -4958,18 +4961,23 @@ function Player1AIMove_Callback(hObject, eventdata, handles)
     global tableBlockData;
     global record;
     GuiHandle = ancestor(hObject, 'figure');
+    % check which players turn it is
     if handles.plr==1
-        %do AI
+        % do AI
         board = handles.box;
         turn = handles.plr;
         agent_turn = 1;
+        % This function will find the optimal place the AI should be placed
         [ board, value] = searchTreeTemp(board, turn, agent_turn);
         
         plrmark='X';
-
+        % this loop just goes through the new board matrix and sees which
+        % place the new player chose and then moves to that place and also
+        % updates the gui
         for i = 1:3
             for j=1:3
                 if (handles.box(i,j)~=board(i,j))
+                   % setString will update the gui tic tac toe grid
                    setString(plrmark, i, j, GuiHandle);
                    number = (handles.counter+1)/2;
                    letter = 'P';
@@ -5062,10 +5070,10 @@ function PPEndAlpha_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns PPEndAlpha contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from PPEndAlpha
-global ppGoalLetter
- 
-contents = cellstr(get(hObject, 'String'));
-ppGoalLetter = contents{get(hObject, 'Value')};
+    global ppGoalLetter
+
+    contents = cellstr(get(hObject, 'String'));
+    ppGoalLetter = contents{get(hObject, 'Value')};
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -5076,9 +5084,9 @@ function PPEndAlpha_CreateFcn(hObject, eventdata, handles)
 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
 
 % --- Executes on selection change in PPStartAlpha.
@@ -5089,9 +5097,9 @@ function PPStartAlpha_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns PPStartAlpha contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from PPStartAlpha
-global ppStartLetter
-contents = cellstr(get(hObject, 'String'));
-ppStartLetter = contents{get(hObject, 'Value')};
+    global ppStartLetter
+    contents = cellstr(get(hObject, 'String'));
+    ppStartLetter = contents{get(hObject, 'Value')};
 
 end
 
@@ -5103,9 +5111,9 @@ function PPStartAlpha_CreateFcn(hObject, eventdata, handles)
 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
 
 % --- Executes on selection change in PPStartNumber.
@@ -5116,9 +5124,9 @@ function PPStartNumber_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns PPStartNumber contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from PPStartNumber
-global ppStartNumber
-contents = cellstr(get(hObject, 'String'));
-ppStartNumber = contents{get(hObject, 'Value')};
+    global ppStartNumber
+    contents = cellstr(get(hObject, 'String'));
+    ppStartNumber = contents{get(hObject, 'Value')};
 end
 
 % --- Executes during object creation, after setting all properties.
@@ -5129,9 +5137,9 @@ function PPStartNumber_CreateFcn(hObject, eventdata, handles)
 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
 
 % --- Executes on selection change in PPEndNumber.
@@ -5142,9 +5150,9 @@ function PPEndNumber_Callback(hObject, eventdata, handles)
 
 % Hints: contents = cellstr(get(hObject,'String')) returns PPEndNumber contents as cell array
 %        contents{get(hObject,'Value')} returns selected item from PPEndNumber
-global ppGoalNumber
-contents = cellstr(get(hObject, 'String'));
-ppGoalNumber = contents{get(hObject, 'Value')};
+    global ppGoalNumber
+    contents = cellstr(get(hObject, 'String'));
+    ppGoalNumber = contents{get(hObject, 'Value')};
 
 end
 
@@ -5156,9 +5164,9 @@ function PPEndNumber_CreateFcn(hObject, eventdata, handles)
 
 % Hint: popupmenu controls usually have a white background on Windows.
 %       See ISPC and COMPUTER.
-if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
-    set(hObject,'BackgroundColor','white');
-end
+    if ispc && isequal(get(hObject,'BackgroundColor'), get(0,'defaultUicontrolBackgroundColor'))
+        set(hObject,'BackgroundColor','white');
+    end
 end
 
 % --- Executes on button press in StartMaze.
@@ -5223,9 +5231,10 @@ function BPtoBPButton1_Callback(hObject, eventdata, handles)
 	x1 = BP2BP_blocklist(1);
     y1 = BP2BP_blocklist(2);
     
-        % Check if BP is already in use
+    % Check if BP is already in use
     occupied = checkBPOccupied(BP2BP_letter, BP2BP_number);
     if (occupied == false)
+        % if occupied is false, then move to desired BP
         [x2,y2] = gameboardConversion(BP2BP_number,BP2BP_letter);
         SM_BP2BP(x1,y1,x2,y2);
         BP2BP_updateBlocklist(BP2BP_number,BP2BP_letter, x2, y2);
@@ -5236,6 +5245,7 @@ function BPtoBPButton1_Callback(hObject, eventdata, handles)
         set(handles.BPtoBPBlockList, 'String', tableBlockData);
         set(handles.RotateBlockBlockList, 'String', tableBlockData);
     elseif (occupied == true)
+        % if occupied is true, then do not move to the BP
         f = msgbox('BP is occupied');
     end
     
@@ -5428,6 +5438,7 @@ function TestingButton_Callback(hObject, eventdata, handles)
     % GuiHandle allows us to change gui in external function
     GuiHandle = ancestor(hObject, 'figure');
 	
+    % Goes through and tests each simple move
     Testing_BP2BP(GuiHandle);
     pause; % press enter to continue
 	
@@ -5481,7 +5492,11 @@ function fillTableInput_Callback(hObject, eventdata, handles)
             if (occupied == false)
                 SM_BP2BP(fillTableX(i7),fillTableY(i7),gameboardX(i7),gameboardY(i7));
                 BP2BP_updateBlocklist(gameboardNumber, gameboardLetter, gameboardX(i7), gameboardY(i7));
-                set(handles.TableBlocksListbox, 'String', tableBlockData);
+                % updating info to all lists  
+                set(handles.TableBlocksListbox, 'String', tableBlockData);    
+                set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+                set(handles.BPtoBPBlockList, 'String', tableBlockData);
+                set(handles.RotateBlockBlockList, 'String', tableBlockData);
                 fTableBlockData(1) = [];
                 set(handles.fillTableListbox,'String',fTableBlockData);
                 break;
