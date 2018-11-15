@@ -76,6 +76,8 @@ function GUI_OpeningFcn(hObject, eventdata, handles, varargin)
     global vid;
     global vid2;
     global OG;
+    global testflag;
+    testflag =1;
     global MODE;% simulation or real? make sure anything that requires hardware to be connected checks if the mode is imulation first.
     MODE = 'r';
 
@@ -5576,4 +5578,16 @@ function cameraFeedButton_Callback(hObject, eventdata, handles)
 % hObject    handle to cameraFeedButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
+global testflag;
+
+[image1,image2 ]= DisplayImage(testflag); 
+axes(handles.axes1);  
+imshow(image1); hold on; 
+axes(handles.axes2);
+imshow(image2); hold on;
+if testflag <17
+testflag =testflag +1;
+else
+    testflag=1;
+end
 end
