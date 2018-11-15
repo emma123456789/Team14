@@ -1,20 +1,12 @@
+function   [TestImageTable,TestImageCobveyor] = DisplayImage(i)
+% DisplayImage  get the prerecorded images 
+% [A,B] = DisplayImage(i)  get the image for table svaed into A, for
+%
+% conveyor saved into B
 
 
-
-function   TestImages = DisplayImage(i)
-
- TestImages=imread([num2str(i),'.jpg']);
+ TestImageTable=imread([num2str(i),'.jpg']);
+ TestImageCobveyor = imread([num2str(i+100),'.jpg']);
  
 end
 
-% 
-% global testflag;
-% 
-% TestImages = DisplayImage(testflag); 
-% axes(handles.axes1);  
-% imshow(TestImages); hold on; 
-% if testflag <=16
-% testflag =testflag +1;
-% else
-%     testflag=1;
-% end
