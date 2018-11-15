@@ -1,4 +1,7 @@
     function [x,y]= getBox_XY(hObject)
+% getBox_XY  get x,y position of the box on conveyor
+%   [x,y]= getBox_XY(hObject) get x and y of the box on conveyor
+
     % box = imread('no_blocks.jpg');
     global convParam convImagePoints convWorldPoints
     global vid2
@@ -45,7 +48,7 @@
     
     x = round(x);
     y = round(y);
-    
+    %change the xy to the relative axes
     [R, T] = extrinsics(convImagePoints.imagePoints, convWorldPoints.worldPoints, convParam.ConvCameraParams);
     worldPoints = pointsToWorld(convParam.ConvCameraParams, R, T, [x y]);
     xTol=0; yTol=0;
