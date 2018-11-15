@@ -1,5 +1,23 @@
-%Function sends the appropriate functions to robot studio to move a block
-%from one BP to another
+%SM_BP2BP adds the appropriate commands to the send queue to move a
+%block from a table BP to another BP.
+%
+%X1, Y1 indicate the position of the block on the table
+%X2, Y2 indicate the position to move the block to on the table
+%
+%The order of commands is:
+%1. Move quickly to position above block to be moved (high enough to be clear of all collisions)
+%2. Turn on the vacuum pump
+%3. Move slowly down to the block position
+%4. Turn on vacuum solenoid
+%5. Move quickly back up to clearance height 
+%6. Move quickly to position above new BP at the same height
+%7. Move slowly down to table
+%8. Turn off vacuum solenoid
+%9. Move back up to clearance height
+%10. Turn off the vacuum pump
+%
+%The clearance height is 6 times the block height.
+
 function SM_BP2BP(X1, Y1, X2, Y2)
     global queue;
     global OG;
@@ -10,11 +28,6 @@ function SM_BP2BP(X1, Y1, X2, Y2)
     block_height = 5;
     move_height = table_height + block_height * 6;
     grip_height = table_height + block_height;
-    
-    
-    %first avoid collision with table
-    %WIP
-    %WIP
     
     %strcat
     [letter,number] = Coordinates2BP(X2,Y2);
