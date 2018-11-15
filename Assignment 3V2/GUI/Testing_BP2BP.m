@@ -28,7 +28,7 @@ function Testing_BP2BP(GuiHandle)
     set(handles.LAAnglevalue,'string', stringSplit(3));
     
     % Move using SM BP2BP modified so it will pause and move away
-    SMTESTING_BP2BP(X1, Y1, X2, Y2, GuiHandle);
+    SMTESTING_BP2BP(X1, Y1, rot, X2, Y2, GuiHandle);
 %     findTableBlockIndex(letter, number);
     BP2BP_updateBlocklist(number, letter, X2, Y2);
     

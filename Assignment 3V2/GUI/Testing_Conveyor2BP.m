@@ -31,7 +31,7 @@ function Testing_Conveyor2BP(GuiHandle)
     set(handles.LAAnglevalue,'string', stringSplit(3));
     
     % Move using SM Conveyor2BP modified so it will pause and move away
-    SMTESTING_Conveyor2BP(X1, Y1, X2, Y2, GuiHandle);
+    SMTESTING_Conveyor2BP(X1, Y1, rot, X2, Y2, GuiHandle);
     Conveyor2BP_updateBlocklist(number, letter, X2, Y2);
     
     % updating info to all lists  

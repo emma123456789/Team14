@@ -1,6 +1,6 @@
 %Function sends the appropriate functions to robot studio to move a block
 %from one BP to another
-function SMTESTING_Conveyor2BP(X1, Y1, X2, Y2, GuiHandle)
+function SMTESTING_Conveyor2BP(X1, Y1, rot, X2, Y2, GuiHandle)
     global queue;
     fast = 'v500';
     regular = 'v100';
@@ -56,7 +56,9 @@ function SMTESTING_Conveyor2BP(X1, Y1, X2, Y2, GuiHandle)
     robot_pose_z = str2double(robot_pose_z)-5;
     robot_pose_z = num2str(robot_pose_z);
 	robot_pose_rot = get(handles.Joint6Status,'String');
-	
+    robot_pose_rot = str2double(rot) - str2double(robot_pose_rot);
+    robot_pose_rot = num2str(robot_pose_rot);
+    
     set(handles.RPXvalue,'string', robot_pose_x);
     set(handles.RPYvalue,'string', robot_pose_y);
     set(handles.RPZvalue,'string', robot_pose_z);
