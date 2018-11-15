@@ -22,7 +22,7 @@ function varargout = GUI(varargin)
 %
     % See also: GUIDE, GUIDATA, GUIHANDLES
      % Edit the above text to modify the response to help GUI
-     % Last Modified by GUIDE v2.5 15-Nov-2018 21:11:57
+     % Last Modified by GUIDE v2.5 16-Nov-2018 01:18:05
      % Begin initialization code - DO NOT EDIT
     gui_Singleton = 1;
     gui_State = struct('gui_Name',       mfilename, ...
@@ -2905,26 +2905,44 @@ function fillTableButton_Callback(hObject, eventdata, handles)
 % hObject    handle to fillTableButton (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
-%     global tableBlockData;
-%     global fillTableX;
-%     global fillTableY;
-%     global gameboardX;
-%     global gameboardY;
-%     global deckNum;
-%     global gbNum;
-%     global gameboardNumber;
-%     global gameboardLetter;
-%     global BP2BP_index;
-%     
-%     CM_fillTable;
-%     if(~isempty(deckNum)&&~isempty(gbNum))
-%         for i7 = 1:min(deckNum,gbNum)
-%             SM_BP2BP(fillTableX(i7),fillTableY(i7),gameboardX(i7),gameboardY(i7));
-%             BP2BP_index = 1;
-%             BP2BP_updateBlocklist(gameboardNumber, gameboardLetter, gameboardX(i7), gameboardY(i7));
-%             set(handles.TableBlocksListbox, 'String', tableBlockData);
-%         end
-%     end
+    global tableBlockData;
+    global fillTableX;
+    global fillTableY;
+    global gameboardX;
+    global gameboardY;
+    global deckNum;
+    global gbNum;
+    global gameboardNumber;
+    global gameboardLetter;
+    global BP2BP_index;
+    global BP2BP_indexList;
+%     global ftBlockInfo;
+    global fTableBlockData;
+    
+    CM_fillTable;
+
+    if(deckNum ~= 0)
+        for i7 = 1:min(deckNum,gbNum)
+            % Check if BP is already in use
+            occupied = checkBPOccupied(gameboardLetter(i7), gameboardNumber(i7));
+            if (occupied == false)
+                SM_BP2BP(fillTableX(i7),fillTableY(i7),gameboardX(i7),gameboardY(i7));
+                BP2BP_index = BP2BP_indexList(i7)-(i7-1);
+                BP2BP_updateBlocklist(gameboardNumber(i7), gameboardLetter(i7), gameboardX(i7), gameboardY(i7));
+                % updating info to all lists  
+                set(handles.TableBlocksListbox, 'String', tableBlockData);    
+                set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+                set(handles.BPtoBPBlockList, 'String', tableBlockData);
+                set(handles.RotateBlockBlockList, 'String', tableBlockData);
+                fTableBlockData(1) = [];
+                set(handles.fillTableListbox,'String',fTableBlockData);
+            elseif (occupied == true)
+                f = msgbox('BP is occupied');
+            end
+        end
+    else
+        disp('No more blocks on both decks!');
+    end
 end
 
 
@@ -3432,7 +3450,7 @@ function CorrectButton_Callback(hObject, eventdata, handles)
     
     tableList = string(blockInfo);
     
-    % The correct button will check which block data the user wants to add
+    % The correct button will check which block data the user wants to addbutton
     % to and then adds whatever they inputed on the gui
     switch cameraType
 		case 'Table'
@@ -5456,65 +5474,22 @@ end
 
 
 function fillTableInput_Callback(hObject, eventdata, handles)
-% hObject    handle to fillTableInput (see GCBO)
+% hObject    handle to  (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 
-% Hints: get(hObject,'String') returns contents of fillTableInput as text
-%        str2double(get(hObject,'String')) returns contents of fillTableInput as a double
-    global tableBlockData;
-    global fillTableX;
-    global fillTableY;
-    global gameboardX;
-    global gameboardY;
-    global deckNum;
-    global gbNum;
-    global gameboardNumber;
-    global gameboardLetter;
-    global BP2BP_index;
-    global BP2BP_indexList;
+% Hints: get(hObject,'String') returns contents of  as text
+%        str2double(get(hObject,'String')) returns contents of  as a double
+
     global ftBlockInfo;
     global fTableBlockData;
     
     ftBlockInfo = get(hObject,'String');
-    
-    fTableList = string(ftBlockInfo);
-    if isempty(fTableBlockData)
-        fTableBlockData = fTableList;
-    else
-        fTableBlockData = [fTableBlockData; fTableList];
-    end
-    set(handles.fillTableListbox, 'String', fTableBlockData);
-    CM_fillTable;
-
-    if(deckNum ~= 0)
-        for i7 = 1:min(deckNum,gbNum)
-            % Check if BP is already in use
-            occupied = checkBPOccupied(gameboardLetter, gameboardNumber);
-            if (occupied == false)
-                SM_BP2BP(fillTableX(i7),fillTableY(i7),gameboardX(i7),gameboardY(i7));
-                BP2BP_index = BP2BP_indexList(i7)-(i7-1);
-                BP2BP_updateBlocklist(gameboardNumber, gameboardLetter, gameboardX(i7), gameboardY(i7));
-                % updating info to all lists  
-                set(handles.TableBlocksListbox, 'String', tableBlockData);    
-                set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
-                set(handles.BPtoBPBlockList, 'String', tableBlockData);
-                set(handles.RotateBlockBlockList, 'String', tableBlockData);
-                fTableBlockData(1) = [];
-                set(handles.fillTableListbox,'String',fTableBlockData);
-                break;
-            elseif (occupied == true)
-                f = msgbox('BP is occupied');
-            end
-        end
-    else
-        disp('No more blocks on both decks!');
-    end
 end
 
 % --- Executes during object creation, after setting all properties.
 function fillTableInput_CreateFcn(hObject, eventdata, handles)
-% hObject    handle to fillTableInput (see GCBO)
+% hObject    handle to  (see GCBO)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    empty - handles not created until after all CreateFcns called
 
@@ -5591,3 +5566,25 @@ else
     testflag=1;
 end
 end
+
+
+% --- Executes on button press in addButton.
+function addButton_Callback(hObject, eventdata, handles)
+% hObject    handle to addButton (see GCBO)
+% eventdata  reserved - to be defined in a future version of MATLAB
+% handles    structure with handles and user data (see GUIDATA)
+    
+    global ftBlockInfo;
+    global fTableBlockData;
+    
+    fTableList = string(ftBlockInfo);
+    if isempty(fTableBlockData)
+        fTableBlockData = fTableList;
+    else
+        fTableBlockData = [fTableBlockData; fTableList];
+    end
+    set(handles.fillTableListbox, 'String', fTableBlockData);
+
+end
+
+

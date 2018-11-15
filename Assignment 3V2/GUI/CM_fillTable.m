@@ -8,7 +8,7 @@
 function CM_fillTable()
     global fTableBlockData;
     global tableBlockData;
-    global BP2BP_index;
+%     global BP2BP_index;
     global fillTableX;
     global fillTableY;
     global gameboardX;
@@ -21,6 +21,11 @@ function CM_fillTable()
     fillTableX = [];
     fillTableY = [];
     BP2BP_indexList = [];
+    gameboardLetter = strings;
+    gameboardNumber = [];
+    gameboardX = [];
+    gameboardY = [];
+    
     len = length(tableBlockData);
     
     for i5 = 1:len
@@ -39,9 +44,9 @@ function CM_fillTable()
     gbNum = length(fTableBlockData);
     for i6 = 1:gbNum
         fString = string(fTableBlockData(i6));
-        gameboardLetter = fString{1}(1);
-        gameboardNumber = str2double(fString{1}(2));
-        [gameboardX(i6),gameboardY(i6)] = gameboardConversion(gameboardNumber,gameboardLetter);
+        gameboardLetter(i6) = fString{1}(1);
+        gameboardNumber(i6) = str2double(fString{1}(2));
+        [gameboardX(i6),gameboardY(i6)] = gameboardConversion(gameboardNumber(i6),gameboardLetter(i6));
     end
 
     
