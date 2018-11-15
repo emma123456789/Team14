@@ -38,54 +38,62 @@ function CM_SortDeck(GuiHandle)
 		disp('Invalid Input');
 	else
 		while ~isempty(p1_moveInd)	% Sort the players' decks
-			% Move the first block on player 1's deck that needs to be 
-			% sorted to an empty BP
-			strSplit = strsplit(tableBlockData_copy(p1_moveInd(1)));
-			p1_x1 = str2double(strSplit(1));
-			p1_y1 = str2double(strSplit(2));
-			p1_BP = strSplit(5);
+            
+             % Check if BP is already in use
+            occupied = checkBPOccupied('P', 9);
+            if (occupied == false)
+                % Move the first block on player 1's deck that needs to be 
+                % sorted to an empty BP
+                strSplit = strsplit(tableBlockData_copy(p1_moveInd(1)));
+                p1_x1 = str2double(strSplit(1));
+                p1_y1 = str2double(strSplit(2));
+                p1_BP = strSplit(5);
 
-			[p1_x2,p1_y2] = gameboardConversion(9,'P');		% I'll change this position when the OG is defined
-			SM_BP2BP(p1_x1, p1_y1, p1_x2, p1_y2);
-			
-			% Update block list
-% 			[letter_1,number_1] = Coordinates2BP(p1_x1,p1_y1);
-			letter_1 = p1_BP{1}(1);
-			number_1 = str2double(p1_BP{1}(2));
-			findTableBlockIndex(letter_1, number_1);
-			BP2BP_updateBlocklist(9,'P', p1_x2, p1_y2);
-			set(handles.TableBlocksListbox, 'String', tableBlockData);
-			
-			% Move the first block on player 2's deck that needs to be
-			% sorted to the empty space on player 1's deck
-			strSplit = strsplit(tableBlockData_copy(p2_moveInd(1)));
-			p2_x1 = str2double(strSplit(1));
-			p2_y1 = str2double(strSplit(2));
-			p2_BP = strSplit(5);
-			p2_x2 = p1_x1;
-			p2_y2 = p1_y1;
-			SM_BP2BP(p2_x1, p2_y1, p2_x2, p2_y2);
-			
-			% Update block list
-% 			[letter_2,number_2] = Coordinates2BP(p2_x1,p2_y1);
-			letter_2 = p2_BP{1}(1);
-			number_2 = str2double(p2_BP{1}(2));
-			findTableBlockIndex(letter_2, number_2);
-			BP2BP_updateBlocklist(number_1,letter_1, p2_x2, p2_y2);
-			set(handles.TableBlocksListbox, 'String', tableBlockData);
-			
-			% Move the block that was removed from player 1's deck to the
-			% empty space on player 2's deck
-			SM_BP2BP(p1_x2, p1_y2, p2_x1, p2_y1);
+                [p1_x2,p1_y2] = gameboardConversion(9,'P');		% I'll change this position when the OG is defined
+                SM_BP2BP(p1_x1, p1_y1, p1_x2, p1_y2);
 
-			% Update block list
-			findTableBlockIndex('P',9);
-			BP2BP_updateBlocklist(number_2,letter_2, p2_x1, p2_y1);
-			set(handles.TableBlocksListbox, 'String', tableBlockData);
-			
-			% Update the to-do list
-			p1_moveInd(1) = [];
-			p2_moveInd(1) = [];
+                % Update block list
+    % 			[letter_1,number_1] = Coordinates2BP(p1_x1,p1_y1);
+                letter_1 = p1_BP{1}(1);
+                number_1 = str2double(p1_BP{1}(2));
+                findTableBlockIndex(letter_1, number_1);
+                BP2BP_updateBlocklist(9,'P', p1_x2, p1_y2);
+                set(handles.TableBlocksListbox, 'String', tableBlockData);
+
+                % Move the first block on player 2's deck that needs to be
+                % sorted to the empty space on player 1's deck
+                strSplit = strsplit(tableBlockData_copy(p2_moveInd(1)));
+                p2_x1 = str2double(strSplit(1));
+                p2_y1 = str2double(strSplit(2));
+                p2_BP = strSplit(5);
+                p2_x2 = p1_x1;
+                p2_y2 = p1_y1;
+                SM_BP2BP(p2_x1, p2_y1, p2_x2, p2_y2);
+
+                % Update block list
+    % 			[letter_2,number_2] = Coordinates2BP(p2_x1,p2_y1);
+                letter_2 = p2_BP{1}(1);
+                number_2 = str2double(p2_BP{1}(2));
+                findTableBlockIndex(letter_2, number_2);
+                BP2BP_updateBlocklist(number_1,letter_1, p2_x2, p2_y2);
+                set(handles.TableBlocksListbox, 'String', tableBlockData);
+
+                % Move the block that was removed from player 1's deck to the
+                % empty space on player 2's deck
+                SM_BP2BP(p1_x2, p1_y2, p2_x1, p2_y1);
+
+                % Update block list
+                findTableBlockIndex('P',9);
+                BP2BP_updateBlocklist(number_2,letter_2, p2_x1, p2_y1);
+                set(handles.TableBlocksListbox, 'String', tableBlockData);
+
+                % Update the to-do list
+                p1_moveInd(1) = [];
+                p2_moveInd(1) = [];
+            elseif (occupied == true)
+                f = msgbox('BP is occupied');
+                break;
+            end
 		end	
     
 		% updating info to all lists  
