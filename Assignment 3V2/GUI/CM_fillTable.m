@@ -34,14 +34,7 @@ function CM_fillTable()
         fString = string(fTableBlockData(i6));
         gameboardLetter = fString{1}(1);
         gameboardNumber = str2double(fString{1}(2));
-        
-%         % Check if BP is already in use
-%         occupied = checkBPOccupied(gameboardLetter, gameboardNumber);
-%         if (occupied == false)
-            [gameboardX(i6),gameboardY(i6)] = gameboardConversion(gameboardNumber,gameboardLetter);
-%         elseif (occupied == true)
-%             f = msgbox('BP is occupied');
-%         end
+        [gameboardX(i6),gameboardY(i6)] = gameboardConversion(gameboardNumber,gameboardLetter);
     end
 
     

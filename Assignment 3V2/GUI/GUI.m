@@ -2829,18 +2829,26 @@ function fillDeck1Button_Callback(hObject, eventdata, handles)
             l1_x1(i3) = letterBlocks(1,i3);
             l1_y1(i3) = letterBlocks(2,i3);
             l1_rot(i3) = letterBlocks(3,i3);
-            [l1_x2(i3),l1_y2(i3)] = gameboardConversion(i3,'P');
-            Conveyor2BP_index = letterIndex(i3)-(i3-1);
-            SM_FillDeckConveyor2BP(l1_x1(i3), l1_y1(i3), l1_x2(i3), l1_y2(i3), l1_rot(i3));
-            Conveyor2BP_updateBlocklist(i3, 'P', l1_x2(i3), l1_y2(i3));
-            set(handles.TableBlocksListbox, 'String', tableBlockData);
-            set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
-            set(handles.BPtoBPBlockList, 'String', tableBlockData);
-            set(handles.RotateBlockBlockList, 'String', tableBlockData);
-            set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
-            set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
+            
+            % Check if BP is already in use
+            occupied = checkBPOccupied('P', i3);
+            if (occupied == false)
+                [l1_x2(i3),l1_y2(i3)] = gameboardConversion(i3,'P');
+                Conveyor2BP_index = letterIndex(i3)-(i3-1);
+                SM_FillDeckConveyor2BP(l1_x1(i3), l1_y1(i3), l1_x2(i3), l1_y2(i3), l1_rot(i3));
+                Conveyor2BP_updateBlocklist(i3, 'P', l1_x2(i3), l1_y2(i3));
+                set(handles.TableBlocksListbox, 'String', tableBlockData);
+                set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+                set(handles.BPtoBPBlockList, 'String', tableBlockData);
+                set(handles.RotateBlockBlockList, 'String', tableBlockData);
+                set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
+                set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
+            elseif (occupied == true)
+                f = msgbox('BP is occupied');
+            end
         end
     end
+    
 end
 
 % --- Executes on button press in clearDeck1Button.
@@ -5345,16 +5353,23 @@ function fillDeck2Button_Callback(hObject, eventdata, handles)
             s1_x1(i2) = shapeBlocks(1,i2);
             s1_y1(i2) = shapeBlocks(2,i2);
             s1_rot(i2) = shapeBlocks(3,i2);
-            [s1_x2(i2),s1_y2(i2)] = gameboardConversion(i2,'Q');
-            Conveyor2BP_index = shapeIndex(i2)-(i2-1);
-            SM_FillDeckConveyor2BP(s1_x1(i2), s1_y1(i2), s1_x2(i2), s1_y2(i2), s1_rot(i2));
-            Conveyor2BP_updateBlocklist(i2, 'Q', s1_x2(i2), s1_y2(i2));
-            set(handles.TableBlocksListbox, 'String', tableBlockData);
-            set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
-            set(handles.BPtoBPBlockList, 'String', tableBlockData);
-            set(handles.RotateBlockBlockList, 'String', tableBlockData);
-            set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
-            set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
+            
+            % Check if BP is already in use
+            occupied = checkBPOccupied('P', i3);
+            if (occupied == false)
+                [s1_x2(i2),s1_y2(i2)] = gameboardConversion(i2,'Q');
+                Conveyor2BP_index = shapeIndex(i2)-(i2-1);
+                SM_FillDeckConveyor2BP(s1_x1(i2), s1_y1(i2), s1_x2(i2), s1_y2(i2), s1_rot(i2));
+                Conveyor2BP_updateBlocklist(i2, 'Q', s1_x2(i2), s1_y2(i2));
+                set(handles.TableBlocksListbox, 'String', tableBlockData);
+                set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+                set(handles.BPtoBPBlockList, 'String', tableBlockData);
+                set(handles.RotateBlockBlockList, 'String', tableBlockData);
+                set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
+                set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
+            elseif (occupied == true)
+                f = msgbox('BP is occupied');
+            end
         end
     end
 end
@@ -5461,17 +5476,22 @@ function fillTableInput_Callback(hObject, eventdata, handles)
 
     if(deckNum ~= 0)
         for i7 = 1:min(deckNum,gbNum)
-            SM_BP2BP(fillTableX(i7),fillTableY(i7),gameboardX(i7),gameboardY(i7));
-            BP2BP_index = 1;
-            BP2BP_updateBlocklist(gameboardNumber, gameboardLetter, gameboardX(i7), gameboardY(i7));
-            set(handles.TableBlocksListbox, 'String', tableBlockData);
-            fTableBlockData(1) = [];
-            set(handles.fillTableListbox,'String',fTableBlockData);
+            % Check if BP is already in use
+            occupied = checkBPOccupied(gameboardLetter, gameboardNumber);
+            if (occupied == false)
+                SM_BP2BP(fillTableX(i7),fillTableY(i7),gameboardX(i7),gameboardY(i7));
+                BP2BP_updateBlocklist(gameboardNumber, gameboardLetter, gameboardX(i7), gameboardY(i7));
+                set(handles.TableBlocksListbox, 'String', tableBlockData);
+                fTableBlockData(1) = [];
+                set(handles.fillTableListbox,'String',fTableBlockData);
+                break;
+            elseif (occupied == true)
+                f = msgbox('BP is occupied');
+            end
         end
     else
         disp('No more blocks on both decks!');
     end
-    
 end
 
 % --- Executes during object creation, after setting all properties.
