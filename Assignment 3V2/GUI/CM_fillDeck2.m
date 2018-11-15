@@ -1,4 +1,8 @@
-%% Player2's deck = Shapes
+% This function finds the x, y and rotation of the blocks to be filled 
+% onto player 2's deck. Then, the simple move functions will be called 
+% on the GUI to move the blocks.
+% Requirements: Fill one player's deck using blocks contained in a box on 
+% the conveyor.
 
 function CM_fillDeck2()
     global conveyorBlockData;

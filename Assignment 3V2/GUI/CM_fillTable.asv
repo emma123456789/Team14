@@ -1,9 +1,5 @@
-% This function calls the simple move functions and move the block from 
-% both decks to a list of locations as specified in a 9x9 matrix.
-% Requirements: Deploy a set of blocks to the boards as specified in a 
-% 9x9 matrix, use blocks stored in both player's decks. The type of
-% block doesn't matter. There may be blocks already placed neatly on 
-% BPs.
+% This function calls the simple move functions and move the block 
+% from both players' decks to 
 
 function CM_fillTable()
     global fTableBlockData;

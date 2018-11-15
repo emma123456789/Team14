@@ -1,5 +1,5 @@
-% This function returns the location of the BP in the occupancy grid
-% and check if the OG location is occupied.
+% This function links the BP location to the corresponding cell in
+
 
  function [OGflg,row,column] = CheckOG(BP)
      global OG;

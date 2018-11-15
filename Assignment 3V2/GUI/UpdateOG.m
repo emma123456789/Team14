@@ -1,11 +1,5 @@
-% % %update OG
-%  global OG;
-%  OG = zeros(9,11);
-% % row = 1;
-% % column=1;
-% BP='A1';
-% 
-% [newOG] = UpdateOG1(BP);
+% This function updates the occupancy grid after each time the simple
+% move functions are called.
 
 function [newOG] = UpdateOG(BP)
 

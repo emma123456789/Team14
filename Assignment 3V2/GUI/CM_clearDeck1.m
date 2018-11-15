@@ -1,3 +1,7 @@
+% This function calls the simple move functions and move player 1's 
+% deck onto the conveyor.
+% Requirements: Discard one player's deck onto the conveyor.
+
 function CM_clearDeck1()
 
     global boxX;
