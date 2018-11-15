@@ -5470,10 +5470,10 @@ function fillTableInput_Callback(hObject, eventdata, handles)
     global gameboardNumber;
     global gameboardLetter;
     global BP2BP_index;
+    global BP2BP_indexList;
     global ftBlockInfo;
     global fTableBlockData;
     
-        
     ftBlockInfo = get(hObject,'String');
     
     fTableList = string(ftBlockInfo);
@@ -5491,6 +5491,7 @@ function fillTableInput_Callback(hObject, eventdata, handles)
             occupied = checkBPOccupied(gameboardLetter, gameboardNumber);
             if (occupied == false)
                 SM_BP2BP(fillTableX(i7),fillTableY(i7),gameboardX(i7),gameboardY(i7));
+                BP2BP_index = BP2BP_indexList(i7)-(i7-1);
                 BP2BP_updateBlocklist(gameboardNumber, gameboardLetter, gameboardX(i7), gameboardY(i7));
                 % updating info to all lists  
                 set(handles.TableBlocksListbox, 'String', tableBlockData);    

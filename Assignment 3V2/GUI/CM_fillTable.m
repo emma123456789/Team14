@@ -12,8 +12,10 @@ function CM_fillTable()
     global gbNum;
     global gameboardLetter;
     global gameboardNumber;
+    global BP2BP_indexList;
     fillTableX = [];
     fillTableY = [];
+    BP2BP_indexList = [];
     len = length(tableBlockData);
     
     for i5 = 1:len
@@ -23,7 +25,7 @@ function CM_fillTable()
 		if (strcmp(BP,'P1')||strcmp(BP,'P2')||strcmp(BP,'P3')||strcmp(BP,'P4')||strcmp(BP,'P5')||strcmp(BP,'P6')||...
             strcmp(BP,'Q1')||strcmp(BP,'Q2')||strcmp(BP,'Q3')||strcmp(BP,'Q4')||strcmp(BP,'Q5')||strcmp(BP,'Q6'))
 %             fillTableIndex(end+1) = i5;
-            BP2BP_index = i5;
+            BP2BP_indexList(end+1) = i5;
             fillTableX(end+1) = str2double(stringSplit(1));
             fillTableY(end+1) = str2double(stringSplit(2));
         end
