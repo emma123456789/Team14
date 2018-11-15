@@ -475,6 +475,8 @@ end
         src1 = getselectedsource(vid);
         src1.ExposureMode = 'manual';
         src1.Exposure = -4;
+	src1.Contrast = 57;
+	src1.Saturation = 78;
         preview(vid2,hImage2);
      end
      
@@ -2302,8 +2304,8 @@ function getBox_Callback(hObject, eventdata, handles)
   
     bw1 = ~bwareaopen(~bw,1000); 
     bw2 = ~bwareaopen(~bw,152000);
-    bw3 = medfilt2(bw2,[10 10]);
-    blackIndex = find(bw3==0);
+%     bw3 = medfilt2(bw2,[10 10]);
+    blackIndex = find(bw2==0);
     box2=rgb2gray(box);
     
     box2(blackIndex) =255;
@@ -2574,6 +2576,10 @@ end
 function [trueAngles, centroids, letter, finalTextBefore] = useBlocks(image)
 
     images = imsharpen(image);
+    images(:,1:410,:)=255;
+     images(:,1185:1600,:)=255;
+     images(790:1200,:,:)=255;
+     images(1:278,:,:)=255;
     imHSV = rgb2hsv(images);
     
     imMask = imHSV(:,:,2)<0.25 & imHSV(:,:,3)>0.68;
