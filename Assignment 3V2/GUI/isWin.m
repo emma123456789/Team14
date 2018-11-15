@@ -1,3 +1,5 @@
+% This function returns win: true or false
+% Determines if the player of input turn has won or not in tic tac toe
 function [ win ] = isWin( board, row, col, turn )
     sequence = 0;
     for i=1:row

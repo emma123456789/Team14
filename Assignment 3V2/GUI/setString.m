@@ -1,4 +1,5 @@
-% setString will update the gui tic tac toe grid
+% setString will update the gui tic tac toe grid and is called in the AI
+% player 1 callback button
 function setString(plrmark, i, j, GuiHandle)
     handles = guidata(GuiHandle);
     if (i == 1)

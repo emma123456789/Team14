@@ -1,5 +1,6 @@
-% Testing function for BP2BP
-
+% Testing function for BP2BP: it compares the expected results with the
+% robot pose to verify that BP2BP move works. It will display a success or
+% failure on the GUI.
 function Testing_BP2BP(GuiHandle) 
     global tableBlockData;
 	global BP2BP_index;

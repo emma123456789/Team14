@@ -1,5 +1,5 @@
-%Function sends the appropriate functions to robot studio to move a block
-%from one BP to another
+% Function moves robot move away from camera by sending a string to
+% robotstudio
 function Move2Home()
     global queue;
     fast = 'v500';

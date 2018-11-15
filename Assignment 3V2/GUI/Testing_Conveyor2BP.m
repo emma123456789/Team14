@@ -1,4 +1,6 @@
-% Testing function for Conveyor2BP
+% Testing function for Conveyor2BP: it compares the expected results with the
+% robot pose to verify that Conveyor2BP move works. It will display a success or
+% failure on the GUI.
 
 function Testing_Conveyor2BP(GuiHandle) 
     global tableBlockData;

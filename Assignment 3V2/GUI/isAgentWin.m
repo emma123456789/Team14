@@ -1,3 +1,8 @@
+% Returns the gamestate of who will win in tic tac toe
+% gameState = 10: player wins
+% gameState = -10: other player  wins
+% gameState = 0: there is a draw
+% gameState = 5: no one wins
 function [ gameState ] = isAgentWin( board, row, col, agentTurn )
     win = isWin(board, row, col , agentTurn);
     if win == true

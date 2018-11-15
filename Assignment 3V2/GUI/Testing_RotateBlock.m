@@ -1,4 +1,6 @@
-% Testing function for RotateBlock
+% Testing function for RotateBlock: it compares the expected results with the
+% robot pose to verify that RotateBlock move works. It will display a success or
+% failure on the GUI.
 
 function Testing_RotateBlock(GuiHandle) 
     global tableBlockData;
