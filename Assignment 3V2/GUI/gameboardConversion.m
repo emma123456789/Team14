@@ -1,8 +1,13 @@
+% Given the BP, this function will convert it to x and y coordinates
 function [x_coordinate,y_coordinate] = gameboardConversion(x,y)
+	% Define the constant values
 	half_block_length = 36/2;
 	base = 175;
 	
+	% Convert the row value to x coordinate
 	x_coordinate = base + (half_block_length * (2*x-1));
+
+	% Convert the column letter to y coordinate
 	y = convertStringsToChars(y);
 	switch y
 		case 'A'
