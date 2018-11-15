@@ -5579,11 +5579,11 @@ function cameraFeedButton_Callback(hObject, eventdata, handles)
 % eventdata  reserved - to be defined in a future version of MATLAB
 % handles    structure with handles and user data (see GUIDATA)
 global testflag;
-
+global g_handles;
 [image1,image2 ]= DisplayImage(testflag); 
-axes(handles.axes1);  
+axes(g_handles.TableCamera);
 imshow(image1); hold on; 
-axes(handles.axes2);
+axes(g_handles.ConveyorCamera);
 imshow(image2); hold on;
 if testflag <17
 testflag =testflag +1;
