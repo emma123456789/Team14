@@ -2397,6 +2397,37 @@ function getBox_Callback(hObject, eventdata, handles)
     
     else
         disp('No Blocks');
+	
+	% detection of box
+    bOrientation = regionprops('table',bw2,'Centroid','Image','Orientation');
+    N= length(bOrientation.Orientation);
+     for i= 1:N 
+      if   (length(bOrientation.Image{i})>200)
+     index=i;
+      end
+     end
+    plot(bOrientation.Centroid(index,1),bOrientation.Centroid(index,2),'*');
+    text(bOrientation.Centroid(index,1),bOrientation.Centroid(index,2),num2str(bOrientation.Orientation(index)),'Color','red','FontSize',20);
+    contour(bw2,'r');
+    
+    %get centroid for box
+    x=bOrientation.Centroid(index,1);
+    y=bOrientation.Centroid(index,2);
+    
+    x = round(x);
+    y = round(y);
+    
+    [R, T] = extrinsics(convImagePoints.imagePoints, convWorldPoints.worldPoints, convParam.ConvCameraParams);
+    worldPoints = pointsToWorld(convParam.ConvCameraParams, R, T, [x y]);
+    xTol=0; yTol=0;
+    X = worldPoints(end,1)+xTol;
+    Y = worldPoints(end,2)+yTol;
+    x = round(X); 
+    y = round(Y);
+    BoxX = x;
+    BoxY = y;
+    a = sprintf('%.0f %.0f',x,y);
+    Boxcentrod = a;
     end
       
        
