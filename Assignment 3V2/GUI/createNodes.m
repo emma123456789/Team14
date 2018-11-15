@@ -1,3 +1,4 @@
+% Create nodes for BP
 function [G, pPlot] = createNodes()
     s = [];
     t = [];
