@@ -2922,18 +2922,24 @@ function ConveyortoBPButton1_Callback(hObject, eventdata, handles)
     
 	x1 = conveyor2BP_blocklist(1);
     y1 = conveyor2BP_blocklist(2);
-	[x2,y2] = gameboardConversion(conveyor2BP_number,conveyor2BP_letter);
-
-	SM_Conveyor2BP(x1,y1,x2,y2);
-    Conveyor2BP_updateBlocklist(conveyor2BP_number,conveyor2BP_letter, x2, y2);
     
-    % updating info to all lists  
-    set(handles.TableBlocksListbox, 'String', tableBlockData);
-    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
-    set(handles.BPtoBPBlockList, 'String', tableBlockData);
-    set(handles.RotateBlockBlockList, 'String', tableBlockData);
-    set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
-    set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
+    % Check if BP is already in use
+    occupied = checkBPOccupied(conveyor2BP_letter, conveyor2BP_number);
+    if (occupied == false)
+        [x2,y2] = gameboardConversion(conveyor2BP_number,conveyor2BP_letter);
+        SM_Conveyor2BP(x1,y1,x2,y2);
+        Conveyor2BP_updateBlocklist(conveyor2BP_number,conveyor2BP_letter, x2, y2);
+
+        % updating info to all lists  
+        set(handles.TableBlocksListbox, 'String', tableBlockData);
+        set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+        set(handles.BPtoBPBlockList, 'String', tableBlockData);
+        set(handles.RotateBlockBlockList, 'String', tableBlockData);
+        set(handles.ConveyortoBPBlockList, 'String', conveyorBlockData);
+        set(handles.ConveyorBlocksListbox, 'String', conveyorBlockData);
+    elseif (occupied == true)
+        f = msgbox('BP is occupied');
+    end
     
 end
 
@@ -5177,19 +5183,23 @@ function BPtoBPButton1_Callback(hObject, eventdata, handles)
     global tableBlockData;
 	x1 = BP2BP_blocklist(1);
     y1 = BP2BP_blocklist(2);
-	[x2,y2] = gameboardConversion(BP2BP_number,BP2BP_letter);
-
-	SM_BP2BP(x1,y1,x2,y2);
-    BP2BP_updateBlocklist(BP2BP_number,BP2BP_letter, x2, y2);
     
+        % Check if BP is already in use
+    occupied = checkBPOccupied(BP2BP_letter, BP2BP_number);
+    if (occupied == false)
+        [x2,y2] = gameboardConversion(BP2BP_number,BP2BP_letter);
+        SM_BP2BP(x1,y1,x2,y2);
+        BP2BP_updateBlocklist(BP2BP_number,BP2BP_letter, x2, y2);
+        
+        % updating info to all lists  
+        set(handles.TableBlocksListbox, 'String', tableBlockData);
+        set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
+        set(handles.BPtoBPBlockList, 'String', tableBlockData);
+        set(handles.RotateBlockBlockList, 'String', tableBlockData);
+    elseif (occupied == true)
+        f = msgbox('BP is occupied');
+    end
     
-    % updating info to all lists  
-    set(handles.TableBlocksListbox, 'String', tableBlockData);
-    set(handles.BPtoConveyorBlockList, 'String', tableBlockData);
-    set(handles.BPtoBPBlockList, 'String', tableBlockData);
-    set(handles.RotateBlockBlockList, 'String', tableBlockData);
-    
-
 end
 
 
