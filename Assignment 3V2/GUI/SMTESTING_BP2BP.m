@@ -53,8 +53,8 @@ function SMTESTING_BP2BP(X1, Y1, rot, X2, Y2, GuiHandle)
 	robot_pose_z = get(handles.ZStatus,'String');
     robot_pose_z = str2double(robot_pose_z)-5;
     robot_pose_z = num2str(robot_pose_z);
-	robot_pose_rot = get(handles.Joint6Status,'String');
-    robot_pose_rot = str2double(rot) - str2double(robot_pose_rot);
+	robot_pose_rot = get(handles.rollStatus,'String');
+    robot_pose_rot = str2double(rot) + str2double(robot_pose_rot);
     robot_pose_rot = num2str(robot_pose_rot);
 	
     set(handles.RPXvalue,'string', robot_pose_x);
